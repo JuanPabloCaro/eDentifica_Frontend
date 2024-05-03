@@ -59,6 +59,26 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
+
+    //para el manejo de database
+    // Navigation Component
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+
+
+    // Lifecycle components
+    implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation ("androidx.lifecycle:lifecycle-common-java8:2.7.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+
+    // Kotlin components
+    implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
+    api ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+    api ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+
+    //para la navegacion
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
