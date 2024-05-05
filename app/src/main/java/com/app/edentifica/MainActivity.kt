@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     //Este es el componente que se encarga de la navegacion y sabe cual es la primera pantalla
                     //This is the component that is in charge of navigation and knows which is the first screen.
-                    AppNavigation(/*repositorio, repositorioPizza*/)
+                    AppNavigation()
                 }
             }
         }

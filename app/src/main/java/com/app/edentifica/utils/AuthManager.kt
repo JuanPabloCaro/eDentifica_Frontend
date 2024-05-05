@@ -30,4 +30,8 @@ class AuthManager {
         }
     }
 
+    fun signOut(){
+        auth.signOut();
+    }
+
 }

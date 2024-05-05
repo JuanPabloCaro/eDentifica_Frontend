@@ -33,7 +33,7 @@ fun AppNavigation(/*repositorio: UsuarioRepositorio,repositorioPizza: PizzaRepos
         }
 
         composable(route=AppScreen.HomeScreen.route){
-            HomeScreen(navController = navController, /*AltaUsuarioViewModel(repositorio)*/)
+            HomeScreen(navController = navController, auth= authManager/*AltaUsuarioViewModel(repositorio)*/)
         }
     }
 

@@ -58,7 +58,6 @@ import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, auth: AuthManager/*loginViewModel: LoginViewModel*/){
     //variables
