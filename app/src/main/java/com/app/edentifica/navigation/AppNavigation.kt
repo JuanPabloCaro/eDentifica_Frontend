@@ -9,6 +9,7 @@ import com.app.edentifica.ui.screens.HomeScreen
 import com.app.edentifica.ui.screens.LoginScreen
 import com.app.edentifica.ui.screens.RegisterScreen
 import com.app.edentifica.utils.AuthManager
+import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun AppNavigation(/*repositorio: UsuarioRepositorio,repositorioPizza: PizzaRepositorio*/) {
@@ -19,21 +20,42 @@ fun AppNavigation(/*repositorio: UsuarioRepositorio,repositorioPizza: PizzaRepos
     //Here I instantiate Auth manager to login to the application as anonymous
     val authManager: AuthManager = AuthManager()
 
-    NavHost(navController = navController, startDestination = AppScreen.LoginScreen.route ){
+    //Aqui recojo al usuario actual que todavia no ha cerrado sesion o que en su defecto es null si no hay usuario con la sesion abierta.
+    //Here I get the current user who is not logged out yet or null if there is no user logged in.
+    val user: FirebaseUser? = authManager.getCurrentUser()
+
+    NavHost(
+        navController = navController,
+        startDestination = if(user==null) AppScreen.LoginScreen.route else AppScreen.HomeScreen.route // here we have a conditional, this redirect to screen start depends of user exist or not
+    ){
         composable(route=AppScreen.LoginScreen.route){
-            LoginScreen(navController = navController, auth= authManager /*LoginViewModel(repositorio)*/)
+            LoginScreen(
+                navController = navController,
+                auth= authManager
+            /*LoginViewModel(repositorio)*/
+            )
         }
 
         composable(route=AppScreen.RegisterScreen.route){
-            RegisterScreen(navController = navController, /*AltaUsuarioViewModel(repositorio)*/)
+            RegisterScreen(
+                navController = navController,
+                authManager
+            /*AltaUsuarioViewModel(repositorio)*/
+            )
         }
 
         composable(route=AppScreen.ForgotPasswordScreen.route){
-            ForgotPasswordScreen(navController = navController, /*AltaUsuarioViewModel(repositorio)*/)
+            ForgotPasswordScreen(
+                navController = navController,
+                /*AltaUsuarioViewModel(repositorio)*/
+                )
         }
 
         composable(route=AppScreen.HomeScreen.route){
-            HomeScreen(navController = navController, auth= authManager/*AltaUsuarioViewModel(repositorio)*/)
+            HomeScreen(navController = navController,
+                auth= authManager
+            /*AltaUsuarioViewModel(repositorio)*/
+            )
         }
     }
 

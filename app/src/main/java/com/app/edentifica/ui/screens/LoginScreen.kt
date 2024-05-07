@@ -3,7 +3,10 @@ package com.app.edentifica.ui.screens
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,9 +16,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.BottomAppBar
@@ -46,6 +54,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -60,9 +70,6 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(navController: NavController, auth: AuthManager/*loginViewModel: LoginViewModel*/){
-    //variables
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -74,15 +81,13 @@ fun LoginScreen(navController: NavController, auth: AuthManager/*loginViewModel:
             }
         }
     ){
-        BodyContent(navController, email, password,scope,auth,context/*loginViewModel*/)
+        BodyContent(navController,scope,auth,context/*loginViewModel*/)
     }
 }
 
 @Composable
 fun BodyContent(
     navController: NavController,
-    email: String,
-    password: String,
     scope: CoroutineScope,
     auth: AuthManager,
     context: Context
@@ -92,7 +97,7 @@ fun BodyContent(
             .fillMaxSize()
             .padding(16.dp)
     ){
-        FormularioLogin(Modifier.align(Alignment.Center), navController, email,password,scope,auth,context/* loginViewModel*/)
+        FormularioLogin(Modifier.align(Alignment.Center), navController,scope,auth,context/* loginViewModel*/)
     }
 }
 
@@ -100,12 +105,14 @@ fun BodyContent(
 fun FormularioLogin(
     align: Modifier,
     navController: NavController,
-    email: String,
-    password: String,
     scope: CoroutineScope,
     auth: AuthManager,
     context: Context
 ) {
+    //variables
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     Column(
         modifier = align.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -126,43 +133,38 @@ fun FormularioLogin(
         Spacer(modifier = Modifier.height(32.dp))
 
         // Campo de email - Field email
+        Spacer(modifier = Modifier.height(30.dp))
         TextField(
-            value = "",
-            onValueChange = { /* No hacer nada por ahora */ },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Email") },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { /* Mover el enfoque al siguiente campo si es necesario */ }
-            )
-        )
+            label = { Text(text = "Email") },
+            value = email,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            onValueChange = { email = it })
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Campo de contraseña - Field password
+        // Campo de password - Field password
+        Spacer(modifier = Modifier.height(10.dp))
         TextField(
-            value = "",
-            onValueChange = { /* No hacer nada por ahora */ },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Password") },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = { /* Ocultar el teclado si es necesario */ }
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+            label = { Text(text = "Password") },
+            value = password,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            onValueChange = { password = it })
 
         // Botón de inicio de sesión - Login Button
-        Button(
-            onClick = { /* Llamar a la función de inicio de sesión con el email y la contraseña */ },
-            modifier = Modifier.align(alignment = androidx.compose.ui.Alignment.CenterHorizontally)
-        ) {
-            Text(text = "Login")
+        Spacer(modifier = Modifier.height(20.dp))
+        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+            Button(
+                onClick = {
+                    scope.launch {
+                        emailPassSignIn(email, password, auth, context, navController)
+                    }
+                },
+                shape = RoundedCornerShape(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text(text = "Login".uppercase())
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -204,26 +206,28 @@ fun FormularioLogin(
         Spacer(modifier = Modifier.height(8.dp))
 
         // Botón de inicio de sesión con Google
-        Button(
-            onClick = { /* Lógica para iniciar sesión con Google */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Sign in with Google")
-        }
+        SocialMediaButton(
+            onClick = {
+                //auth.signInWithGoogle(googleSignInLauncher)
+            },
+            text = "Continue with Google",
+            icon = R.drawable.ic_google,
+            color = Color(0xFFF1F1F1)
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Botón de inicio de sesión como invitado
-        Button(
+        SocialMediaButton(
             onClick = {
-                      scope.launch {
-                          incognitoSignIn(auth,context, navController)
-                      }
+                scope.launch{
+                    incognitoSignIn(auth, context, navController)
+                }
             },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Login as guest")
-        }
+            text = "Continue as a guest",
+            icon = R.drawable.ic_incognito,
+            color = Color(0xFF363636)
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -240,6 +244,28 @@ fun FormularioLogin(
     }
 }
 
+//Function to login with email and password
+private suspend fun emailPassSignIn(email: String, password: String, auth: AuthManager, context: Context, navController: NavController) {
+    if(email.isNotEmpty() && password.isNotEmpty()) {
+        when (val result = auth.signInWithEmailandPassword(email, password)) {
+            is AuthRes.Succes-> {
+                navController.navigate(AppScreen.HomeScreen.route) {
+                    popUpTo(AppScreen.LoginScreen.route) {
+                        inclusive = true
+                    }
+                }
+            }
+
+            is AuthRes.Error -> {
+                Toast.makeText(context, "Error Login: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    } else {
+        Toast.makeText(context, "There are empty fields", Toast.LENGTH_SHORT).show()
+    }
+}
+
+//Function to login how guest
 private suspend fun incognitoSignIn(auth: AuthManager, context: Context, navController: NavController) {
     when(val result = auth.signInAnonymously()){
         is AuthRes.Succes ->{
@@ -251,6 +277,35 @@ private suspend fun incognitoSignIn(auth: AuthManager, context: Context, navCont
         }
         is AuthRes.Error ->{
             Log.d("Error modo invitado","Este error se produce cuando un usuario quiere acceder como invitado en la app")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color, ) {
+    var click by remember { mutableStateOf(false) }
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.padding(start = 40.dp, end = 40.dp).clickable { click = !click },
+        shape = RoundedCornerShape(50),
+        border = BorderStroke(width = 1.dp, color = if(icon == R.drawable.ic_incognito) color else Color.Gray),
+        color = color
+    ) {
+        Row(
+            modifier = Modifier.padding(start = 12.dp, end = 16.dp, top = 12.dp, bottom = 12.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painter = painterResource(id = icon),
+                modifier = Modifier.size(24.dp),
+                contentDescription = text,
+                tint = Color.Unspecified
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "$text", color = if(icon == R.drawable.ic_incognito) Color.White else Color.Black)
+            click = true
         }
     }
 }
