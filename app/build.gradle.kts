@@ -1,3 +1,5 @@
+
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,6 +7,14 @@ plugins {
 }
 
 android {
+//    signingConfigs {
+//        create("debugLog") {
+//            storeFile = file("C:\\Users\\jcaro\\.android\\upload-keystore.jks")
+//            storePassword = "99070602420"
+//            keyAlias = "key0"
+//            keyPassword = "99070602420"
+//        }
+//    }
     namespace = "com.app.edentifica"
     compileSdk = 34
 
@@ -57,6 +67,12 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.gms:play-services-auth:20.6.0")
+
+
+    //COIL
+    implementation("io.coil-kt:coil:1.4.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")

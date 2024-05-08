@@ -2,8 +2,13 @@ package com.app.edentifica.ui.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,26 +23,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,12 +48,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -63,6 +64,8 @@ import com.app.edentifica.R
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.utils.AuthRes
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -74,14 +77,48 @@ fun LoginScreen(navController: NavController, auth: AuthManager/*loginViewModel:
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()) { result ->
+        when(val account = auth.handleSignInResult(GoogleSignIn.getSignedInAccountFromIntent(result.data))) {
+            is AuthRes.Succes-> {
+                val credential = GoogleAuthProvider.getCredential(account?.data?.idToken, null)
+                scope.launch {
+                    val fireUser = auth.signInWithGoogleCredential(credential)
+                    if (fireUser != null){
+                        Toast.makeText(context, "Bienvenid@", Toast.LENGTH_SHORT).show()
+                        navController.navigate(AppScreen.HomeScreen.route){
+                            popUpTo(AppScreen.LoginScreen.route){
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+            }
+            is AuthRes.Error -> {
+                Toast.makeText(context, "Error: ${account.errorMessage}", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                Toast.makeText(context, "Error unknown", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     Scaffold (
         bottomBar = {
             BottomAppBar (){
-                Text(text = "Version 1.0 @Copyrigth 2024 Todos los derechos reservados",fontSize = 12.sp, fontStyle = FontStyle.Italic, color= Color.DarkGray)
+                Text(
+                    text = stringResource(R.string.copyrigth),
+                    fontSize = 12.sp,
+                    fontStyle = FontStyle.Italic,
+                    color= Color.DarkGray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.Center)
+                )
             }
         }
     ){
-        BodyContent(navController,scope,auth,context/*loginViewModel*/)
+        BodyContent(navController,scope,auth,context,googleSignInLauncher/*loginViewModel*/)
     }
 }
 
@@ -90,14 +127,15 @@ fun BodyContent(
     navController: NavController,
     scope: CoroutineScope,
     auth: AuthManager,
-    context: Context
+    context: Context,
+    googleSignInLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ){
-        FormularioLogin(Modifier.align(Alignment.Center), navController,scope,auth,context/* loginViewModel*/)
+        FormularioLogin(Modifier.align(Alignment.Center), navController,scope,auth,context,googleSignInLauncher/* loginViewModel*/)
     }
 }
 
@@ -107,7 +145,8 @@ fun FormularioLogin(
     navController: NavController,
     scope: CoroutineScope,
     auth: AuthManager,
-    context: Context
+    context: Context,
+    googleSignInLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
     //variables
     var email by remember { mutableStateOf("") }
@@ -175,7 +214,13 @@ fun FormularioLogin(
             modifier = Modifier.padding(vertical = 8.dp),
             onClick = {
                 navController.navigate(route = AppScreen.ForgotPasswordScreen.route)
-            }
+            },
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontFamily = FontFamily.Default,
+                textDecoration = TextDecoration.Underline,
+                color = Color.Blue
+            )
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -208,7 +253,7 @@ fun FormularioLogin(
         // Botón de inicio de sesión con Google
         SocialMediaButton(
             onClick = {
-                //auth.signInWithGoogle(googleSignInLauncher)
+                auth.signInWithGoogle(googleSignInLauncher)
             },
             text = "Continue with Google",
             icon = R.drawable.ic_google,
@@ -240,6 +285,12 @@ fun FormularioLogin(
             onClick= {
                 navController.navigate(route = AppScreen.RegisterScreen.route)
             },
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontFamily = FontFamily.Default,
+                textDecoration = TextDecoration.Underline,
+                color = Color.Blue
+            )
         )
     }
 }
@@ -287,13 +338,17 @@ fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color
     var click by remember { mutableStateOf(false) }
     Surface(
         onClick = onClick,
-        modifier = Modifier.padding(start = 40.dp, end = 40.dp).clickable { click = !click },
+        modifier = Modifier
+            .padding(start = 40.dp, end = 40.dp)
+            .clickable { click = !click },
         shape = RoundedCornerShape(50),
         border = BorderStroke(width = 1.dp, color = if(icon == R.drawable.ic_incognito) color else Color.Gray),
         color = color
     ) {
         Row(
-            modifier = Modifier.padding(start = 12.dp, end = 16.dp, top = 12.dp, bottom = 12.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(start = 12.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
