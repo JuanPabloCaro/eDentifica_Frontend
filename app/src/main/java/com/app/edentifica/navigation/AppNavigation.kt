@@ -47,6 +47,7 @@ fun AppNavigation(/*repositorio: UsuarioRepositorio,repositorioPizza: PizzaRepos
         composable(route=AppScreen.ForgotPasswordScreen.route){
             ForgotPasswordScreen(
                 navController = navController,
+                auth = authManager
                 /*AltaUsuarioViewModel(repositorio)*/
                 )
         }

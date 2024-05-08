@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
@@ -51,11 +52,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -77,7 +81,15 @@ fun LoginScreen(navController: NavController, auth: AuthManager/*loginViewModel:
     Scaffold (
         bottomBar = {
             BottomAppBar (){
-                Text(text = "Version 1.0 @Copyrigth 2024 Todos los derechos reservados",fontSize = 12.sp, fontStyle = FontStyle.Italic, color= Color.DarkGray)
+                Text(
+                    text = "Version 1.0 @Copyrigth 2024 Todos los derechos reservados",
+                    fontSize = 12.sp,
+                    fontStyle = FontStyle.Italic,
+                    color= Color.DarkGray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.Center)
+                )
             }
         }
     ){
@@ -175,7 +187,13 @@ fun FormularioLogin(
             modifier = Modifier.padding(vertical = 8.dp),
             onClick = {
                 navController.navigate(route = AppScreen.ForgotPasswordScreen.route)
-            }
+            },
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontFamily = FontFamily.Default,
+                textDecoration = TextDecoration.Underline,
+                color = Color.Blue
+            )
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -240,6 +258,12 @@ fun FormularioLogin(
             onClick= {
                 navController.navigate(route = AppScreen.RegisterScreen.route)
             },
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontFamily = FontFamily.Default,
+                textDecoration = TextDecoration.Underline,
+                color = Color.Blue
+            )
         )
     }
 }

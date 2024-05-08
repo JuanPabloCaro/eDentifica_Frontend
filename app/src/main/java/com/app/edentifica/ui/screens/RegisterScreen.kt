@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
@@ -83,13 +84,21 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
                 }
             },
             title = {
-                Text(text = "eDentifica", fontSize = 26.sp, fontStyle = FontStyle.Italic, color= Color.Gray)
+                Text(text = "Back", fontSize = 26.sp, fontStyle = FontStyle.Italic, color= Color.Gray)
             }
         )
     },
         bottomBar = {
-            BottomAppBar {
-                Text(text = "Version 1.0 @Copyrigth 2024 Todos los derechos reservados",fontSize = 12.sp, fontStyle = FontStyle.Italic, color= Color.DarkGray)
+            BottomAppBar (){
+                Text(
+                    text = "Version 1.0 @Copyrigth 2024 Todos los derechos reservados",
+                    fontSize = 12.sp,
+                    fontStyle = FontStyle.Italic,
+                    color= Color.DarkGray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.Center)
+                )
             }
         }
     ) {
@@ -98,6 +107,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(20.dp))
             //Logo
             Image(
                 painter = painterResource(id = R.drawable.nombre_edentifica),
@@ -117,7 +127,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
             )
 
             //field name
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             TextField(
                 label = { Text(text = "Name") },
                 value = name,
@@ -125,7 +135,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
                 onValueChange = { name = it })
 
             //field last name
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             TextField(
                 label = { Text(text = "Last Name") },
                 value = lastName,
@@ -133,7 +143,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
                 onValueChange = { lastName = it })
 
             //field phone
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             TextField(
                 label = { Text(text = "Phone") },
                 value = phone,
@@ -141,7 +151,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
                 onValueChange = { phone = it })
 
             //field email
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             TextField(
                 label = { Text(text = "Email") },
                 value = email,
@@ -175,7 +185,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
                 }
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             ClickableText(
                 text = AnnotatedString("Already have an account? Sign in"),
                 onClick = {
@@ -185,7 +195,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
                     fontSize = 14.sp,
                     fontFamily = FontFamily.Default,
                     textDecoration = TextDecoration.Underline,
-                    color = Purple40
+                    color = Color.Blue
                 )
             )
         }
