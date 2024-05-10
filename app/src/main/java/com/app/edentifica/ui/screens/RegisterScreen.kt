@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
@@ -25,7 +24,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -46,7 +44,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -54,10 +51,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.edentifica.R
-import com.app.edentifica.ui.theme.Purple40
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.utils.AuthRes
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,6 +68,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
     var password by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
+
 
     Scaffold(topBar = {
         TopAppBar(
@@ -173,6 +169,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
                 Button(
                     onClick = {
                         scope.launch {
+
                             signUp(name, lastName, phone, email, password, auth, context, navController)
                         }
                     },
@@ -203,7 +200,16 @@ fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuario
 
 }
 
-private suspend fun signUp(name: String, lastName:String, phone:String, email: String, password: String, auth: AuthManager, context: Context, navController: NavController) {
+private suspend fun signUp(
+    name: String,
+    lastName: String,
+    phone: String,
+    email: String,
+    password: String,
+    auth: AuthManager,
+    context: Context,
+    navController: NavController
+) {
     if(name.isNotEmpty() && lastName.isNotEmpty() && phone.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()){
         when(val result = auth.createUserWithEmailandPassword(email, password)){ // agregar la linea de retrofit para insertar el user en la base de datos
             is AuthRes.Succes ->{

@@ -53,15 +53,19 @@ import coil.request.ImageRequest
 import com.app.edentifica.R
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
+import com.app.edentifica.utils.googleAuth.SignInState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(navController: NavController, auth : AuthManager/*altaUsuarioViewModel: AltaUsuarioViewModel*/) {
+fun HomeScreen(
+    navController: NavController,
+    auth : AuthManager
+/*altaUsuarioViewModel: AltaUsuarioViewModel*/
+) {
     //VARIABLES Y CONSTANTES
     var showDialog by remember { mutableStateOf(false) }
-
     val user = auth.getCurrentUser()
 
     val onLogoutConfirmed:()->Unit = {

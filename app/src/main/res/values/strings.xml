@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">eDentifica</string>
     <string name="copyrigth">Version 1.0 @Copyrigth 2024 Todos los derechos reservados</string>
+    <string name="default_web_client_id">694564092160-tk7hkpsat4muhcti68f27dllsa2rqafl.apps.googleusercontent.com</string>
 </resources>

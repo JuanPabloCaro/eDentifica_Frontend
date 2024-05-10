@@ -2,13 +2,8 @@ package com.app.edentifica.ui.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -37,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,42 +60,29 @@ import com.app.edentifica.R
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.utils.AuthRes
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.firebase.auth.GoogleAuthProvider
+import com.app.edentifica.utils.googleAuth.SignInState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun LoginScreen(navController: NavController, auth: AuthManager/*loginViewModel: LoginViewModel*/){
-
+fun LoginScreen(
+    navController: NavController,
+    auth: AuthManager,
+    state: SignInState,
+    onSignInClick:()->Unit
+){
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val googleSignInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()) { result ->
-        when(val account = auth.handleSignInResult(GoogleSignIn.getSignedInAccountFromIntent(result.data))) {
-            is AuthRes.Succes-> {
-                val credential = GoogleAuthProvider.getCredential(account?.data?.idToken, null)
-                scope.launch {
-                    val fireUser = auth.signInWithGoogleCredential(credential)
-                    if (fireUser != null){
-                        Toast.makeText(context, "Bienvenid@", Toast.LENGTH_SHORT).show()
-                        navController.navigate(AppScreen.HomeScreen.route){
-                            popUpTo(AppScreen.LoginScreen.route){
-                                inclusive = true
-                            }
-                        }
-                    }
-                }
-            }
-            is AuthRes.Error -> {
-                Toast.makeText(context, "Error: ${account.errorMessage}", Toast.LENGTH_SHORT).show()
-            }
-            else -> {
-                Toast.makeText(context, "Error unknown", Toast.LENGTH_SHORT).show()
-            }
+    LaunchedEffect(key1 = state.signInError) {
+        state.signInError?.let{error ->
+            Toast.makeText(
+                context,
+                error,
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -118,7 +101,7 @@ fun LoginScreen(navController: NavController, auth: AuthManager/*loginViewModel:
             }
         }
     ){
-        BodyContent(navController,scope,auth,context,googleSignInLauncher/*loginViewModel*/)
+        BodyContent(navController,scope,auth,context,onSignInClick)
     }
 }
 
@@ -128,14 +111,14 @@ fun BodyContent(
     scope: CoroutineScope,
     auth: AuthManager,
     context: Context,
-    googleSignInLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
+    onSignInClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ){
-        FormularioLogin(Modifier.align(Alignment.Center), navController,scope,auth,context,googleSignInLauncher/* loginViewModel*/)
+        FormularioLogin(Modifier.align(Alignment.Center), navController,scope,auth,context,onSignInClick/*googleSignInLauncher loginViewModel*/)
     }
 }
 
@@ -146,7 +129,7 @@ fun FormularioLogin(
     scope: CoroutineScope,
     auth: AuthManager,
     context: Context,
-    googleSignInLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
+    onSignInClick: () -> Unit
 ) {
     //variables
     var email by remember { mutableStateOf("") }
@@ -252,9 +235,7 @@ fun FormularioLogin(
 
         // Botón de inicio de sesión con Google
         SocialMediaButton(
-            onClick = {
-                auth.signInWithGoogle(googleSignInLauncher)
-            },
+            onClick = onSignInClick,
             text = "Continue with Google",
             icon = R.drawable.ic_google,
             color = Color(0xFFF1F1F1)

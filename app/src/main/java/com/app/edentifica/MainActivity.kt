@@ -2,16 +2,26 @@ package com.app.edentifica
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.edentifica.navigation.AppNavigation
 import com.app.edentifica.ui.theme.EDentificaTheme
+import com.app.edentifica.utils.googleAuth.GoogleAuthUiClient
+import com.app.edentifica.utils.googleAuth.SignInViewModel
+import com.google.android.gms.auth.api.identity.Identity
+import kotlinx.coroutines.launch
 
 /**
  * Proyecto eDentifica:
@@ -27,6 +37,13 @@ import com.app.edentifica.ui.theme.EDentificaTheme
  * @since 2024-03-8
  */
 class MainActivity : ComponentActivity() {
+    private val googleAuthUiClient by lazy{
+        GoogleAuthUiClient(
+            context = applicationContext,
+            oneTapClient = Identity.getSignInClient(applicationContext)
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,14 +53,45 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val viewModel= viewModel<SignInViewModel>()
+                    val state by viewModel.state.collectAsStateWithLifecycle()
+                    val launcher= rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.StartIntentSenderForResult(),
+                        onResult = {result ->
+                            if(result.resultCode == RESULT_OK){
+                                lifecycleScope.launch{
+                                    val signInResult = googleAuthUiClient.signInWithIntent(
+                                        intent = result.data ?: return@launch
+                                    )
+                                    viewModel.onSignInResult(signInResult)
+                                }
+                            }
+
+                        }
+                    )
                     //Este es el componente que se encarga de la navegacion y sabe cual es la primera pantalla
                     //This is the component that is in charge of navigation and knows which is the first screen.
-                    AppNavigation(this)
+                    AppNavigation(
+                        state = state,
+                        onSignInClick = {
+                            lifecycleScope.launch {
+                                val signInIntentSender = googleAuthUiClient.signIn()
+                                launcher.launch(
+                                    IntentSenderRequest.Builder(
+                                        signInIntentSender ?: return@launch
+                                    ).build()
+                                )
+                            }
+                        }
+                    )
                 }
             }
         }
     }
 }
+
+
+
 
 @Preview(showBackground = true)
 @Composable

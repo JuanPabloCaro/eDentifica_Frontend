@@ -7,14 +7,6 @@ plugins {
 }
 
 android {
-//    signingConfigs {
-//        create("debugLog") {
-//            storeFile = file("C:\\Users\\jcaro\\.android\\upload-keystore.jks")
-//            storePassword = "99070602420"
-//            keyAlias = "key0"
-//            keyPassword = "99070602420"
-//        }
-//    }
     namespace = "com.app.edentifica"
     compileSdk = 34
 
@@ -61,6 +53,8 @@ android {
 }
 
 dependencies {
+    implementation("com.google.firebase:firebase-auth:23.0.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     val compose_version = "1.0.2"
 
     //FIREBASE
@@ -89,6 +83,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation ("androidx.lifecycle:lifecycle-common-java8:2.7.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
 
     // Kotlin components
     implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
