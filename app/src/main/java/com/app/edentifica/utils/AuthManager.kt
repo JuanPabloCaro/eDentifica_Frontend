@@ -70,7 +70,6 @@ class AuthManager() {
 
     fun signOut(){
         auth.signOut();
-//        signInClient.signOut();
     }
 
     fun getCurrentUser(): FirebaseUser?{

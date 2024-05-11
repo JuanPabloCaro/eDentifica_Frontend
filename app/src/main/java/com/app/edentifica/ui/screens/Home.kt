@@ -1,16 +1,14 @@
 package com.app.edentifica.ui.screens
 
 import android.annotation.SuppressLint
-import android.widget.Space
+import android.content.Intent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,14 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.BottomAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -48,21 +41,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.core.content.ContextCompat.startActivity
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.app.edentifica.MainActivity
 import com.app.edentifica.R
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
-import com.app.edentifica.utils.googleAuth.SignInState
+import kotlinx.coroutines.Job
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
     navController: NavController,
-    auth : AuthManager
-/*altaUsuarioViewModel: AltaUsuarioViewModel*/
+    auth: AuthManager,
+    onSignOutGoogle: () -> Unit
 ) {
     //VARIABLES Y CONSTANTES
     var showDialog by remember { mutableStateOf(false) }
@@ -70,6 +64,8 @@ fun HomeScreen(
 
     val onLogoutConfirmed:()->Unit = {
         auth.signOut()
+        onSignOutGoogle()
+
         navController.navigate(AppScreen.LoginScreen.route){
             popUpTo(AppScreen.HomeScreen.route){
                 inclusive= true
@@ -156,10 +152,12 @@ fun HomeScreen(
         contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialog(onConfirmLogout = {
-                    onLogoutConfirmed()
-                    showDialog = false
-                }, onDismiss = { showDialog = false })
+                LogoutDialog(
+                    onConfirmLogout = {
+                        onLogoutConfirmed()
+                        showDialog = false
+                    },
+                    onDismiss = { showDialog = false })
             }
 
         }
@@ -181,7 +179,10 @@ fun BodyContentHome(navController: NavController) {
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialog(onConfirmLogout: () -> Unit, onDismiss: () -> Unit) {
+fun LogoutDialog(
+    onConfirmLogout: () -> Unit,
+    onDismiss: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Cerrar sesión") },

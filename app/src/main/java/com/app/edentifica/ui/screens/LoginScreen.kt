@@ -73,9 +73,11 @@ fun LoginScreen(
     state: SignInState,
     onSignInClick:()->Unit
 ){
+    //VARIABLES Y CONSTANTES
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    //Esta funcion muestra cuando hay un error en el inicio de sesion de google
     LaunchedEffect(key1 = state.signInError) {
         state.signInError?.let{error ->
             Toast.makeText(
@@ -131,7 +133,7 @@ fun FormularioLogin(
     context: Context,
     onSignInClick: () -> Unit
 ) {
-    //variables
+    //VARIABLES Y CONSTANTES
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 

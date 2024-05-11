@@ -58,8 +58,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun RegisterScreen(navController: NavController, auth: AuthManager /*altaUsuarioViewModel: AltaUsuarioViewModel*/){
+fun RegisterScreen(navController: NavController, auth: AuthManager ){
 
+    //VARIABLES Y CONSTANTES
     val context = LocalContext.current
     var name by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }

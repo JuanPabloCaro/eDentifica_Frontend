@@ -38,6 +38,7 @@ class GoogleAuthUiClient(
         val credential = oneTapClient.getSignInCredentialFromIntent(intent)
         val googleIdToken = credential.googleIdToken
         val googleCredentials= GoogleAuthProvider.getCredential(googleIdToken,null)
+
         return try{
 
             val user = auth.signInWithCredential(googleCredentials).await().user
@@ -64,13 +65,13 @@ class GoogleAuthUiClient(
 
 
 
-    fun getSignedInUser(): UserData?=auth.currentUser?.run{
-        UserData(
-            userId = uid,
-            username = displayName,
-            profilePictureUrl = photoUrl?.toString()
-        )
-    }
+//    fun getSignedInUser(): UserData?=auth.currentUser?.run{
+//        UserData(
+//            userId = uid,
+//            username = displayName,
+//            profilePictureUrl = photoUrl?.toString()
+//        )
+//    }
 
 
     suspend fun signOut(){

@@ -1,5 +1,6 @@
 package com.app.edentifica
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -14,13 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.app.edentifica.navigation.AppNavigation
-import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.ui.theme.EDentificaTheme
 import com.app.edentifica.utils.googleAuth.GoogleAuthUiClient
 import com.app.edentifica.utils.googleAuth.SignInViewModel
@@ -58,9 +59,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     //Inicializo la el view model y los componentes necesarios para que se inicie sesion con google
-                    val navController= rememberNavController()
                     val viewModel= viewModel<SignInViewModel>()
                     val state by viewModel.state.collectAsStateWithLifecycle()
+                    val context= LocalContext.current
+
+                    //Esta funcion es de google para saber si todo esta ok con el inicio de sesion para enviar el intent
                     val launcher= rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.StartIntentSenderForResult(),
                         onResult = {result ->
@@ -77,14 +80,15 @@ class MainActivity : ComponentActivity() {
                     )
 
 
+                    //Aqui, si el inicio es correcto entonces muestra un mensaje por pantalla y se resetea el viewModel
                     LaunchedEffect(key1 = state.isSignInSuccessful) {
                         if(state.isSignInSuccessful){
-                            //navController.navigate(AppScreen.HomeScreen.route)
                             Toast.makeText(
                                 applicationContext,
                                 "Sing in Successful",
-                                Toast.LENGTH_LONG
+                                Toast.LENGTH_SHORT
                             ).show()
+                            viewModel.resetState()
                         }
                     }
 
@@ -93,7 +97,7 @@ class MainActivity : ComponentActivity() {
                     //This is the component that is in charge of navigation and knows which is the first screen.
                     AppNavigation(
                         state = state,
-                        onSignInClick = {
+                        onSignInClickGoogle = {
                             lifecycleScope.launch {
                                 val signInIntentSender = googleAuthUiClient.signIn()
                                 launcher.launch(
@@ -102,21 +106,27 @@ class MainActivity : ComponentActivity() {
                                     ).build()
                                 )
                             }
+                        },
+                        onSignOutGoogle = {
+                            lifecycleScope.launch {
+                                googleAuthUiClient.signOut()
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Signed out",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                // Reiniciar la actividad principal, asi pueden volver a iniciar sesion con otra cuenta de google
+                                val intent = Intent(context, MainActivity::class.java)
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                                startActivity(intent)
+                                finish()
+
+                            }
                         }
                     )
                 }
             }
         }
-    }
-}
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun eDentificaPreview() {
-    EDentificaTheme{
-        //AppNavigation(this)
     }
 }

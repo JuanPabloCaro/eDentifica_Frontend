@@ -37,7 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.edentifica.R
 import com.app.edentifica.navigation.AppScreen
-import com.app.edentifica.ui.theme.Purple40
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.utils.AuthRes
 import kotlinx.coroutines.launch

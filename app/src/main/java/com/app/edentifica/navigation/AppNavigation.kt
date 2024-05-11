@@ -14,7 +14,11 @@ import com.app.edentifica.utils.googleAuth.SignInState
 
 
 @Composable
-fun AppNavigation(state: SignInState, onSignInClick: () -> Unit) {
+fun AppNavigation(
+    state: SignInState,
+    onSignInClickGoogle: () -> Unit,
+    onSignOutGoogle: () -> Unit
+) {
     //Aqui se maneja toda la navegacion entre nuestras pantallas
     //This handles all the navigation between our screens.
     val navController = rememberNavController()
@@ -35,16 +39,14 @@ fun AppNavigation(state: SignInState, onSignInClick: () -> Unit) {
                 navController = navController,
                 auth= authManager,
                 state = state,
-                onSignInClick = onSignInClick
-            /*LoginViewModel(repositorio)*/
+                onSignInClick = onSignInClickGoogle
             )
         }
 
         composable(route=AppScreen.RegisterScreen.route){
             RegisterScreen(
                 navController = navController,
-                authManager
-            /*AltaUsuarioViewModel(repositorio)*/
+                auth = authManager
             )
         }
 
@@ -52,14 +54,13 @@ fun AppNavigation(state: SignInState, onSignInClick: () -> Unit) {
             ForgotPasswordScreen(
                 navController = navController,
                 auth = authManager
-                /*AltaUsuarioViewModel(repositorio)*/
                 )
         }
 
         composable(route=AppScreen.HomeScreen.route){
             HomeScreen(navController = navController,
-                auth= authManager
-            /*AltaUsuarioViewModel(repositorio)*/
+                auth= authManager,
+                onSignOutGoogle= onSignOutGoogle
             )
         }
     }
