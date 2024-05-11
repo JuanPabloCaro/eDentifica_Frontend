@@ -8,21 +8,20 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import com.app.edentifica.navigation.AppNavigation
 import com.app.edentifica.ui.theme.EDentificaTheme
+import com.app.edentifica.ui.viewModel.UsersViewModel
 import com.app.edentifica.utils.googleAuth.GoogleAuthUiClient
 import com.app.edentifica.utils.googleAuth.SignInViewModel
 import com.google.android.gms.auth.api.identity.Identity
@@ -42,6 +41,8 @@ import kotlinx.coroutines.launch
  * @since 2024-03-8
  */
 class MainActivity : ComponentActivity() {
+    val viewModelUser by viewModels<UsersViewModel>()
+
     private val googleAuthUiClient by lazy{
         GoogleAuthUiClient(
             context = applicationContext,
@@ -123,7 +124,8 @@ class MainActivity : ComponentActivity() {
                                 finish()
 
                             }
-                        }
+                        },
+                        viewModelUser= viewModelUser
                     )
                 }
             }

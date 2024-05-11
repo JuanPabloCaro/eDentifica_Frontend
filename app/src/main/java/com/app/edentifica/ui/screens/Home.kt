@@ -1,18 +1,20 @@
 package com.app.edentifica.ui.screens
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -41,14 +43,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.core.content.ContextCompat.startActivity
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.app.edentifica.MainActivity
 import com.app.edentifica.R
 import com.app.edentifica.navigation.AppScreen
+import com.app.edentifica.ui.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
-import kotlinx.coroutines.Job
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.text.font.FontWeight
+import com.app.edentifica.data.model.User
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -56,9 +60,13 @@ import kotlinx.coroutines.Job
 fun HomeScreen(
     navController: NavController,
     auth: AuthManager,
-    onSignOutGoogle: () -> Unit
+    onSignOutGoogle: () -> Unit,
+    viewModelUser: UsersViewModel
 ) {
     //VARIABLES Y CONSTANTES
+    // Obtén la lista de usuarios del StateFlow usando collectAsState
+//    val users: List<User> by viewModelUser.usersStateFlow.collectAsState()
+
     var showDialog by remember { mutableStateOf(false) }
     val user = auth.getCurrentUser()
 
@@ -162,15 +170,40 @@ fun HomeScreen(
 
         }
         //funcion composable que pinta el contenido de home
-        BodyContentHome(navController)
+        BodyContentHome(navController, viewModelUser /*,users*/)
     }
 }
 
 
 
 @Composable
-fun BodyContentHome(navController: NavController) {
- //Poner el contenido de home
+fun BodyContentHome(navController: NavController, viewModelUser: UsersViewModel/*, users: List<User>*/) {
+//ejemplo
+    // Estado para controlar si se ha presionado el botón
+//    var buttonClicked by remember { mutableStateOf(false) }
+//
+//    Column {
+//        // Botón para obtener los usuarios
+//        Button(onClick = {
+//            // Llama a la función getAllUsers() del ViewModel
+//            viewModelUser.getAllUsers()
+//            // Cambia el estado del botón para indicar que ha sido presionado
+//            buttonClicked = true
+//        }) {
+//            Text("Obtener Usuarios")
+//        }
+//
+//        // Si el botón ha sido presionado, muestra la lista de usuarios
+//        if (buttonClicked) {
+//            // Muestra los usuarios en una columna
+//            Column {
+//                for (user in users) {
+//                    Text(text = user.name)
+//                }
+//            }
+//        }
+//    }
+
 }
 
 

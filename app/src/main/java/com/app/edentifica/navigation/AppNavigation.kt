@@ -8,6 +8,7 @@ import com.app.edentifica.ui.screens.ForgotPasswordScreen
 import com.app.edentifica.ui.screens.HomeScreen
 import com.app.edentifica.ui.screens.LoginScreen
 import com.app.edentifica.ui.screens.RegisterScreen
+import com.app.edentifica.ui.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
 import com.google.firebase.auth.FirebaseUser
 import com.app.edentifica.utils.googleAuth.SignInState
@@ -17,7 +18,8 @@ import com.app.edentifica.utils.googleAuth.SignInState
 fun AppNavigation(
     state: SignInState,
     onSignInClickGoogle: () -> Unit,
-    onSignOutGoogle: () -> Unit
+    onSignOutGoogle: () -> Unit,
+    viewModelUser: UsersViewModel
 ) {
     //Aqui se maneja toda la navegacion entre nuestras pantallas
     //This handles all the navigation between our screens.
@@ -60,7 +62,8 @@ fun AppNavigation(
         composable(route=AppScreen.HomeScreen.route){
             HomeScreen(navController = navController,
                 auth= authManager,
-                onSignOutGoogle= onSignOutGoogle
+                onSignOutGoogle= onSignOutGoogle,
+                viewModelUser= viewModelUser
             )
         }
     }
