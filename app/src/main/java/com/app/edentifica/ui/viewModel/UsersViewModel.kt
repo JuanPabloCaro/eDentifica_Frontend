@@ -1,32 +1,44 @@
 package com.app.edentifica.ui.viewModel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.edentifica.data.model.User
-import com.app.edentifica.data.retrofit.RetrofitClient
+import com.app.edentifica.data.retrofit.RetrofitApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class UsersViewModel: ViewModel() {
-    private val _usersStateFlow = MutableStateFlow<List<User>>(emptyList())
-    val usersStateFlow: StateFlow<List<User>> = _usersStateFlow
+data class UIStateUser(
+    val listUsers: List<User> = emptyList(),
+    val userSelected: User? = null
+)
 
-    fun getAllUsers(){
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = RetrofitClient.webService.getAllUsers()
-            withContext(Dispatchers.Main){
-                if(response.body()!!.status=="200"){
-                    val _listUsers = response.body()!!.data
-                    _usersStateFlow.value = _listUsers
+
+class UsersViewModel : ViewModel() {
+    private val _uis: MutableStateFlow<UIStateUser> =  MutableStateFlow(UIStateUser())
+    val uis = _uis.asStateFlow()
+
+    init {
+        getListUsers()
+    }
+    fun setUser(men: User){
+        _uis.update {
+            it.copy(userSelected = men )
+        }
+    }
+
+    fun getListUsers(){
+        viewModelScope.launch(Dispatchers.IO){
+            val response = RetrofitApi.userService.getAllUser()
+            if (response.isSuccessful){
+                _uis.update {
+                    it.copy(listUsers = response?.body() ?: emptyList())
                 }
             }
         }
     }
-
 }

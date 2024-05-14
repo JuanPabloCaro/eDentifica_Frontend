@@ -1,20 +1,19 @@
 package com.app.edentifica.ui.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -27,6 +26,8 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,9 +51,8 @@ import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.ui.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.text.font.FontWeight
 import com.app.edentifica.data.model.User
+import com.app.edentifica.ui.viewModel.UIStateUser
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -61,11 +61,13 @@ fun HomeScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
-    viewModelUser: UsersViewModel
+    vmUsers: UsersViewModel
 ) {
     //VARIABLES Y CONSTANTES
-    // Obtén la lista de usuarios del StateFlow usando collectAsState
-//    val users: List<User> by viewModelUser.usersStateFlow.collectAsState()
+//    var users by remember { mutableStateOf<List<User>>(emptyList()) }
+//    val uiState = vmUsers.uis.collectAsState()
+
+
 
     var showDialog by remember { mutableStateOf(false) }
     val user = auth.getCurrentUser()
@@ -170,40 +172,35 @@ fun HomeScreen(
 
         }
         //funcion composable que pinta el contenido de home
-        BodyContentHome(navController, viewModelUser /*,users*/)
+        BodyContentHome(navController, vmUsers)
     }
 }
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BodyContentHome(navController: NavController, viewModelUser: UsersViewModel/*, users: List<User>*/) {
-//ejemplo
-    // Estado para controlar si se ha presionado el botón
-//    var buttonClicked by remember { mutableStateOf(false) }
+fun BodyContentHome(navController: NavController, vmUsers: UsersViewModel) {
+//    val listUsers by vmUsers.uis.collectAsState()
 //
-//    Column {
-//        // Botón para obtener los usuarios
-//        Button(onClick = {
-//            // Llama a la función getAllUsers() del ViewModel
-//            viewModelUser.getAllUsers()
-//            // Cambia el estado del botón para indicar que ha sido presionado
-//            buttonClicked = true
-//        }) {
-//            Text("Obtener Usuarios")
-//        }
+//    LazyColumn {
+//        item { Text(text = "RESULTADO Peticion REST API ") }
 //
-//        // Si el botón ha sido presionado, muestra la lista de usuarios
-//        if (buttonClicked) {
-//            // Muestra los usuarios en una columna
-//            Column {
-//                for (user in users) {
-//                    Text(text = user.name)
+//        items(listUsers.listUsers.size) { index ->
+//            val user = listUsers.listUsers[index]
+//            Card(
+//                onClick = {
+//                    Log.d("MIDEBUG", "CARD ONCLIC = $user")
+////                    vmUsers.setUser(user)
+////                    nav.navigate(Rutas.MENSAJE.ruta)
 //                }
+//            ) {
+//                Text(
+//                    text = "(${user.id}) : ${user.name} "
+//                )
 //            }
 //        }
 //    }
-
 }
 
 

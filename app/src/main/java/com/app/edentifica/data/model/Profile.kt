@@ -1,14 +1,14 @@
 package com.app.edentifica.data.model
 
-import java.time.LocalDate
+import com.google.gson.annotations.SerializedName
 
 data class Profile(
-    var id:String,
-    var description:String,
-    var phones:Set<Phone>,
-    var emails:Set<Email>,
-    var socialNetworks: Set<SocialNetwork>,
-    var isMultiuser:Boolean,
-    var idUsers: Set<String>,
-    var idAdmin: String
+    @SerializedName("id") var id:String,
+    @SerializedName("description") var description:String,
+    @SerializedName("phones") var phones:Set<Phone>,
+    @SerializedName("emails") var emails:Set<Email>,
+    @SerializedName("socialNetworks") var socialNetworks: Set<SocialNetwork>,
+    @SerializedName("isMultiuser") var isMultiuser:Boolean,
+    @SerializedName("idUsers") var idUsers: Set<String>,
+    @SerializedName("idAdmin") var idAdmin: String
 )

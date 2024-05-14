@@ -19,7 +19,7 @@ fun AppNavigation(
     state: SignInState,
     onSignInClickGoogle: () -> Unit,
     onSignOutGoogle: () -> Unit,
-    viewModelUser: UsersViewModel
+    vmUsers: UsersViewModel
 ) {
     //Aqui se maneja toda la navegacion entre nuestras pantallas
     //This handles all the navigation between our screens.
@@ -63,7 +63,7 @@ fun AppNavigation(
             HomeScreen(navController = navController,
                 auth= authManager,
                 onSignOutGoogle= onSignOutGoogle,
-                viewModelUser= viewModelUser
+                vmUsers= vmUsers
             )
         }
     }
