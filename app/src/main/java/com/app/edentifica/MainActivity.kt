@@ -2,13 +2,13 @@ package com.app.edentifica
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,7 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.edentifica.navigation.AppNavigation
 import com.app.edentifica.ui.theme.EDentificaTheme
-import com.app.edentifica.ui.viewModel.UsersViewModel
+import com.app.edentifica.viewModel.UsersViewModel
 import com.app.edentifica.utils.googleAuth.GoogleAuthUiClient
 import com.app.edentifica.utils.googleAuth.SignInViewModel
 import com.google.android.gms.auth.api.identity.Identity
@@ -41,6 +41,11 @@ import kotlinx.coroutines.launch
  * @since 2024-03-8
  */
 class MainActivity : ComponentActivity() {
+
+    //ViewModels
+    val vmUsers by viewModels<UsersViewModel>()
+    val vmGoogle by viewModels<SignInViewModel>()
+
     private val googleAuthUiClient by lazy{
         GoogleAuthUiClient(
             context = applicationContext,
@@ -50,9 +55,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val vmUsers= UsersViewModel()
-
         setContent {
             EDentificaTheme {
                 // A surface container using the 'background' color from the theme
@@ -60,6 +62,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+//                    vmUsers.getUsers()
+
                     //Inicializo la el view model y los componentes necesarios para que se inicie sesion con google
                     val viewModel= viewModel<SignInViewModel>()
                     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -94,8 +98,6 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    Log.e("test",vmUsers.getListUsers().toString());
-
 
                     //Este es el componente que se encarga de la navegacion y sabe cual es la primera pantalla
                     //This is the component that is in charge of navigation and knows which is the first screen.
@@ -128,7 +130,8 @@ class MainActivity : ComponentActivity() {
 
                             }
                         },
-                        vmUsers= vmUsers
+                        vmUsers= vmUsers,
+                        vmGoogle= vmGoogle
                     )
                 }
             }

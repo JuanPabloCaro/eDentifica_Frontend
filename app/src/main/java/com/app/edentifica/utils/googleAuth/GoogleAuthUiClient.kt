@@ -44,11 +44,14 @@ class GoogleAuthUiClient(
             val user = auth.signInWithCredential(googleCredentials).await().user
             SignInResult(
                 data= user?.run{
-                    UserData(
-                        userId = uid,
-                        username = displayName,
-                        profilePictureUrl = photoUrl?.toString()
-                    )
+                    email?.let {
+                        UserData(
+                            userId = uid,
+                            username = displayName,
+                            userEmail = it,
+                            profilePictureUrl = photoUrl?.toString()
+                        )
+                    }
                 },
                 errorMessage = null
             )

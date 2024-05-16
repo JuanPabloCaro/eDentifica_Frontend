@@ -5,5 +5,5 @@ import com.app.edentifica.data.model.User
 data class UsersResponse(
     var status: String,
     var message: String,
-    var data: ArrayList<User>
+    var data: User
 )
