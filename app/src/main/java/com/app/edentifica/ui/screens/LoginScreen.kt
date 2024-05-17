@@ -2,6 +2,7 @@ package com.app.edentifica.ui.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -57,10 +58,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.edentifica.R
+import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.utils.AuthRes
 import com.app.edentifica.utils.googleAuth.SignInState
+import com.app.edentifica.viewModel.UsersViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -71,7 +74,8 @@ fun LoginScreen(
     navController: NavController,
     auth: AuthManager,
     state: SignInState,
-    onSignInClick:()->Unit
+    onSignInClick: () -> Unit,
+    vmUsers: UsersViewModel
 ){
     //VARIABLES Y CONSTANTES
     val context = LocalContext.current
@@ -103,7 +107,7 @@ fun LoginScreen(
             }
         }
     ){
-        BodyContent(navController,scope,auth,context,onSignInClick)
+        BodyContent(navController,scope,auth,context,onSignInClick, vmUsers)
     }
 }
 
@@ -113,14 +117,15 @@ fun BodyContent(
     scope: CoroutineScope,
     auth: AuthManager,
     context: Context,
-    onSignInClick: () -> Unit
+    onSignInClick: () -> Unit,
+    vmUsers: UsersViewModel
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ){
-        FormularioLogin(Modifier.align(Alignment.Center), navController,scope,auth,context,onSignInClick/*googleSignInLauncher loginViewModel*/)
+        FormularioLogin(Modifier.align(Alignment.Center), navController,scope,auth,context,onSignInClick, vmUsers)
     }
 }
 
@@ -131,7 +136,8 @@ fun FormularioLogin(
     scope: CoroutineScope,
     auth: AuthManager,
     context: Context,
-    onSignInClick: () -> Unit
+    onSignInClick: () -> Unit,
+    vmUsers: UsersViewModel
 ) {
     //VARIABLES Y CONSTANTES
     var email by remember { mutableStateOf("") }
@@ -179,7 +185,7 @@ fun FormularioLogin(
             Button(
                 onClick = {
                     scope.launch {
-                        emailPassSignIn(email, password, auth, context, navController)
+                        emailPassSignIn(email, password, auth, context, navController, vmUsers)
                     }
                 },
                 shape = RoundedCornerShape(50.dp),
@@ -279,7 +285,14 @@ fun FormularioLogin(
 }
 
 //Function to login with email and password
-private suspend fun emailPassSignIn(email: String, password: String, auth: AuthManager, context: Context, navController: NavController) {
+private suspend fun emailPassSignIn(
+    email: String,
+    password: String,
+    auth: AuthManager,
+    context: Context,
+    navController: NavController,
+    vmUsers: UsersViewModel
+) {
     if(email.isNotEmpty() && password.isNotEmpty()) {
         when (val result = auth.signInWithEmailandPassword(email, password)) {
             is AuthRes.Succes-> {
@@ -288,6 +301,7 @@ private suspend fun emailPassSignIn(email: String, password: String, auth: AuthM
                         inclusive = true
                     }
                 }
+
             }
 
             is AuthRes.Error -> {
@@ -317,7 +331,7 @@ private suspend fun incognitoSignIn(auth: AuthManager, context: Context, navCont
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color, ) {
+fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color) {
     var click by remember { mutableStateOf(false) }
     Surface(
         onClick = onClick,

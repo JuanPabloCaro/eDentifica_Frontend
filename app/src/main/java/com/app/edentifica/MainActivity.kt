@@ -44,7 +44,6 @@ class MainActivity : ComponentActivity() {
 
     //ViewModels
     val vmUsers by viewModels<UsersViewModel>()
-    val vmGoogle by viewModels<SignInViewModel>()
 
     private val googleAuthUiClient by lazy{
         GoogleAuthUiClient(
@@ -62,8 +61,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-//                    vmUsers.getUsers()
-
                     //Inicializo la el view model y los componentes necesarios para que se inicie sesion con google
                     val viewModel= viewModel<SignInViewModel>()
                     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -98,7 +95,6 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-
                     //Este es el componente que se encarga de la navegacion y sabe cual es la primera pantalla
                     //This is the component that is in charge of navigation and knows which is the first screen.
                     AppNavigation(
@@ -130,9 +126,9 @@ class MainActivity : ComponentActivity() {
 
                             }
                         },
-                        vmUsers= vmUsers,
-                        vmGoogle= vmGoogle
+                        vmUsers= vmUsers
                     )
+
                 }
             }
         }

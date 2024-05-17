@@ -1,7 +1,7 @@
 package com.app.edentifica.viewModel
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.edentifica.data.model.User
@@ -15,6 +15,9 @@ class UsersViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
+    private val _validationOne = MutableStateFlow<Boolean>(false)
+    val validationOne: StateFlow<Boolean> = _validationOne
+
     fun getUserByEmail(email: String) {
         viewModelScope.launch {
             try {
@@ -22,10 +25,28 @@ class UsersViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     _user.value = response.body()
                 } else {
-                    // Manejar el error de la llamada Retrofit
+                    Log.e("error en userViewModel", "error")
                 }
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error en userViewModel try", it) }
+            }
+        }
+    }
+
+    fun toDoCallByUser(user:User) {
+        viewModelScope.launch {
+            try {
+                val response = userService.toDoCall(user)
+                if (response.isSuccessful) {
+                    _validationOne.value = response.body()!!
+                    Log.e("validacion", "bien")
+                } else {
+                    Log.e("error en userViewModel", "error")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error en userViewModel try", it) }
             }
         }
     }

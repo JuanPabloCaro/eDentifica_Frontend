@@ -1,6 +1,6 @@
 package com.app.edentifica.ui.screens
 
-import  android.annotation.SuppressLint
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,47 +16,47 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.getValue
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.edentifica.R
-import com.app.edentifica.navigation.AppScreen
-import com.app.edentifica.viewModel.UsersViewModel
-import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.data.model.User
-import com.app.edentifica.utils.googleAuth.SignInViewModel
-
+import com.app.edentifica.navigation.AppScreen
+import com.app.edentifica.utils.AuthManager
+import com.app.edentifica.viewModel.UsersViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(
+fun ValidationOneScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
@@ -71,15 +72,6 @@ fun HomeScreen(
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
-
-    //si el usuario esta sin validar, lo envio a la pantalla de validacion
-    if(userState?.validations?.get(0)?.isValidated == false){
-        navController.navigate(AppScreen.ValidationOneScreen.route){
-            popUpTo(AppScreen.HomeScreen.route){
-                inclusive= true
-            }
-        }
-    }
 
     Log.e("userBBDD", userState.toString())
 
@@ -157,7 +149,7 @@ fun HomeScreen(
         },
         bottomBar = {
             BottomAppBar (backgroundColor = Color.DarkGray){
-                androidx.compose.material3.Text(
+                Text(
                     text = "Version 1.0 @Copyrigth 2024 Todos los derechos reservados",
                     fontSize = 12.sp,
                     fontStyle = FontStyle.Italic,
@@ -170,10 +162,10 @@ fun HomeScreen(
         }
     ) {
         //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
-        contentPadding ->
+            contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialog(
+                LogoutDialogValidation(
                     onConfirmLogout = {
                         onLogoutConfirmed()
                         showDialog = false
@@ -183,37 +175,47 @@ fun HomeScreen(
 
         }
         //funcion composable que pinta el contenido de home
-        BodyContentHome(navController, vmUsers, userState)
+        BodyContentValidationOne(navController, vmUsers, userState)
     }
 }
 
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BodyContentHome(
-    navController: NavController,
-    vmUsers: UsersViewModel,
-    userState: User?
-) {
-    Column {
-        if (userState != null) {
-            Text(text = "Nombre: ${userState.name}")
-            Text(text = "Apellido: ${userState.lastName}")
-        }
+fun BodyContentValidationOne(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
 
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "¡Ups, todavia no te has validado, para empezar la validacion por favor haz click en empezar!",
+            style = MaterialTheme.typography.h5
+        )
+        Button(
+            onClick = {
+                // Llamar a la función del ViewModel
+                userState?.let { user ->
+                    vmUsers.toDoCallByUser(user)
+                    //si la llamada es correcta lo redirijo, pendiente agregar la otra pantalla de introducir el resultado
+                    if (vmUsers.validationOne.value) {
+                        navController.navigate(AppScreen.HomeScreen.route)
+                    }
+                }
+            },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(text = "Empezar")
+        }
     }
 
 }
-
-
 
 /**
  * Funcion composable que se encarga de mostrar un alert para preguntar al
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialog(
+fun LogoutDialogValidation(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {
