@@ -71,13 +71,16 @@ fun HomeScreen(
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
+    Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
+    Log.e("userValidation", userState?.toString().toString())
 
     //si el usuario esta sin validar, lo envio a la pantalla de validacion
-    if(userState?.validations?.get(0)?.isValidated == false && vmUsers.answerValidation.value==false){
+//    if(userState?.validations?.get(0)?.validated.equals("0")){
+    if(userState?.validations?.get(0)?.isValidated==false){
         navController.navigate(AppScreen.ValidationOneScreen.route)
     }
 
-    Log.e("userBBDD", userState.toString())
+//    Log.e("userBBDD", userState.toString())
 
     val onLogoutConfirmed:()->Unit = {
         auth.signOut()

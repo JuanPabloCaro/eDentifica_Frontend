@@ -18,8 +18,27 @@ class UsersViewModel : ViewModel() {
     private val _validationOne = MutableStateFlow<Boolean>(false)
     val validationOne: StateFlow<Boolean> = _validationOne
 
-    private val _answerValidation = MutableStateFlow<Boolean>(false)
-    val answerValidation: StateFlow<Boolean> = _answerValidation
+    private val _answerValidation = MutableStateFlow<Boolean?>(false)
+    val answerValidation: StateFlow<Boolean?> = _answerValidation
+
+    /**
+     * Esta funcion recibe un User y lo inserta en la base de datos
+     */
+    fun insertUserVm(user:User) {
+        viewModelScope.launch {
+            try {
+                val response = userService.insertUser(user)
+                if (response.isSuccessful) {
+                    _user.value = response.body()
+                } else {
+                    Log.e("error en userViewModel", "getUserByEmail")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel getUserByEmail", it) }
+            }
+        }
+    }
 
     /**
      * Esta funcion recibe un email y nos devuelve al usuario encontrado
@@ -99,7 +118,7 @@ class UsersViewModel : ViewModel() {
                     if (responseBody != null) {
                         _answerValidation.value = responseBody
                         //si la respuesta es true, actualizao al usuario desde la base de datos
-                        _user.value = userService.getByEmail(user.email.email).body()
+                        getUserByEmail(user.email.email)
 
                         Log.e("respuesta validacion", "bien")
                     } else {

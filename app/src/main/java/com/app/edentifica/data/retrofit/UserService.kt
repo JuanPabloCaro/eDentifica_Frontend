@@ -14,6 +14,8 @@ interface UserService {
 
     @POST("edentifica/users/update")
     suspend fun updateUser(@Body user: User): Response<Boolean>
+    @POST("edentifica/users/insert")
+    suspend fun insertUser(@Body user: User): Response<User>
 
     @POST("edentifica/users/validation_one_call")
     suspend fun toDoCall(@Body user: User): Response<Boolean>

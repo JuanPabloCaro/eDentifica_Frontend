@@ -1,7 +1,10 @@
 package com.app.edentifica.data.model
 
+import com.google.gson.annotations.SerializedName
+
 data class Validation(
-    var id:String,
-    var challenge:String,
-    var isValidated:Boolean,
+    @SerializedName("id") var id:String,
+    @SerializedName("challenge") var challenge:String,
+//    @SerializedName("validated") var validated:String,
+    @SerializedName("isValidated") var isValidated:Boolean,
 )

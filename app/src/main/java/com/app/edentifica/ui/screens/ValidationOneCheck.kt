@@ -197,13 +197,13 @@ fun BodyContentValidationOneCheck(navController: NavController, vmUsers: UsersVi
     // Usa un when para manejar diferentes casos
     when {
         validationOneCheckState.value == true -> {
-            // Si validationOne es true, redirigir a otra pantalla
+            // Si validationOneCheck es true, redirigir a otra pantalla
             LaunchedEffect(Unit) {
                 navController.navigate(AppScreen.HomeScreen.route)
             }
         }
         validationOneCheckState.value == false -> {
-            // Si validationOne es false, mostrar el botón para comenzar la validación
+            // Si validationOneCheck es false, mostrar el botón para comenzar la validación
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,

@@ -51,14 +51,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.edentifica.R
+import com.app.edentifica.data.model.Email
+import com.app.edentifica.data.model.Phone
+import com.app.edentifica.data.model.Profile
+import com.app.edentifica.data.model.User
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.utils.AuthRes
+import com.app.edentifica.viewModel.UsersViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun RegisterScreen(navController: NavController, auth: AuthManager ){
+fun RegisterScreen(
+    navController: NavController,
+    auth: AuthManager,
+    vmUsers: UsersViewModel
+){
 
     //VARIABLES Y CONSTANTES
     val context = LocalContext.current
@@ -171,7 +180,7 @@ fun RegisterScreen(navController: NavController, auth: AuthManager ){
                     onClick = {
                         scope.launch {
 
-                            signUp(name, lastName, phone, email, password, auth, context, navController)
+                            signUp(name, lastName, phone, email, password, auth, context, navController,vmUsers)
                         }
                     },
                     shape = RoundedCornerShape(50.dp),
@@ -209,11 +218,25 @@ private suspend fun signUp(
     password: String,
     auth: AuthManager,
     context: Context,
-    navController: NavController
+    navController: NavController,
+    vmUsers: UsersViewModel
 ) {
     if(name.isNotEmpty() && lastName.isNotEmpty() && phone.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()){
-        when(val result = auth.createUserWithEmailandPassword(email, password)){ // agregar la linea de retrofit para insertar el user en la base de datos
+        val userToInsert: User = User(
+            null,
+            name,
+            lastName,
+            Phone(null,phone,null,null),
+            Email(null,email,null,null),
+            Profile(null,"","",null,null,null,null),
+            null,
+            null
+        )
+        when(val result = auth.createUserWithEmailandPassword(email, password)){
+            // agregar la linea de retrofit para insertar el user en la base de datos
             is AuthRes.Succes ->{
+                // Llama a la función del ViewModel para insertar el usuario
+                vmUsers.insertUserVm(userToInsert)
                 Toast.makeText(context, "Successful registration", Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
             }

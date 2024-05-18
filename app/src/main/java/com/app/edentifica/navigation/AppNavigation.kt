@@ -14,7 +14,6 @@ import com.app.edentifica.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
 import com.google.firebase.auth.FirebaseUser
 import com.app.edentifica.utils.googleAuth.SignInState
-import com.app.edentifica.utils.googleAuth.SignInViewModel
 
 
 @Composable
@@ -52,7 +51,8 @@ fun AppNavigation(
         composable(route=AppScreen.RegisterScreen.route){
             RegisterScreen(
                 navController = navController,
-                auth = authManager
+                auth = authManager,
+                vmUsers=vmUsers
             )
         }
 
