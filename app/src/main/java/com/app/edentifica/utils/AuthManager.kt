@@ -1,6 +1,9 @@
 package com.app.edentifica.utils
 
 
+import android.content.Intent
+import androidx.core.content.ContextCompat.startActivity
+import com.app.edentifica.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth

@@ -18,6 +18,12 @@ class UsersViewModel : ViewModel() {
     private val _validationOne = MutableStateFlow<Boolean>(false)
     val validationOne: StateFlow<Boolean> = _validationOne
 
+    private val _answerValidation = MutableStateFlow<Boolean>(false)
+    val answerValidation: StateFlow<Boolean> = _answerValidation
+
+    /**
+     * Esta funcion recibe un email y nos devuelve al usuario encontrado
+     */
     fun getUserByEmail(email: String) {
         viewModelScope.launch {
             try {
@@ -25,29 +31,88 @@ class UsersViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     _user.value = response.body()
                 } else {
-                    Log.e("error en userViewModel", "error")
+                    Log.e("error en userViewModel", "getUserByEmail")
                 }
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
-                e.message?.let { Log.e("error en userViewModel try", it) }
+                e.message?.let { Log.e("error catch userViewModel getUserByEmail", it) }
             }
         }
     }
 
-    fun toDoCallByUser(user:User) {
+
+    /**
+     * Esta funcion recibe un email y nos devuelve al usuario encontrado
+     */
+    fun updateUserVM(user: User) {
+        viewModelScope.launch {
+            try {
+                val response = userService.updateUser(user)
+                if (response.isSuccessful) {
+                    _user.value = userService.getByEmail(user.email.email).body()
+                } else {
+                    Log.e("error en userViewModel", "getUserByEmail")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel getUserByEmail", it) }
+            }
+        }
+    }
+
+
+    /**
+     * Esta funcion recibe un usuario para realizar la llamada de la validacion one
+     */
+    fun toDoCallByUser(user: User) {
         viewModelScope.launch {
             try {
                 val response = userService.toDoCall(user)
                 if (response.isSuccessful) {
-                    _validationOne.value = response.body()!!
-                    Log.e("validacion", "bien")
+                    val responseBody = response.body()
+                    if (responseBody != null) {
+                        _validationOne.value = responseBody
+                        Log.e("validacion", "bien")
+                    } else {
+                        Log.e("error en userViewModel", "toDoCallByUser if")
+                    }
                 } else {
-                    Log.e("error en userViewModel", "error")
+                    Log.e("error en userViewModel", "toDoCallByUser else")
                 }
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
-                e.message?.let { Log.e("error en userViewModel try", it) }
+                e.message?.let { Log.e("error catch userViewModel toDoCallByUser try", it) }
             }
         }
     }
+
+
+    /**
+     * Esta funcion recibe la respuesta matematica y actualiza su variable si es correcta
+     */
+    fun answerMathByUser(answer: Int,user: User) {
+        viewModelScope.launch {
+            try {
+                val response = userService.answerMathChallenge(answer,user)
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    if (responseBody != null) {
+                        _answerValidation.value = responseBody
+                        //si la respuesta es true, actualizao al usuario desde la base de datos
+                        _user.value = userService.getByEmail(user.email.email).body()
+
+                        Log.e("respuesta validacion", "bien")
+                    } else {
+                        Log.e("error en userViewModel", "responseBody es nulo")
+                    }
+                } else {
+                    Log.e("error en userViewModel", "answerMathByUser")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel answerMathByUser try", it) }
+            }
+        }
+    }
+
 }

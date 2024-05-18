@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
@@ -66,7 +68,7 @@ fun ValidationOneScreen(
     var showDialog by remember { mutableStateOf(false) }
 
     val user = auth.getCurrentUser()
-    // Llama a getUserByEmail cuando se inicia HomeScreen
+    // Llama a getUserByEmail cuando se inicia ValidationOneScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
@@ -75,7 +77,9 @@ fun ValidationOneScreen(
 
     Log.e("userBBDD", userState.toString())
 
-    val onLogoutConfirmed:()->Unit = {
+
+
+    val onLogoutConfirmedValidation:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -162,12 +166,12 @@ fun ValidationOneScreen(
         }
     ) {
         //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
-            contentPadding ->
+        contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
                 LogoutDialogValidation(
                     onConfirmLogout = {
-                        onLogoutConfirmed()
+                        onLogoutConfirmedValidation()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -182,29 +186,50 @@ fun ValidationOneScreen(
 @Composable
 fun BodyContentValidationOne(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "¡Ups, todavia no te has validado, para empezar la validacion por favor haz click en empezar!",
-            style = MaterialTheme.typography.h5
-        )
-        Button(
-            onClick = {
-                // Llamar a la función del ViewModel
-                userState?.let { user ->
-                    vmUsers.toDoCallByUser(user)
-                    //si la llamada es correcta lo redirijo, pendiente agregar la otra pantalla de introducir el resultado
-                    if (vmUsers.validationOne.value) {
-                        navController.navigate(AppScreen.HomeScreen.route)
+    // Observa el estado de validationOne
+    val validationOneState = vmUsers.validationOne.collectAsState()
+
+    // Usa un when para manejar diferentes casos
+    when {
+        validationOneState.value == true -> {
+            // Si validationOne es true, redirigir a otra pantalla
+            LaunchedEffect(Unit) {
+                navController.navigate(AppScreen.ValidationOneCheckScreen.route)
+            }
+        }
+        validationOneState.value == false -> {
+            // Si validationOne es false, mostrar el botón para comenzar la validación
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "¡UPS, todavía no te has validado…!\n" +
+                            "Para este proceso, te vamos a llamar y escucharás una operación matemática, después de esto debes colgar la llamada y contestar el resultado en nuestra aplicación\n" +
+                            "Si estás listo, empecemos",
+                    style = MaterialTheme.typography.h5
+                )
+                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+                    androidx.compose.material3.Button(
+                        onClick = {
+                            // Llamar a la función del ViewModel
+                            userState?.let { user ->
+                                vmUsers.toDoCallByUser(user)
+                            }
+                        },
+                        shape = RoundedCornerShape(50.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text(text = "Empezar")
                     }
                 }
-            },
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text(text = "Empezar")
+            }
+        }
+        else -> {
+            // Manejar otros casos si es necesario
         }
     }
 

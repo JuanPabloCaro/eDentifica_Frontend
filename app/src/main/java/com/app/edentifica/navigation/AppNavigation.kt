@@ -8,6 +8,7 @@ import com.app.edentifica.ui.screens.ForgotPasswordScreen
 import com.app.edentifica.ui.screens.HomeScreen
 import com.app.edentifica.ui.screens.LoginScreen
 import com.app.edentifica.ui.screens.RegisterScreen
+import com.app.edentifica.ui.screens.ValidationOneCheckScreen
 import com.app.edentifica.ui.screens.ValidationOneScreen
 import com.app.edentifica.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
@@ -62,8 +63,9 @@ fun AppNavigation(
                 )
         }
 
-        composable(route=AppScreen.HomeScreen.route){
-            HomeScreen(navController = navController,
+        composable(route= AppScreen.HomeScreen.route){
+            HomeScreen(
+                navController = navController,
                 auth= authManager,
                 onSignOutGoogle= onSignOutGoogle,
                 vmUsers= vmUsers
@@ -72,6 +74,15 @@ fun AppNavigation(
 
         composable(route=AppScreen.ValidationOneScreen.route){
             ValidationOneScreen(
+                navController = navController,
+                auth= authManager,
+                onSignOutGoogle = onSignInClickGoogle,
+                vmUsers=vmUsers
+            )
+        }
+
+        composable(route=AppScreen.ValidationOneCheckScreen.route){
+            ValidationOneCheckScreen(
                 navController = navController,
                 auth= authManager,
                 onSignOutGoogle = onSignInClickGoogle,
