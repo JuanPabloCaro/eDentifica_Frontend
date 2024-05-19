@@ -15,6 +15,9 @@ class UsersViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
+    private val _userInserted = MutableStateFlow<Boolean?>(false)
+    val userInserted: StateFlow<Boolean?> = _userInserted
+
     private val _validationOne = MutableStateFlow<Boolean>(false)
     val validationOne: StateFlow<Boolean> = _validationOne
 
@@ -24,19 +27,21 @@ class UsersViewModel : ViewModel() {
     /**
      * Esta funcion recibe un User y lo inserta en la base de datos
      */
-    fun insertUserVm(user:User) {
-        viewModelScope.launch {
-            try {
-                val response = userService.insertUser(user)
-                if (response.isSuccessful) {
-                    _user.value = response.body()
-                } else {
-                    Log.e("error en userViewModel", "getUserByEmail")
-                }
-            } catch (e: Exception) {
-                // Manejar errores de red u otros errores
-                e.message?.let { Log.e("error catch userViewModel getUserByEmail", it) }
+
+    suspend fun insertUserVm(user:User): Boolean {
+        return try {
+            val response = userService.insertUser(user)
+            if (response.isSuccessful) {
+                _userInserted.value = true
+                true
+            } else {
+                Log.e("error en userViewModel", "insertUser")
+                false
             }
+        } catch (e: Exception) {
+            // Manejar errores de red u otros errores
+            e.message?.let { Log.e("error catch userViewModel insert User", it) }
+            false
         }
     }
 
@@ -119,7 +124,6 @@ class UsersViewModel : ViewModel() {
                         _answerValidation.value = responseBody
                         //si la respuesta es true, actualizao al usuario desde la base de datos
                         getUserByEmail(user.email.email)
-
                         Log.e("respuesta validacion", "bien")
                     } else {
                         Log.e("error en userViewModel", "responseBody es nulo")

@@ -14,5 +14,6 @@ sealed class AppScreen(val route: String){
     object ValidationOneScreen: AppScreen("validation_one_screen")
 
     object ValidationOneCheckScreen: AppScreen("validation_one_check_screen")
+    object RegisterPhoneScreen: AppScreen("register_phone")
 
 }

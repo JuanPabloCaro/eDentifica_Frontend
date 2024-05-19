@@ -2,6 +2,7 @@ package com.app.edentifica.ui.screens
 
 import  android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,11 +47,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.edentifica.R
+import com.app.edentifica.data.model.Email
+import com.app.edentifica.data.model.Phone
+import com.app.edentifica.data.model.Profile
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.data.model.User
+import com.app.edentifica.utils.AuthRes
 import com.app.edentifica.utils.googleAuth.SignInViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -62,8 +69,9 @@ fun HomeScreen(
     vmUsers: UsersViewModel,
 ) {
     //VARIABLES Y CONSTANTES
+    //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-
+    //recojo al user Actual
     val user = auth.getCurrentUser()
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
@@ -71,16 +79,33 @@ fun HomeScreen(
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
+
     Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
     Log.e("userValidation", userState?.toString().toString())
 
-    //si el usuario esta sin validar, lo envio a la pantalla de validacion
-//    if(userState?.validations?.get(0)?.validated.equals("0")){
-    if(userState?.validations?.get(0)?.isValidated==false){
-        navController.navigate(AppScreen.ValidationOneScreen.route)
+    //si el user es existe le pregunto si ya esta validado
+    if(userState != null){
+        if(userState?.validations?.get(0)?.isValidated==false){
+            navController.navigate(AppScreen.ValidationOneScreen.route)
+        }
+    }else{// si el usuario no existe lo inserto en la base de datos
+        val userToInsert: User = User(
+            null,
+            auth.getCurrentUser()?.displayName.toString(),
+            "",
+            Phone(null,auth.getCurrentUser()?.phoneNumber.toString(),false,null),
+            Email(null,auth.getCurrentUser()?.email.toString(),false,null),
+            Profile(null,"",auth.getCurrentUser()?.photoUrl.toString(),null,null,null,null),
+            null,
+            null
+        )
+        // Llama a la función del ViewModel para insertar el usuario y espera a que se complete
+        LaunchedEffect (Unit) {
+            vmUsers.insertUserVm(userToInsert)
+            vmUsers.getUserByEmail(auth.getCurrentUser()?.email.toString())
+        }
     }
 
-//    Log.e("userBBDD", userState.toString())
 
     val onLogoutConfirmed:()->Unit = {
         auth.signOut()

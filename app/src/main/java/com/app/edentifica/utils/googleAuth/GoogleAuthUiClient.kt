@@ -49,7 +49,8 @@ class GoogleAuthUiClient(
                             userId = uid,
                             username = displayName,
                             userEmail = it,
-                            profilePictureUrl = photoUrl?.toString()
+                            profilePictureUrl = photoUrl?.toString(),
+                            userPhone = phoneNumber.toString()
                         )
                     }
                 },

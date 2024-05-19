@@ -1,7 +1,9 @@
 package com.app.edentifica.ui.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
@@ -29,9 +32,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,6 +48,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,17 +60,18 @@ import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.UsersViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ValidationOneCheckScreen(
     navController: NavController,
     auth: AuthManager,
-    onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
 ) {
     //VARIABLES Y CONSTANTES
-    var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val user = auth.getCurrentUser()
     // Llama a getUserByEmail cuando se inicia ValidationOneScreen
@@ -81,17 +84,6 @@ fun ValidationOneCheckScreen(
     Log.e("userBBDD", userState.toString())
 
 
-
-    val onLogoutConfirmedValidationCheck:()->Unit = {
-        auth.signOut()
-        onSignOutGoogle()
-
-        navController.navigate(AppScreen.LoginScreen.route){
-            popUpTo(AppScreen.HomeScreen.route){
-                inclusive= true
-            }
-        }
-    }
 
     //Estructura de la pantalla
     Scaffold(
@@ -141,16 +133,6 @@ fun ValidationOneCheckScreen(
                         }
                     }
                 },
-                actions = {
-                    //boton de accion para salir cerrar sesion
-                    IconButton(
-                        onClick = {
-                            showDialog = true
-                        }
-                    ) {
-                        Icon(Icons.Outlined.ExitToApp, contentDescription = "Cerrar sesión")
-                    }
-                },
                 backgroundColor= Color.Gray
             )
         },
@@ -168,115 +150,77 @@ fun ValidationOneCheckScreen(
             }
         }
     ) {
-        //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
-        contentPadding ->
-        Box(modifier = Modifier.padding(contentPadding)) {
-            if (showDialog) {
-                LogoutDialogValidationCheck(
-                    onConfirmLogout = {
-                        onLogoutConfirmedValidationCheck()
-                        showDialog = false
-                    },
-                    onDismiss = { showDialog = false })
-            }
-
-        }
         //funcion composable que pinta el contenido de home
-        BodyContentValidationOneCheck(navController, vmUsers, userState)
+        BodyContentValidationOneCheck(navController, vmUsers, userState, context)
     }
 }
 
 @Composable
-fun BodyContentValidationOneCheck(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
-    //// Observa el estado de validationOneCheck
+fun BodyContentValidationOneCheck(
+    navController: NavController,
+    vmUsers: UsersViewModel,
+    userState: User?,
+    context: Context
+) {
+    // Observa el estado de validationOneCheck
     val validationOneCheckState = vmUsers.answerValidation.collectAsState()
     // Estado para almacenar la respuesta del usuario
     var userResponse by remember { mutableStateOf("") }
+    // Estado para verificar si se ha presionado el botón
+    var buttonPressed by remember { mutableStateOf(false) }
 
-
-    // Usa un when para manejar diferentes casos
-    when {
-        validationOneCheckState.value == true -> {
-            // Si validationOneCheck es true, redirigir a otra pantalla
-            LaunchedEffect(Unit) {
-                navController.navigate(AppScreen.HomeScreen.route)
-            }
-        }
-        validationOneCheckState.value == false -> {
-            // Si validationOneCheck es false, mostrar el botón para comenzar la validación
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Por favor introduce la respuesta del reto matematico",
-                    style = MaterialTheme.typography.h5
-                )
-
-                // Campo de entrada para la respuesta del usuario
-                OutlinedTextField(
-                    value = userResponse,
-                    onValueChange = { userResponse = it },
-                    label = { Text("Respuesta") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                )
-
-                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                    Button(
-                        onClick = {
-                            // Llamar a la función del ViewModel
-                            userState?.let { user ->
-                                vmUsers.answerMathByUser(userResponse.toInt(),user)
-                            }
-                        },
-                        shape = RoundedCornerShape(50.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = "Empezar")
-                    }
-                }
-            }
-        }
-        else -> {
-            // Manejar otros casos si es necesario
+    // LaunchedEffect para mostrar el Toast después de la actualización de userState
+    LaunchedEffect(userState) {
+        if (validationOneCheckState.value == true) {
+            Toast.makeText(
+                context,
+                "La Validacion 1 ha sido exitosa",
+                Toast.LENGTH_LONG
+            ).show()
+            buttonPressed=true
+            navController.navigate(AppScreen.HomeScreen.route)
         }
     }
 
-}
+    //Falta mostrar el mensaje de error
 
-/**
- * Funcion composable que se encarga de mostrar un alert para preguntar al
- * usuario si quiere continuar o cerrar sesion
- */
-@Composable
-fun LogoutDialogValidationCheck(
-    onConfirmLogout: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión") },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?") },
-        confirmButton = {
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Por favor introduce la respuesta del reto matematico",
+            style = MaterialTheme.typography.h5
+        )
+
+        // Campo de entrada para la respuesta del usuario
+        OutlinedTextField(
+            value = userResponse,
+            onValueChange = { userResponse = it },
+            label = { Text("Respuesta") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
-                onClick = onConfirmLogout,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Green)
+                onClick = {
+                    // Llamar a la función del ViewModel
+                    userState?.let { user ->
+                        vmUsers.answerMathByUser(userResponse.toInt(),user)
+                    }
+                },
+                shape = RoundedCornerShape(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
             ) {
-                Text("Aceptar",color= Color.White)
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
-            ) {
-                Text("Cancelar",color= Color.White)
+                Text(text = "Validar respuesta")
             }
         }
-    )
+    }
 }

@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
                                     val signInResult = googleAuthUiClient.signInWithIntent(
                                         intent = result.data ?: return@launch
                                     )
-                                    viewModel.onSignInResult(signInResult)
+                                    viewModel.onSignInResult(signInResult, context)
                                 }
                             }
 

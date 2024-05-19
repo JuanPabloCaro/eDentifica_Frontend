@@ -58,6 +58,8 @@ import com.app.edentifica.data.model.User
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.utils.AuthRes
 import com.app.edentifica.viewModel.UsersViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -232,18 +234,27 @@ private suspend fun signUp(
             null,
             null
         )
-        when(val result = auth.createUserWithEmailandPassword(email, password)){
-            // agregar la linea de retrofit para insertar el user en la base de datos
-            is AuthRes.Succes ->{
-                // Llama a la función del ViewModel para insertar el usuario
-                vmUsers.insertUserVm(userToInsert)
-                Toast.makeText(context, "Successful registration", Toast.LENGTH_SHORT).show()
-                navController.popBackStack()
+        // Llama a la función del ViewModel para insertar el usuario y espera a que se complete
+        val isUserInserted = coroutineScope {
+            async { vmUsers.insertUserVm(userToInsert) }
+        }.await()
+
+        if(isUserInserted){
+            when(val result = auth.createUserWithEmailandPassword(email, password)){
+                // agregar la linea de retrofit para insertar el user en la base de datos
+                is AuthRes.Succes ->{
+
+                    Toast.makeText(context, "Successful registration", Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
+                }
+                is AuthRes.Error ->{
+                    Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
+                }
             }
-            is AuthRes.Error ->{
-                Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
-            }
+        }else{
+            Toast.makeText(context, "Error SignUp: maybe already exists number phone or email", Toast.LENGTH_SHORT).show()
         }
+
     }else{
         Toast.makeText(context, "There are empty fields", Toast.LENGTH_SHORT).show()
     }

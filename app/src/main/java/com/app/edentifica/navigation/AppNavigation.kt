@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.app.edentifica.ui.screens.ForgotPasswordScreen
 import com.app.edentifica.ui.screens.HomeScreen
 import com.app.edentifica.ui.screens.LoginScreen
+import com.app.edentifica.ui.screens.RegisterPhoneScreen
 import com.app.edentifica.ui.screens.RegisterScreen
 import com.app.edentifica.ui.screens.ValidationOneCheckScreen
 import com.app.edentifica.ui.screens.ValidationOneScreen
@@ -76,7 +77,7 @@ fun AppNavigation(
             ValidationOneScreen(
                 navController = navController,
                 auth= authManager,
-                onSignOutGoogle = onSignInClickGoogle,
+                onSignOutGoogle= onSignOutGoogle,
                 vmUsers=vmUsers
             )
         }
@@ -85,7 +86,14 @@ fun AppNavigation(
             ValidationOneCheckScreen(
                 navController = navController,
                 auth= authManager,
-                onSignOutGoogle = onSignInClickGoogle,
+                vmUsers=vmUsers
+            )
+        }
+
+        composable(route=AppScreen.RegisterPhoneScreen.route){
+            RegisterPhoneScreen(
+                navController = navController,
+                auth= authManager,
                 vmUsers=vmUsers
             )
         }
