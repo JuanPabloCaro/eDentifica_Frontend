@@ -154,18 +154,19 @@ fun BodyContentRegisterPhone(
     context: Context
 ) {
     var userResponse by remember { mutableStateOf("") }
+    //falta poner el telefono del view model para ver cuando cambia su estado
 
     // LaunchedEffect para mostrar el Toast después de la actualización de userState
-    LaunchedEffect(userState) {
-        if (!userState?.phone?.phoneNumber.equals("")) {
-            Toast.makeText(
-                context,
-                "the phone was inserted correctly",
-                Toast.LENGTH_LONG
-            ).show()
-            navController.navigate(AppScreen.ValidationOneScreen.route)
-        }
-    }
+//    LaunchedEffect(userState) {
+//        if (!userState?.phone?.phoneNumber.equals("")) {
+//            Toast.makeText(
+//                context,
+//                "the phone was inserted correctly",
+//                Toast.LENGTH_LONG
+//            ).show()
+//            navController.navigate(AppScreen.ValidationOneScreen.route)
+//        }
+//    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -191,14 +192,10 @@ fun BodyContentRegisterPhone(
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-                    // Llamar a la función del ViewModel
-                    userState?.let { user ->
-                        // Copiar el usuario actual y agregar el teléfono
-                        val updatedUser = user.copy(phone = Phone(null,userResponse,false,userState.profile?.id))
-                        // Llamar a la función del ViewModel para actualizar el usuario
-                        vmUsers.updateUserVM(updatedUser)
-                        vmUsers.getUserByEmail(user.email.email)
-                    }
+                    // Llamar a la función del ViewModel para insertar el telefono
+//                    userState?.let { user ->
+//
+//                    }
                 },
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier

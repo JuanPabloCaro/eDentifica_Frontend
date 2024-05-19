@@ -80,13 +80,15 @@ fun ValidationOneScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
-    Log.e("userBBDD", userState.toString())
     // Verifica si el teléfono del usuario es nulo y navega a la pantalla de registro de teléfono si es necesario
     LaunchedEffect(userState) {
-        if (userState?.phone?.phoneNumber == null || userState?.phone?.phoneNumber.equals("")) {
+        if (userState?.phone?.phoneNumber == null || userState?.phone?.phoneNumber.equals("") || userState?.phone?.phoneNumber.equals("null")) {
             navController.navigate(AppScreen.RegisterPhoneScreen.route)
         }
     }
+
+    Log.e("userBBDD", userState.toString())
+
 
 
     val onLogoutConfirmed:()->Unit = {
