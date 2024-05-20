@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,9 +24,11 @@ import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.getValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -43,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -86,9 +90,13 @@ fun HomeScreen(
     //si el user es existe le pregunto si ya esta validado
     if(userState != null){
         if(userState?.validations?.get(0)?.isValidated==false){
-            navController.navigate(AppScreen.ValidationOneScreen.route)
+            navController.navigate(AppScreen.ValidationOneScreen.route){
+                popUpTo(AppScreen.HomeScreen.route){
+                    inclusive= true
+                }
+            }
         }
-    }else{// si el usuario no existe lo inserto en la base de datos
+    }else if(auth.getCurrentUser()?.email !=null){// si el usuario no existe lo inserto en la base de datos
         val userToInsert: User = User(
             null,
             auth.getCurrentUser()?.displayName.toString(),
@@ -153,20 +161,35 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = 20.sp,
+                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Bienvenid@",//welcomeMessage,
+                                fontSize = 16.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
-                                fontSize = 12.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis)
+                            (if(!user?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis)
+                            }
                         }
+
                     }
                 },
                 actions = {
+                    //Si el usuario es diferente a null/anonimo, entonces se muestra el boton para navegar al perfil
+                    if(auth.getCurrentUser()?.email!=null){
+                        // Botón del perfil
+                        IconButton(
+                            onClick = {
+                                navController.navigate(AppScreen.ProfileUserScreen.route)
+                            }
+                        ) {
+                            Icon(Icons.Filled.AccountCircle, contentDescription = "Perfil")
+                        }
+                    }
+
                     //boton de accion para salir cerrar sesion
                     IconButton(
                         onClick = {
@@ -220,15 +243,61 @@ fun BodyContentHome(
     vmUsers: UsersViewModel,
     userState: User?
 ) {
-    Column {
-        if (userState != null) {
-            Text(text = "Nombre: ${userState.name}")
-            Text(text = "Apellido: ${userState.lastName}")
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "¿Qué quieres buscar?",
+            style = MaterialTheme.typography.h5,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
+
+        Button(
+            onClick = { /* Handle email search */ },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onPrimary
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text("Buscar correo")
         }
 
-    }
+        Button(
+            onClick = { /* Handle phone search */ },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onPrimary
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text("Buscar teléfono")
+        }
 
+        Button(
+            onClick = { /* Handle social media search */ },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onPrimary
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text("Buscar red social")
+        }
+    }
 }
+
 
 
 

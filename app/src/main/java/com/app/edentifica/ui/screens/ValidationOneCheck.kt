@@ -226,7 +226,11 @@ fun BodyContentValidationOneCheck(
                 buttonPressed = false
                 vmUsers.validationOneNegative()
                 vmUsers.validationOneCheckNegative()
-                navController.popBackStack()
+                navController.navigate(AppScreen.ValidationOneScreen.route){
+                    popUpTo(AppScreen.ValidationOneCheckScreen.route){
+                        inclusive= true
+                    }
+                }
             }
         }
 
@@ -238,7 +242,11 @@ fun BodyContentValidationOneCheck(
                     "La validación 1 ha sido exitosa",
                     Toast.LENGTH_LONG
                 ).show()
-                navController.navigate(AppScreen.HomeScreen.route)
+                navController.navigate(AppScreen.HomeScreen.route){
+                    popUpTo(AppScreen.ValidationOneCheckScreen.route){
+                        inclusive= true
+                    }
+                }
             }
         }
     }
