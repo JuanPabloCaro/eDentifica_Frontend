@@ -21,7 +21,7 @@ class UsersViewModel : ViewModel() {
     private val _validationOne = MutableStateFlow<Boolean>(false)
     val validationOne: StateFlow<Boolean> = _validationOne
 
-    private val _answerValidation = MutableStateFlow<Boolean?>(false)
+    private val _answerValidation = MutableStateFlow<Boolean?>(null)
     val answerValidation: StateFlow<Boolean?> = _answerValidation
 
     /**
@@ -54,26 +54,6 @@ class UsersViewModel : ViewModel() {
                 val response = userService.getByEmail(email)
                 if (response.isSuccessful) {
                     _user.value = response.body()
-                } else {
-                    Log.e("error en userViewModel", "getUserByEmail")
-                }
-            } catch (e: Exception) {
-                // Manejar errores de red u otros errores
-                e.message?.let { Log.e("error catch userViewModel getUserByEmail", it) }
-            }
-        }
-    }
-
-
-    /**
-     * Esta funcion recibe un email y nos devuelve al usuario encontrado
-     */
-    fun updateUserVM(user: User) {
-        viewModelScope.launch {
-            try {
-                val response = userService.updateUser(user)
-                if (response.isSuccessful) {
-                    _user.value = userService.getByEmail(user.email.email).body()
                 } else {
                     Log.e("error en userViewModel", "getUserByEmail")
                 }
@@ -120,13 +100,16 @@ class UsersViewModel : ViewModel() {
                 val response = userService.answerMathChallenge(answer,user)
                 if (response.isSuccessful) {
                     val responseBody = response.body()
-                    if (responseBody != null) {
+                    if (responseBody==true) {
                         _answerValidation.value = responseBody
                         //si la respuesta es true, actualizao al usuario desde la base de datos
                         getUserByEmail(user.email.email)
                         Log.e("respuesta validacion", "bien")
                     } else {
-                        Log.e("error en userViewModel", "responseBody es nulo")
+                        _answerValidation.value = responseBody
+                        //si la respuesta es true, actualizao al usuario desde la base de datos
+                        getUserByEmail(user.email.email)
+                        Log.e("error en userViewModel", "la respuesta no es correcta")
                     }
                 } else {
                     Log.e("error en userViewModel", "answerMathByUser")
@@ -134,6 +117,35 @@ class UsersViewModel : ViewModel() {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch userViewModel answerMathByUser try", it) }
+            }
+        }
+    }
+
+
+    /**
+     * Esta funcion niega la validacion 1
+     */
+    fun validationOneNegative() {
+        viewModelScope.launch {
+            try {
+                _validationOne.value=false
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel validationOneNegative", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone en nulo la respuesta del reto matematico del usuario
+     */
+    fun validationOneCheckNegative() {
+        viewModelScope.launch {
+            try {
+                _answerValidation.value=null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel validationOneCheckNegative", it) }
             }
         }
     }

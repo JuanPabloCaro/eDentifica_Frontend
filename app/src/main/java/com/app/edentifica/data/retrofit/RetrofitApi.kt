@@ -11,4 +11,5 @@ object RetrofitApi {
         .build()
 
     val userService : UserService by lazy { retrofit.create(UserService::class.java) }
+    val phoneService : PhoneService by lazy { retrofit.create(PhoneService::class.java) }
 }

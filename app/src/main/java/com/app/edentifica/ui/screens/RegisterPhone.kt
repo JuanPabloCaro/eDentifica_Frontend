@@ -53,14 +53,16 @@ import com.app.edentifica.data.model.Phone
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
+import com.app.edentifica.viewModel.PhonesViewModel
 import com.app.edentifica.viewModel.UsersViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun RegisterPhoneScreen(
     navController: NavController,
     auth: AuthManager,
     vmUsers: UsersViewModel,
+    vmPhones: PhonesViewModel,
 ) {
     //VARIABLES Y CONSTANTES
     var context = LocalContext.current
@@ -139,7 +141,7 @@ fun RegisterPhoneScreen(
         }
     ) {
         //funcion composable que pinta el contenido de home
-        BodyContentRegisterPhone(navController, vmUsers, userState, context)
+        BodyContentRegisterPhone(navController, userState, context,vmPhones)
     }
 }
 
@@ -149,24 +151,25 @@ fun RegisterPhoneScreen(
 @Composable
 fun BodyContentRegisterPhone(
     navController: NavController,
-    vmUsers: UsersViewModel,
     userState: User?,
-    context: Context
+    context: Context,
+    vmPhones: PhonesViewModel
 ) {
-    var userResponse by remember { mutableStateOf("") }
-    //falta poner el telefono del view model para ver cuando cambia su estado
+    var userPhone by remember { mutableStateOf("") }
+    // Observa el flujo de phone en el ViewModel
+    val phoneUpsateState by vmPhones.phoneUpdated.collectAsState()
 
-    // LaunchedEffect para mostrar el Toast después de la actualización de userState
-//    LaunchedEffect(userState) {
-//        if (!userState?.phone?.phoneNumber.equals("")) {
-//            Toast.makeText(
-//                context,
-//                "the phone was inserted correctly",
-//                Toast.LENGTH_LONG
-//            ).show()
-//            navController.navigate(AppScreen.ValidationOneScreen.route)
-//        }
-//    }
+    // Observa el flujo de actualización del teléfono y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(phoneUpsateState) {
+        if (phoneUpsateState==true) {
+            Toast.makeText(
+                context,
+                "El teléfono se actualizó correctamente",
+                Toast.LENGTH_SHORT
+            ).show()
+            navController.navigate(AppScreen.ValidationOneScreen.route)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -180,8 +183,8 @@ fun BodyContentRegisterPhone(
 
         // Campo de entrada para la respuesta del usuario
         OutlinedTextField(
-            value = userResponse,
-            onValueChange = { userResponse = it },
+            value = userPhone,
+            onValueChange = { userPhone = it },
             label = { Text("phone") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier
@@ -192,10 +195,11 @@ fun BodyContentRegisterPhone(
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-                    // Llamar a la función del ViewModel para insertar el telefono
-//                    userState?.let { user ->
-//
-//                    }
+                    // Actualizar el teléfono en el objeto User y llamar a la función del ViewModel para actualizarlo en la base de datos
+                    userState?.let { user ->
+                        val updatedUser = user.copy(phone = Phone(id = user.phone.id, phoneNumber = userPhone, isVerified = user.phone.isVerified, idProfileUser = user.phone.idProfileUser))
+                        vmPhones.updatePhoneVM(updatedUser.phone)
+                    }
                 },
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier

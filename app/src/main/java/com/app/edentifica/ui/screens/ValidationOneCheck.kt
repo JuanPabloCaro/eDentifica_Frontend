@@ -63,7 +63,7 @@ import com.app.edentifica.viewModel.UsersViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ValidationOneCheckScreen(
     navController: NavController,
@@ -153,6 +153,8 @@ fun ValidationOneCheckScreen(
         //funcion composable que pinta el contenido de home
         BodyContentValidationOneCheck(navController, vmUsers, userState, context)
     }
+
+
 }
 
 @Composable
@@ -164,26 +166,12 @@ fun BodyContentValidationOneCheck(
 ) {
     // Observa el estado de validationOneCheck
     val validationOneCheckState = vmUsers.answerValidation.collectAsState()
+
     // Estado para almacenar la respuesta del usuario
     var userResponse by remember { mutableStateOf("") }
+
     // Estado para verificar si se ha presionado el botón
     var buttonPressed by remember { mutableStateOf(false) }
-
-    // LaunchedEffect para mostrar el Toast después de la actualización de userState
-    LaunchedEffect(userState) {
-        if (validationOneCheckState.value == true) {
-            Toast.makeText(
-                context,
-                "La Validacion 1 ha sido exitosa",
-                Toast.LENGTH_LONG
-            ).show()
-            buttonPressed=true
-            navController.navigate(AppScreen.HomeScreen.route)
-        }
-    }
-
-    //Falta mostrar el mensaje de error
-
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -191,7 +179,7 @@ fun BodyContentValidationOneCheck(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Por favor introduce la respuesta del reto matematico",
+            text = "Por favor introduce la respuesta del reto matemático",
             style = MaterialTheme.typography.h5
         )
 
@@ -210,8 +198,9 @@ fun BodyContentValidationOneCheck(
             Button(
                 onClick = {
                     // Llamar a la función del ViewModel
-                    userState?.let { user ->
-                        vmUsers.answerMathByUser(userResponse.toInt(),user)
+                    if (userState != null) {
+                        vmUsers.answerMathByUser(userResponse.toInt(), userState)
+                        buttonPressed = true // Marcar el botón como presionado
                     }
                 },
                 shape = RoundedCornerShape(50.dp),
@@ -220,6 +209,36 @@ fun BodyContentValidationOneCheck(
                     .height(50.dp)
             ) {
                 Text(text = "Validar respuesta")
+            }
+        }
+
+        // Observar cambios en validationOneCheckState
+        LaunchedEffect(validationOneCheckState.value) {
+            // Si validationOneCheckState es false y el botón ha sido presionado
+            if (validationOneCheckState.value == false && buttonPressed) {
+                Toast.makeText(
+                    context,
+                    "Respuesta inválida",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // Reiniciar variables y navegar a la pantalla anterior
+                buttonPressed = false
+                vmUsers.validationOneNegative()
+                vmUsers.validationOneCheckNegative()
+                navController.popBackStack()
+            }
+        }
+
+        // Si validationOneCheckState es true, navegar a la pantalla HomeScreen
+        if (validationOneCheckState.value == true) {
+            LaunchedEffect(Unit) {
+                Toast.makeText(
+                    context,
+                    "La validación 1 ha sido exitosa",
+                    Toast.LENGTH_LONG
+                ).show()
+                navController.navigate(AppScreen.HomeScreen.route)
             }
         }
     }

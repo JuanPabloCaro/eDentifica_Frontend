@@ -15,6 +15,7 @@ import com.app.edentifica.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
 import com.google.firebase.auth.FirebaseUser
 import com.app.edentifica.utils.googleAuth.SignInState
+import com.app.edentifica.viewModel.PhonesViewModel
 
 
 @Composable
@@ -22,7 +23,8 @@ fun AppNavigation(
     state: SignInState,
     onSignInClickGoogle: () -> Unit,
     onSignOutGoogle: () -> Unit,
-    vmUsers: UsersViewModel
+    vmUsers: UsersViewModel,
+    vmPhones: PhonesViewModel
 ) {
     //Aqui se maneja toda la navegacion entre nuestras pantallas
     //This handles all the navigation between our screens.
@@ -94,7 +96,8 @@ fun AppNavigation(
             RegisterPhoneScreen(
                 navController = navController,
                 auth= authManager,
-                vmUsers=vmUsers
+                vmUsers=vmUsers,
+                vmPhones=vmPhones
             )
         }
     }
