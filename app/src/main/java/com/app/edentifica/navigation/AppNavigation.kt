@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.app.edentifica.ui.screens.FindByEmailScreen
 import com.app.edentifica.ui.screens.ForgotPasswordScreen
 import com.app.edentifica.ui.screens.HomeScreen
 import com.app.edentifica.ui.screens.LoginScreen
@@ -104,6 +105,15 @@ fun AppNavigation(
 
         composable(route=AppScreen.ProfileUserScreen.route){
             ProfileScreen(
+                navController = navController,
+                auth= authManager,
+                onSignOutGoogle= onSignOutGoogle,
+                vmUsers= vmUsers
+            )
+        }
+
+        composable(route=AppScreen.FindByEmailScreen.route){
+            FindByEmailScreen(
                 navController = navController,
                 auth= authManager,
                 onSignOutGoogle= onSignOutGoogle,

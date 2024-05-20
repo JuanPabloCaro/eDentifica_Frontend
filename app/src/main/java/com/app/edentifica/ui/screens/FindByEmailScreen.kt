@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,13 +21,13 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material.Text
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,9 +50,6 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.edentifica.R
-import com.app.edentifica.data.model.Email
-import com.app.edentifica.data.model.Phone
-import com.app.edentifica.data.model.Profile
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
@@ -59,7 +57,7 @@ import com.app.edentifica.viewModel.UsersViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(
+fun FindByEmailScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
@@ -77,8 +75,11 @@ fun ProfileScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
+    Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
+    Log.e("userValidation", userState?.toString().toString())
 
-    val onLogoutConfirmedProfile:()->Unit = {
+
+    val onLogoutConfirmedFindByEmail:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -124,12 +125,12 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Bienvenid@",//welcomeMessage,
+                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Buscar por Correo",//welcomeMessage,
                                 fontSize = 16.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            (if(!user?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
+                            (if(!user?.email.isNullOrEmpty()|| userState!=null) "Buscar por correo" else "")?.let {
                                 Text(
                                     text = it,
                                     fontSize = 12.sp,
@@ -167,7 +168,7 @@ fun ProfileScreen(
         },
         bottomBar = {
             BottomAppBar (backgroundColor = Color.DarkGray){
-                androidx.compose.material3.Text(
+                Text(
                     text = "Version 1.0 @Copyrigth 2024 Todos los derechos reservados",
                     fontSize = 12.sp,
                     fontStyle = FontStyle.Italic,
@@ -183,9 +184,9 @@ fun ProfileScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogProfile(
+                LogoutDialogFindByEmail(
                     onConfirmLogout = {
-                        onLogoutConfirmedProfile()
+                        onLogoutConfirmedFindByEmail()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -193,7 +194,7 @@ fun ProfileScreen(
 
         }
         //funcion composable que pinta el contenido de home
-        BodyContentProfile(navController, vmUsers, userState)
+        BodyContentFindByEmail(navController, vmUsers, userState)
     }
 }
 
@@ -202,8 +203,61 @@ fun ProfileScreen(
 
 
 
+
 @Composable
-fun BodyContentProfile(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
+fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
+
+    // Estado para almacenar el correo electrónico ingresado por el usuario
+    var email by remember { mutableStateOf("") }
+
+    // Observamos el estado del resultado de la busqueda
+    val searchResult by vmUsers.userSearch.collectAsState()
+
+    // Estado para controlar si se ha realizado una búsqueda
+    var searchPerformed by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Campo de entrada para el correo electrónico
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Correo electrónico") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        // Botón para enviar la búsqueda
+        Button(
+            onClick = {
+                // Llamar a la función del ViewModel para buscar por correo electrónico
+                vmUsers.getUserByEmailSearch(email)
+                searchPerformed = true
+            },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("Buscar")
+        }
+
+        // Mostrar el resultado de la búsqueda o el mensaje de error
+        if (searchPerformed) {
+            if (searchResult != null) {
+                Text(
+                    text = "El correo ${email} le pertenece al usuario ${searchResult!!.name} registrado en eDentifica garantizando la seguridad del perfil",
+                    modifier = Modifier.padding(16.dp)
+                )
+            } else {
+                Text(
+                    text = "Lo sentimos, usuario no encontrado, puede tratarse de una posible suplantacion",
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+    }
 
 }
 
@@ -218,7 +272,7 @@ fun BodyContentProfile(navController: NavController, vmUsers: UsersViewModel, us
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogProfile(
+fun LogoutDialogFindByEmail(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {

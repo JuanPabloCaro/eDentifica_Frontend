@@ -258,7 +258,9 @@ fun BodyContentHome(
         )
 
         Button(
-            onClick = { /* Handle email search */ },
+            onClick = {
+                  navController.navigate(AppScreen.FindByEmailScreen.route)
+            },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.primary,
                 contentColor = MaterialTheme.colors.onPrimary

@@ -19,4 +19,6 @@ sealed class AppScreen(val route: String){
 
     object ProfileUserScreen: AppScreen("profile_user")
 
+    object FindByEmailScreen: AppScreen("find_by_email")
+
 }

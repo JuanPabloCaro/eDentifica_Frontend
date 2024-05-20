@@ -15,6 +15,9 @@ class UsersViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
+    private val _userSearch = MutableStateFlow<User?>(null)
+    val userSearch: StateFlow<User?> = _userSearch
+
     private val _userInserted = MutableStateFlow<Boolean?>(false)
     val userInserted: StateFlow<Boolean?> = _userInserted
 
@@ -60,6 +63,25 @@ class UsersViewModel : ViewModel() {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch userViewModel getUserByEmail", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion recibe un email y nos devuelve al usuario encontrado, esta la utilizamos para las busquedas de correo
+     */
+    fun getUserByEmailSearch(email: String) {
+        viewModelScope.launch {
+            try {
+                val response = userService.getByEmail(email)
+                if (response.isSuccessful) {
+                    _userSearch.value = response.body()
+                } else {
+                    Log.e("error en userViewModel", "getUserByEmailSearch")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel getUserByEmailSearch", it) }
             }
         }
     }
