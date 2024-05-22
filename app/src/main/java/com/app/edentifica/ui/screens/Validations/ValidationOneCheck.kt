@@ -1,32 +1,32 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.Validations
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.AlertDialog
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material.Text
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,6 +42,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,45 +50,32 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.edentifica.R
-import com.app.edentifica.data.model.Email
-import com.app.edentifica.data.model.Phone
-import com.app.edentifica.data.model.Profile
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.UsersViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(
+fun ValidationOneCheckScreen(
     navController: NavController,
     auth: AuthManager,
-    onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
 ) {
     //VARIABLES Y CONSTANTES
-    //para mostrar el dialogo de cerrar Sesion
-    var showDialog by remember { mutableStateOf(false) }
-    //recojo al user Actual
+    val context = LocalContext.current
+
     val user = auth.getCurrentUser()
-    // Llama a getUserByEmail cuando se inicia HomeScreen
+    // Llama a getUserByEmail cuando se inicia ValidationOneScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
+    Log.e("userBBDD", userState.toString())
 
-    val onLogoutConfirmedProfile:()->Unit = {
-        auth.signOut()
-        onSignOutGoogle()
 
-        navController.navigate(AppScreen.LoginScreen.route){
-            popUpTo(AppScreen.HomeScreen.route){
-                inclusive= true
-            }
-        }
-    }
 
     //Estructura de la pantalla
     Scaffold(
@@ -124,42 +112,17 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = 16.sp,
+                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenid@",//welcomeMessage,
+                                fontSize = 20.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            (if(!user?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
-                                Text(
-                                    text = it,
-                                    fontSize = 12.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis)
-                            }
+                            Text(
+                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis)
                         }
-
-                    }
-                },
-                actions = {
-                    //Si el usuario es diferente a null/anonimo, entonces se muestra el boton para navegar al perfil
-                    if(auth.getCurrentUser()?.email!=null){
-                        // Botón del perfil
-                        IconButton(
-                            onClick = {
-                                navController.navigate(AppScreen.ProfileUserScreen.route)
-                            }
-                        ) {
-                            Icon(Icons.Filled.AccountCircle, contentDescription = "Perfil")
-                        }
-                    }
-
-                    //boton de accion para salir cerrar sesion
-                    IconButton(
-                        onClick = {
-                            showDialog = true
-                        }
-                    ) {
-                        Icon(Icons.Outlined.ExitToApp, contentDescription = "Cerrar sesión")
                     }
                 },
                 backgroundColor= Color.Gray
@@ -167,7 +130,7 @@ fun ProfileScreen(
         },
         bottomBar = {
             BottomAppBar (backgroundColor = Color.DarkGray){
-                androidx.compose.material3.Text(
+                Text(
                     text = "Version 1.0 @Copyrigth 2024 Todos los derechos reservados",
                     fontSize = 12.sp,
                     fontStyle = FontStyle.Italic,
@@ -179,69 +142,104 @@ fun ProfileScreen(
             }
         }
     ) {
-        //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
-            contentPadding ->
-        Box(modifier = Modifier.padding(contentPadding)) {
-            if (showDialog) {
-                LogoutDialogProfile(
-                    onConfirmLogout = {
-                        onLogoutConfirmedProfile()
-                        showDialog = false
-                    },
-                    onDismiss = { showDialog = false })
-            }
-
-        }
         //funcion composable que pinta el contenido de home
-        BodyContentProfile(navController, vmUsers, userState)
+        BodyContentValidationOneCheck(navController, vmUsers, userState, context)
+    }
+
+
+}
+
+@Composable
+fun BodyContentValidationOneCheck(
+    navController: NavController,
+    vmUsers: UsersViewModel,
+    userState: User?,
+    context: Context
+) {
+    // Observa el estado de validationOneCheck
+    val validationOneCheckState = vmUsers.answerValidation.collectAsState()
+
+    // Estado para almacenar la respuesta del usuario
+    var userResponse by remember { mutableStateOf("") }
+
+    // Estado para verificar si se ha presionado el botón
+    var buttonPressed by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Por favor introduce la respuesta del reto matemático",
+            style = MaterialTheme.typography.h5
+        )
+
+        // Campo de entrada para la respuesta del usuario
+        OutlinedTextField(
+            value = userResponse,
+            onValueChange = { userResponse = it },
+            label = { Text("Respuesta") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+            Button(
+                onClick = {
+                    // Llamar a la función del ViewModel
+                    if (userState != null) {
+                        vmUsers.answerMathByUser(userResponse.toInt(), userState)
+                        buttonPressed = true // Marcar el botón como presionado
+                    }
+                },
+                shape = RoundedCornerShape(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text(text = "Validar respuesta")
+            }
+        }
+
+        // Observar cambios en validationOneCheckState
+        LaunchedEffect(validationOneCheckState.value) {
+            // Si validationOneCheckState es false y el botón ha sido presionado
+            if (validationOneCheckState.value == false && buttonPressed) {
+                Toast.makeText(
+                    context,
+                    "Respuesta inválida",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // Reiniciar variables y navegar a la pantalla anterior
+                buttonPressed = false
+                vmUsers.validationOneNegative()
+                vmUsers.validationOneCheckNegative()
+                navController.navigate(AppScreen.ValidationOneScreen.route){
+                    popUpTo(AppScreen.ValidationOneCheckScreen.route){
+                        inclusive= true
+                    }
+                }
+            }
+        }
+
+        // Si validationOneCheckState es true, navegar a la pantalla HomeScreen
+        if (validationOneCheckState.value == true) {
+            LaunchedEffect(Unit) {
+                Toast.makeText(
+                    context,
+                    "La validación 1 ha sido exitosa",
+                    Toast.LENGTH_LONG
+                ).show()
+                navController.navigate(AppScreen.HomeScreen.route){
+                    popUpTo(AppScreen.ValidationOneCheckScreen.route){
+                        inclusive= true
+                    }
+                }
+            }
+        }
     }
 }
-
-
-
-
-
-
-@Composable
-fun BodyContentProfile(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
-
-}
-
-
-
-
-
-
-
-/**
- * Funcion composable que se encarga de mostrar un alert para preguntar al
- * usuario si quiere continuar o cerrar sesion
- */
-@Composable
-fun LogoutDialogProfile(
-    onConfirmLogout: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión") },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?") },
-        confirmButton = {
-            Button(
-                onClick = onConfirmLogout,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Green)
-            ) {
-                Text("Aceptar",color= Color.White)
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
-            ) {
-                Text("Cancelar",color= Color.White)
-            }
-        }
-    )
-}
-

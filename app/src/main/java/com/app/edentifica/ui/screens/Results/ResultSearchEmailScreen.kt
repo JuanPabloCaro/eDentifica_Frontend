@@ -1,9 +1,7 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.Results
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,24 +10,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,38 +56,29 @@ import com.app.edentifica.viewModel.UsersViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ValidationOneScreen(
+fun ResultSearchEmailScreen(
     navController: NavController,
     auth: AuthManager,
-    vmUsers: UsersViewModel,
     onSignOutGoogle: () -> Unit,
+    vmUsers: UsersViewModel,
 ) {
     //VARIABLES Y CONSTANTES
-
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
+    //recojo al user Actual
     val user = auth.getCurrentUser()
-    // Llama a getUserByEmail cuando se inicia ValidationOneScreen
+    // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
-    // Verifica si el teléfono del usuario es nulo y navega a la pantalla de registro de teléfono si es necesario
-    LaunchedEffect(userState) {
-        if (userState?.phone?.phoneNumber == null || userState?.phone?.phoneNumber.equals("") || userState?.phone?.phoneNumber.equals("null")) {
-            navController.navigate(AppScreen.RegisterPhoneScreen.route)
-        }
-    }
-
-    Log.e("userBBDD", userState.toString())
+    Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
+    Log.e("userValidation", userState?.toString().toString())
 
 
-
-    val onLogoutConfirmed:()->Unit = {
+    val onLogoutConfirmedResultEmail:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -101,7 +88,6 @@ fun ValidationOneScreen(
             }
         }
     }
-
 
     //Estructura de la pantalla
     Scaffold(
@@ -138,20 +124,35 @@ fun ValidationOneScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = 20.sp,
+                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Buscar por Telefono",//welcomeMessage,
+                                fontSize = 16.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
-                                fontSize = 12.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis)
+                            (if(!user?.email.isNullOrEmpty()|| userState!=null) "Buscar por Telefono" else "")?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis)
+                            }
                         }
+
                     }
                 },
                 actions = {
+                    //Si el usuario es diferente a null/anonimo, entonces se muestra el boton para navegar al perfil
+                    if(auth.getCurrentUser()?.email!=null){
+                        // Botón del perfil
+                        IconButton(
+                            onClick = {
+                                navController.navigate(AppScreen.ProfileUserScreen.route)
+                            }
+                        ) {
+                            Icon(Icons.Filled.AccountCircle, contentDescription = "Perfil")
+                        }
+                    }
+
                     //boton de accion para salir cerrar sesion
                     IconButton(
                         onClick = {
@@ -182,9 +183,9 @@ fun ValidationOneScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogValidation(
+                LogoutDialogResultEmail(
                     onConfirmLogout = {
-                        onLogoutConfirmed()
+                        onLogoutConfirmedResultEmail()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -192,72 +193,58 @@ fun ValidationOneScreen(
 
         }
         //funcion composable que pinta el contenido de home
-        BodyContentValidationOne(navController, vmUsers, userState, context)
+        BodyContentResultEmail(navController, vmUsers, userState)
     }
-
 }
+
+
+
+
+
+
 
 @Composable
-fun BodyContentValidationOne(
-    navController: NavController,
-    vmUsers: UsersViewModel,
-    userState: User?,
-    context: Context
-) {
+fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
 
-    // Observa el estado de validationOne
-    val validationOneState = vmUsers.validationOne.collectAsState()
+    // Observamos el estado del resultado de la busqueda
+    val searchResultEmail by vmUsers.userEmailSearch.collectAsState()
 
-    // Usa un when para manejar diferentes casos
-    when {
-        validationOneState.value == true -> {
-            // Si validationOne es true, redirigir a otra pantalla
-            LaunchedEffect(Unit) {
-                navController.navigate(AppScreen.ValidationOneCheckScreen.route){
-                    popUpTo(AppScreen.ValidationOneScreen.route){
-                        inclusive= true
-                    }
-                }
-                Toast.makeText(context, "Te llamaremos en breve...", Toast.LENGTH_LONG).show()
-            }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        if (searchResultEmail != null) {
+            Text(
+                text = "El Email ${searchResultEmail!!.email.email} le pertenece al usuario ${searchResultEmail!!.name} registrado en eDentifica garantizando la seguridad del perfil",
+                modifier = Modifier.padding(16.dp)
+            )
+
+        } else {
+            Text(
+                text = "Lo sentimos, usuario no encontrado, puede tratarse de una posible suplantacion",
+                modifier = Modifier.padding(16.dp)
+            )
         }
-        validationOneState.value == false -> {
-            // Si validationOne es false, mostrar el botón para comenzar la validación
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "¡UPS, todavía no te has validado…!\n" +
-                            "Para este proceso, te vamos a llamar y escucharás una operación matemática, después de esto debes colgar la llamada y contestar el resultado en nuestra aplicación\n" +
-                            "Si estás listo, empecemos",
-                    style = MaterialTheme.typography.h5
-                )
-                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                    androidx.compose.material3.Button(
-                        onClick = {
-                            // Llamar a la función del ViewModel
-                            userState?.let { user ->
-                                vmUsers.toDoCallByUser(user)
-                            }
-                        },
-                        shape = RoundedCornerShape(50.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = "Empezar Validacion")
-                    }
-                }
-            }
-        }
-        else -> {
-            // Manejar otros casos si es necesario
+
+        // Botón para volver a hacer otra busqueda
+        Button(
+            onClick = {
+                vmUsers.putEmailResultNull()
+                navController.navigate(AppScreen.FindByEmailScreen.route)
+            },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("Realizar otra Busqueda")
         }
     }
 
 }
+
+
+
+
+
 
 
 /**
@@ -265,7 +252,7 @@ fun BodyContentValidationOne(
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogValidation(
+fun LogoutDialogResultEmail(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {

@@ -1,8 +1,9 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.Search
 
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,15 +20,19 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,7 +62,7 @@ import com.app.edentifica.viewModel.UsersViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun FindByPhoneScreen(
+fun FindBySocialNetworkScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
@@ -79,7 +84,7 @@ fun FindByPhoneScreen(
     Log.e("userValidation", userState?.toString().toString())
 
 
-    val onLogoutConfirmedFindByPhone:()->Unit = {
+    val onLogoutConfirmedFindBySocial:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -125,12 +130,12 @@ fun FindByPhoneScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Buscar por Telefono",//welcomeMessage,
+                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Buscar por Red Social",//welcomeMessage,
                                 fontSize = 16.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            (if(!user?.email.isNullOrEmpty()|| userState!=null) "Buscar por Telefono" else "")?.let {
+                            (if(!user?.email.isNullOrEmpty()|| userState!=null) "Buscar por Red Social" else "")?.let {
                                 Text(
                                     text = it,
                                     fontSize = 12.sp,
@@ -184,9 +189,9 @@ fun FindByPhoneScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogFindByPhone(
+                LogoutDialogFindBySocial(
                     onConfirmLogout = {
-                        onLogoutConfirmedFindByPhone()
+                        onLogoutConfirmedFindBySocial()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -194,7 +199,7 @@ fun FindByPhoneScreen(
 
         }
         //funcion composable que pinta el contenido de home
-        BodyContentFindByPhone(navController, vmUsers, userState)
+        BodyContentFindBySocial(navController, vmUsers, userState)
     }
 }
 
@@ -205,28 +210,35 @@ fun FindByPhoneScreen(
 
 
 @Composable
-fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
-
-    // Estado para almacenar el telefono ingresado por el usuario
-    var phone by remember { mutableStateOf("") }
-
-    // Observamos el estado del resultado de la busqueda
-    val searchResult by vmUsers.userPhoneSearch.collectAsState()
+fun BodyContentFindBySocial(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
+    // Estado para almacenar el nombre del perfil de la red social ingresado por el usuario
+    var socialName by remember { mutableStateOf("") }
 
     // Estado para controlar si se ha realizado una búsqueda
-    var searchPerformedPhone by remember { mutableStateOf(false) }
+    var searchPerformedSocial by remember { mutableStateOf(false) }
 
+    // Estado para almacenar el tipo de red social seleccionado
+    var selectedSocialType by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Campo de entrada para el telefono
+        // Componente de selección de tipo de red social
+        SelectSocialTypeDropdown(
+            socialTypes = listOf("Facebook", "Instagram", "Twitter"),
+            onSelectionChanged = { selectedType ->
+                // Cuando se selecciona un tipo de red social, almacenar el valor
+                selectedSocialType = selectedType
+            }
+        )
+
+        // Campo de entrada para el nombre del perfil de la red social
         OutlinedTextField(
-            value = phone,
-            onValueChange = { phone = it },
-            label = { Text("Phone") },
+            value = socialName,
+            onValueChange = { socialName = it },
+            label = { Text("Social Name") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -235,26 +247,67 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
         // Botón para enviar la búsqueda
         Button(
             onClick = {
-                // Llamar a la función del ViewModel para buscar por telefono
-                vmUsers.getUserByPhoneSearch(phone)
-                searchPerformedPhone = true
+                // Llamar a la función del ViewModel para buscar por red social
+                selectedSocialType?.let { type ->
+                    vmUsers.getUserBySocialSearch(type, socialName)
+                    searchPerformedSocial = true
+                }
             },
             modifier = Modifier.padding(16.dp)
         ) {
             Text("Buscar")
         }
 
-        // Mostrar el resultado de la búsqueda o el mensaje de error
-        if (searchPerformedPhone) {
-            navController.navigate(AppScreen.ResultSearchPhoneScreen.route)
+        // Mostrar el resultado de la búsqueda o navegar a la pantalla de resultados
+        if (searchPerformedSocial) {
+            // Enviar los parámetros de búsqueda por el viewModel
+            navController.navigate(AppScreen.ResultSearchSocialScreen.route)
         }
-
     }
-
 }
 
+@Composable
+fun SelectSocialTypeDropdown(
+    socialTypes: List<String>,
+    onSelectionChanged: (String) -> Unit
+) {
+//    var expanded by remember { mutableStateOf(false) }
+    var selectedType by remember { mutableStateOf<String?>(null) }
 
+    val dialog = remember { mutableStateOf(false) }
 
+    Column {
+        // Botón que muestra el tipo seleccionado y abre el diálogo al hacer clic
+        Button(
+            onClick = { dialog.value = true },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(selectedType ?: "Seleccionar Tipo de Red Social")
+        }
+
+        if (dialog.value) {
+            AlertDialog(
+                onDismissRequest = { dialog.value = false },
+                title = { Text(text = "Seleccionar tipo de red social") },
+                buttons = {
+                    socialTypes.forEach { type ->
+                        TextButton(
+                            onClick = {
+                                selectedType = type
+                                onSelectionChanged(type)
+                                dialog.value = false
+                            }
+                        ) {
+                            Text(text = type)
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
 
 
 
@@ -264,7 +317,7 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogFindByPhone(
+fun LogoutDialogFindBySocial(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {

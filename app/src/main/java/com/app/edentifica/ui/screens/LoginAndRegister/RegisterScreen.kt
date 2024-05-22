@@ -1,4 +1,4 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.LoginAndRegister
 
 import android.annotation.SuppressLint
 import android.content.Context

@@ -4,18 +4,20 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.app.edentifica.ui.screens.FindByEmailScreen
-import com.app.edentifica.ui.screens.FindByPhoneScreen
-import com.app.edentifica.ui.screens.ForgotPasswordScreen
+import com.app.edentifica.ui.screens.Search.FindByEmailScreen
+import com.app.edentifica.ui.screens.Search.FindByPhoneScreen
+import com.app.edentifica.ui.screens.LoginAndRegister.ForgotPasswordScreen
 import com.app.edentifica.ui.screens.HomeScreen
-import com.app.edentifica.ui.screens.LoginScreen
-import com.app.edentifica.ui.screens.ProfileScreen
-import com.app.edentifica.ui.screens.RegisterPhoneScreen
-import com.app.edentifica.ui.screens.RegisterScreen
-import com.app.edentifica.ui.screens.ResultSearchEmailScreen
-import com.app.edentifica.ui.screens.ResultSearchPhoneScreen
-import com.app.edentifica.ui.screens.ValidationOneCheckScreen
-import com.app.edentifica.ui.screens.ValidationOneScreen
+import com.app.edentifica.ui.screens.LoginAndRegister.LoginScreen
+import com.app.edentifica.ui.screens.ProfileUser.ProfileScreen
+import com.app.edentifica.ui.screens.LoginAndRegister.RegisterPhoneScreen
+import com.app.edentifica.ui.screens.LoginAndRegister.RegisterScreen
+import com.app.edentifica.ui.screens.Results.ResultSearchEmailScreen
+import com.app.edentifica.ui.screens.Results.ResultSearchPhoneScreen
+import com.app.edentifica.ui.screens.Results.ResultSearchSocialScreen
+import com.app.edentifica.ui.screens.Search.FindBySocialNetworkScreen
+import com.app.edentifica.ui.screens.Validations.ValidationOneCheckScreen
+import com.app.edentifica.ui.screens.Validations.ValidationOneScreen
 import com.app.edentifica.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
 import com.google.firebase.auth.FirebaseUser
@@ -133,6 +135,15 @@ fun AppNavigation(
             )
         }
 
+        composable(route=AppScreen.FindBySocialNetworkScreen.route){
+            FindBySocialNetworkScreen(
+                navController = navController,
+                auth= authManager,
+                onSignOutGoogle= onSignOutGoogle,
+                vmUsers= vmUsers
+            )
+        }
+
         composable(route=AppScreen.ResultSearchPhoneScreen.route){
             ResultSearchPhoneScreen(
                 navController = navController,
@@ -148,6 +159,15 @@ fun AppNavigation(
                 auth= authManager,
                 onSignOutGoogle= onSignOutGoogle,
                 vmUsers= vmUsers
+            )
+        }
+
+        composable(route=AppScreen.ResultSearchSocialScreen.route){
+            ResultSearchSocialScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers
             )
         }
     }

@@ -23,8 +23,12 @@ sealed class AppScreen(val route: String){
 
     object FindByPhoneScreen: AppScreen("find_by_phone")
 
+    object FindBySocialNetworkScreen: AppScreen("find_by_social_network")
+
     object ResultSearchPhoneScreen: AppScreen("result_search_phone")
 
     object ResultSearchEmailScreen: AppScreen("result_search_email")
+
+    object ResultSearchSocialScreen: AppScreen("result_search_social_network")
 
 }

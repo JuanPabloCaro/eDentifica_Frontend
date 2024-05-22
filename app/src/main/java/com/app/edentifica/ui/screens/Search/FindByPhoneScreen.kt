@@ -1,4 +1,4 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.Search
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -57,7 +57,7 @@ import com.app.edentifica.viewModel.UsersViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun FindByEmailScreen(
+fun FindByPhoneScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
@@ -79,7 +79,7 @@ fun FindByEmailScreen(
     Log.e("userValidation", userState?.toString().toString())
 
 
-    val onLogoutConfirmedFindByEmail:()->Unit = {
+    val onLogoutConfirmedFindByPhone:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -125,12 +125,12 @@ fun FindByEmailScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Buscar por Correo",//welcomeMessage,
+                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Buscar por Telefono",//welcomeMessage,
                                 fontSize = 16.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            (if(!user?.email.isNullOrEmpty()|| userState!=null) "Buscar por correo" else "")?.let {
+                            (if(!user?.email.isNullOrEmpty()|| userState!=null) "Buscar por Telefono" else "")?.let {
                                 Text(
                                     text = it,
                                     fontSize = 12.sp,
@@ -184,9 +184,9 @@ fun FindByEmailScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogFindByEmail(
+                LogoutDialogFindByPhone(
                     onConfirmLogout = {
-                        onLogoutConfirmedFindByEmail()
+                        onLogoutConfirmedFindByPhone()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -194,7 +194,7 @@ fun FindByEmailScreen(
 
         }
         //funcion composable que pinta el contenido de home
-        BodyContentFindByEmail(navController, vmUsers, userState)
+        BodyContentFindByPhone(navController, vmUsers, userState)
     }
 }
 
@@ -205,27 +205,25 @@ fun FindByEmailScreen(
 
 
 @Composable
-fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
+fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
 
-    // Estado para almacenar el correo electrónico ingresado por el usuario
-    var email by remember { mutableStateOf("") }
-
-    // Observamos el estado del resultado de la busqueda
-    val searchResult by vmUsers.userEmailSearch.collectAsState()
+    // Estado para almacenar el telefono ingresado por el usuario
+    var phone by remember { mutableStateOf("") }
 
     // Estado para controlar si se ha realizado una búsqueda
-    var searchPerformedEmail by remember { mutableStateOf(false) }
+    var searchPerformedPhone by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Campo de entrada para el correo electrónico
+        // Campo de entrada para el telefono
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
+            value = phone,
+            onValueChange = { phone = it },
+            label = { Text("Phone") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -234,9 +232,9 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
         // Botón para enviar la búsqueda
         Button(
             onClick = {
-                // Llamar a la función del ViewModel para buscar por correo electrónico
-                vmUsers.getUserByEmailSearch(email)
-                searchPerformedEmail = true
+                // Llamar a la función del ViewModel para buscar por telefono
+                vmUsers.getUserByPhoneSearch(phone)
+                searchPerformedPhone = true
             },
             modifier = Modifier.padding(16.dp)
         ) {
@@ -244,9 +242,10 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
         }
 
         // Mostrar el resultado de la búsqueda o el mensaje de error
-        if (searchPerformedEmail) {
-            navController.navigate(AppScreen.ResultSearchEmailScreen.route)
+        if (searchPerformedPhone) {
+            navController.navigate(AppScreen.ResultSearchPhoneScreen.route)
         }
+
     }
 
 }
@@ -262,7 +261,7 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogFindByEmail(
+fun LogoutDialogFindByPhone(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {

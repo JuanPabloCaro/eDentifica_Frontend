@@ -1,8 +1,7 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.LoginAndRegister
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -58,7 +57,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.edentifica.R
-import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.utils.AuthRes

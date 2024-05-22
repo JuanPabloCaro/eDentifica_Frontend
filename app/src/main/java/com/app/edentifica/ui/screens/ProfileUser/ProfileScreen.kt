@@ -1,31 +1,30 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.ProfileUser
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,7 +40,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,23 +47,22 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.edentifica.R
-import com.app.edentifica.data.model.Phone
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
-import com.app.edentifica.viewModel.PhonesViewModel
 import com.app.edentifica.viewModel.UsersViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun RegisterPhoneScreen(
+fun ProfileScreen(
     navController: NavController,
     auth: AuthManager,
+    onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
-    vmPhones: PhonesViewModel,
 ) {
     //VARIABLES Y CONSTANTES
-    var context = LocalContext.current
+    //para mostrar el dialogo de cerrar Sesion
+    var showDialog by remember { mutableStateOf(false) }
     //recojo al user Actual
     val user = auth.getCurrentUser()
     // Llama a getUserByEmail cuando se inicia HomeScreen
@@ -74,6 +71,18 @@ fun RegisterPhoneScreen(
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
+
+
+    val onLogoutConfirmedProfile:()->Unit = {
+        auth.signOut()
+        onSignOutGoogle()
+
+        navController.navigate(AppScreen.LoginScreen.route){
+            popUpTo(AppScreen.HomeScreen.route){
+                inclusive= true
+            }
+        }
+    }
 
     //Estructura de la pantalla
     Scaffold(
@@ -110,17 +119,42 @@ fun RegisterPhoneScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = 20.sp,
+                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "${userState?.name}" else "Bienvenid@",//welcomeMessage,
+                                fontSize = 16.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
-                                fontSize = 12.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis)
+                            (if(!user?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis)
+                            }
                         }
+
+                    }
+                },
+                actions = {
+                    //Si el usuario es diferente a null/anonimo, entonces se muestra el boton para navegar al perfil
+                    if(auth.getCurrentUser()?.email!=null){
+                        // Botón del perfil
+                        IconButton(
+                            onClick = {
+                                navController.navigate(AppScreen.ProfileUserScreen.route)
+                            }
+                        ) {
+                            Icon(Icons.Filled.AccountCircle, contentDescription = "Perfil")
+                        }
+                    }
+
+                    //boton de accion para salir cerrar sesion
+                    IconButton(
+                        onClick = {
+                            showDialog = true
+                        }
+                    ) {
+                        Icon(Icons.Outlined.ExitToApp, contentDescription = "Cerrar sesión")
                     }
                 },
                 backgroundColor= Color.Gray
@@ -128,7 +162,7 @@ fun RegisterPhoneScreen(
         },
         bottomBar = {
             BottomAppBar (backgroundColor = Color.DarkGray){
-                Text(
+                androidx.compose.material3.Text(
                     text = "Version 1.0 @Copyrigth 2024 Todos los derechos reservados",
                     fontSize = 12.sp,
                     fontStyle = FontStyle.Italic,
@@ -140,75 +174,69 @@ fun RegisterPhoneScreen(
             }
         }
     ) {
+        //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
+            contentPadding ->
+        Box(modifier = Modifier.padding(contentPadding)) {
+            if (showDialog) {
+                LogoutDialogProfile(
+                    onConfirmLogout = {
+                        onLogoutConfirmedProfile()
+                        showDialog = false
+                    },
+                    onDismiss = { showDialog = false })
+            }
+
+        }
         //funcion composable que pinta el contenido de home
-        BodyContentRegisterPhone(navController, userState, context,vmPhones)
+        BodyContentProfile(navController, vmUsers, userState)
     }
 }
+
+
 
 
 
 
 @Composable
-fun BodyContentRegisterPhone(
-    navController: NavController,
-    userState: User?,
-    context: Context,
-    vmPhones: PhonesViewModel
-) {
-    var userPhone by remember { mutableStateOf("") }
-    // Observa el flujo de phone en el ViewModel
-    val phoneUpsateState by vmPhones.phoneUpdated.collectAsState()
-
-    // Observa el flujo de actualización del teléfono y muestra un Toast cuando se completa la actualización
-    LaunchedEffect(phoneUpsateState) {
-        if (phoneUpsateState==true) {
-            Toast.makeText(
-                context,
-                "El teléfono se actualizó correctamente",
-                Toast.LENGTH_SHORT
-            ).show()
-            navController.navigate(AppScreen.ValidationOneScreen.route)
-        }
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Por favor introduce tu numero de telefono",
-            style = MaterialTheme.typography.h5
-        )
-
-        // Campo de entrada para la respuesta del usuario
-        OutlinedTextField(
-            value = userPhone,
-            onValueChange = { userPhone = it },
-            label = { Text("phone") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
-
-        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-            Button(
-                onClick = {
-                    // Actualizar el teléfono en el objeto User y llamar a la función del ViewModel para actualizarlo en la base de datos
-                    userState?.let { user ->
-                        val updatedUser = user.copy(phone = Phone(id = user.phone.id, phoneNumber = userPhone, isVerified = user.phone.isVerified, idProfileUser = user.phone.idProfileUser))
-                        vmPhones.updatePhoneVM(updatedUser.phone)
-                    }
-                },
-                shape = RoundedCornerShape(50.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text(text = "Insert phone")
-            }
-        }
-    }
+fun BodyContentProfile(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
 
 }
+
+
+
+
+
+
+
+/**
+ * Funcion composable que se encarga de mostrar un alert para preguntar al
+ * usuario si quiere continuar o cerrar sesion
+ */
+@Composable
+fun LogoutDialogProfile(
+    onConfirmLogout: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Cerrar sesión") },
+        text = { Text("¿Estás seguro que deseas cerrar sesión?") },
+        confirmButton = {
+            Button(
+                onClick = onConfirmLogout,
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Green)
+            ) {
+                Text("Aceptar",color= Color.White)
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
+            ) {
+                Text("Cancelar",color= Color.White)
+            }
+        }
+    )
+}
+

@@ -1,8 +1,7 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.LoginAndRegister
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -20,19 +19,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -56,34 +49,31 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.edentifica.R
+import com.app.edentifica.data.model.Phone
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.utils.AuthManager
+import com.app.edentifica.viewModel.PhonesViewModel
 import com.app.edentifica.viewModel.UsersViewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ValidationOneCheckScreen(
+fun RegisterPhoneScreen(
     navController: NavController,
     auth: AuthManager,
     vmUsers: UsersViewModel,
+    vmPhones: PhonesViewModel,
 ) {
     //VARIABLES Y CONSTANTES
-    val context = LocalContext.current
-
+    var context = LocalContext.current
+    //recojo al user Actual
     val user = auth.getCurrentUser()
-    // Llama a getUserByEmail cuando se inicia ValidationOneScreen
+    // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
-
-    Log.e("userBBDD", userState.toString())
-
-
 
     //Estructura de la pantalla
     Scaffold(
@@ -151,27 +141,35 @@ fun ValidationOneCheckScreen(
         }
     ) {
         //funcion composable que pinta el contenido de home
-        BodyContentValidationOneCheck(navController, vmUsers, userState, context)
+        BodyContentRegisterPhone(navController, userState, context,vmPhones)
     }
-
-
 }
 
+
+
+
 @Composable
-fun BodyContentValidationOneCheck(
+fun BodyContentRegisterPhone(
     navController: NavController,
-    vmUsers: UsersViewModel,
     userState: User?,
-    context: Context
+    context: Context,
+    vmPhones: PhonesViewModel
 ) {
-    // Observa el estado de validationOneCheck
-    val validationOneCheckState = vmUsers.answerValidation.collectAsState()
+    var userPhone by remember { mutableStateOf("") }
+    // Observa el flujo de phone en el ViewModel
+    val phoneUpsateState by vmPhones.phoneUpdated.collectAsState()
 
-    // Estado para almacenar la respuesta del usuario
-    var userResponse by remember { mutableStateOf("") }
-
-    // Estado para verificar si se ha presionado el botón
-    var buttonPressed by remember { mutableStateOf(false) }
+    // Observa el flujo de actualización del teléfono y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(phoneUpsateState) {
+        if (phoneUpsateState==true) {
+            Toast.makeText(
+                context,
+                "El teléfono se actualizó correctamente",
+                Toast.LENGTH_SHORT
+            ).show()
+            navController.navigate(AppScreen.ValidationOneScreen.route)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -179,15 +177,15 @@ fun BodyContentValidationOneCheck(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Por favor introduce la respuesta del reto matemático",
+            text = "Por favor introduce tu numero de telefono",
             style = MaterialTheme.typography.h5
         )
 
         // Campo de entrada para la respuesta del usuario
         OutlinedTextField(
-            value = userResponse,
-            onValueChange = { userResponse = it },
-            label = { Text("Respuesta") },
+            value = userPhone,
+            onValueChange = { userPhone = it },
+            label = { Text("phone") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .fillMaxWidth()
@@ -197,10 +195,10 @@ fun BodyContentValidationOneCheck(
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-                    // Llamar a la función del ViewModel
-                    if (userState != null) {
-                        vmUsers.answerMathByUser(userResponse.toInt(), userState)
-                        buttonPressed = true // Marcar el botón como presionado
+                    // Actualizar el teléfono en el objeto User y llamar a la función del ViewModel para actualizarlo en la base de datos
+                    userState?.let { user ->
+                        val updatedUser = user.copy(phone = Phone(id = user.phone.id, phoneNumber = userPhone, isVerified = user.phone.isVerified, idProfileUser = user.phone.idProfileUser))
+                        vmPhones.updatePhoneVM(updatedUser.phone)
                     }
                 },
                 shape = RoundedCornerShape(50.dp),
@@ -208,46 +206,9 @@ fun BodyContentValidationOneCheck(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Validar respuesta")
-            }
-        }
-
-        // Observar cambios en validationOneCheckState
-        LaunchedEffect(validationOneCheckState.value) {
-            // Si validationOneCheckState es false y el botón ha sido presionado
-            if (validationOneCheckState.value == false && buttonPressed) {
-                Toast.makeText(
-                    context,
-                    "Respuesta inválida",
-                    Toast.LENGTH_LONG
-                ).show()
-
-                // Reiniciar variables y navegar a la pantalla anterior
-                buttonPressed = false
-                vmUsers.validationOneNegative()
-                vmUsers.validationOneCheckNegative()
-                navController.navigate(AppScreen.ValidationOneScreen.route){
-                    popUpTo(AppScreen.ValidationOneCheckScreen.route){
-                        inclusive= true
-                    }
-                }
-            }
-        }
-
-        // Si validationOneCheckState es true, navegar a la pantalla HomeScreen
-        if (validationOneCheckState.value == true) {
-            LaunchedEffect(Unit) {
-                Toast.makeText(
-                    context,
-                    "La validación 1 ha sido exitosa",
-                    Toast.LENGTH_LONG
-                ).show()
-                navController.navigate(AppScreen.HomeScreen.route){
-                    popUpTo(AppScreen.ValidationOneCheckScreen.route){
-                        inclusive= true
-                    }
-                }
+                Text(text = "Insert phone")
             }
         }
     }
+
 }
