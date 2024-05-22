@@ -96,6 +96,21 @@ class UsersViewModel : ViewModel() {
     }
 
 
+    /**
+     * Esta funcion pone en nulo la respuesta de buscar por email
+     */
+    fun putEmailResultNull() {
+        viewModelScope.launch {
+            try {
+                _userEmailSearch.value=null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel validationOneCheckNegative", it) }
+            }
+        }
+    }
+
+
 
     /**
      * Esta funcion recibe un phone y nos devuelve al usuario encontrado, esta la utilizamos para las busquedas de telefonos

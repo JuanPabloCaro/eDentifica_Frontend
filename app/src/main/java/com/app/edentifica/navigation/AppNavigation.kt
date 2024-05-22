@@ -12,6 +12,7 @@ import com.app.edentifica.ui.screens.LoginScreen
 import com.app.edentifica.ui.screens.ProfileScreen
 import com.app.edentifica.ui.screens.RegisterPhoneScreen
 import com.app.edentifica.ui.screens.RegisterScreen
+import com.app.edentifica.ui.screens.ResultSearchEmailScreen
 import com.app.edentifica.ui.screens.ResultSearchPhoneScreen
 import com.app.edentifica.ui.screens.ValidationOneCheckScreen
 import com.app.edentifica.ui.screens.ValidationOneScreen
@@ -134,6 +135,15 @@ fun AppNavigation(
 
         composable(route=AppScreen.ResultSearchPhoneScreen.route){
             ResultSearchPhoneScreen(
+                navController = navController,
+                auth= authManager,
+                onSignOutGoogle= onSignOutGoogle,
+                vmUsers= vmUsers
+            )
+        }
+
+        composable(route=AppScreen.ResultSearchEmailScreen.route){
+            ResultSearchEmailScreen(
                 navController = navController,
                 auth= authManager,
                 onSignOutGoogle= onSignOutGoogle,

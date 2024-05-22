@@ -57,7 +57,7 @@ import com.app.edentifica.viewModel.UsersViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ResultSearchPhoneScreen(
+fun ResultSearchEmailScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
@@ -79,7 +79,7 @@ fun ResultSearchPhoneScreen(
     Log.e("userValidation", userState?.toString().toString())
 
 
-    val onLogoutConfirmedResultPhone:()->Unit = {
+    val onLogoutConfirmedResultEmail:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -184,9 +184,9 @@ fun ResultSearchPhoneScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogResultPhone(
+                LogoutDialogResultEmail(
                     onConfirmLogout = {
-                        onLogoutConfirmedResultPhone()
+                        onLogoutConfirmedResultEmail()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -194,7 +194,7 @@ fun ResultSearchPhoneScreen(
 
         }
         //funcion composable que pinta el contenido de home
-        BodyContentResultPhone(navController, vmUsers, userState)
+        BodyContentResultEmail(navController, vmUsers, userState)
     }
 }
 
@@ -205,19 +205,19 @@ fun ResultSearchPhoneScreen(
 
 
 @Composable
-fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
+fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
 
     // Observamos el estado del resultado de la busqueda
-    val searchResultPhone by vmUsers.userPhoneSearch.collectAsState()
+    val searchResultEmail by vmUsers.userEmailSearch.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (searchResultPhone != null) {
+        if (searchResultEmail != null) {
             Text(
-                text = "El Telefono ${searchResultPhone!!.phone.phoneNumber} le pertenece al usuario ${searchResultPhone!!.name} registrado en eDentifica garantizando la seguridad del perfil",
+                text = "El Email ${searchResultEmail!!.email.email} le pertenece al usuario ${searchResultEmail!!.name} registrado en eDentifica garantizando la seguridad del perfil",
                 modifier = Modifier.padding(16.dp)
             )
 
@@ -231,8 +231,8 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
         // Botón para volver a hacer otra busqueda
         Button(
             onClick = {
-                vmUsers.putPhoneResultNull()
-                navController.navigate(AppScreen.FindByPhoneScreen.route)
+                vmUsers.putEmailResultNull()
+                navController.navigate(AppScreen.FindByEmailScreen.route)
             },
             modifier = Modifier.padding(16.dp)
         ) {
@@ -253,7 +253,7 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogResultPhone(
+fun LogoutDialogResultEmail(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {

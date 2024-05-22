@@ -214,7 +214,7 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
     val searchResult by vmUsers.userEmailSearch.collectAsState()
 
     // Estado para controlar si se ha realizado una búsqueda
-    var searchPerformed by remember { mutableStateOf(false) }
+    var searchPerformedEmail by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -225,7 +225,7 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Correo electrónico") },
+            label = { Text("Email") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -236,7 +236,7 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
             onClick = {
                 // Llamar a la función del ViewModel para buscar por correo electrónico
                 vmUsers.getUserByEmailSearch(email)
-                searchPerformed = true
+                searchPerformedEmail = true
             },
             modifier = Modifier.padding(16.dp)
         ) {
@@ -244,18 +244,8 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
         }
 
         // Mostrar el resultado de la búsqueda o el mensaje de error
-        if (searchPerformed) {
-            if (searchResult != null) {
-                Text(
-                    text = "El correo ${email} le pertenece al usuario ${searchResult!!.name} registrado en eDentifica garantizando la seguridad del perfil",
-                    modifier = Modifier.padding(16.dp)
-                )
-            } else {
-                Text(
-                    text = "Lo sentimos, usuario no encontrado, puede tratarse de una posible suplantacion",
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+        if (searchPerformedEmail) {
+            navController.navigate(AppScreen.ResultSearchEmailScreen.route)
         }
     }
 
