@@ -21,4 +21,8 @@ sealed class AppScreen(val route: String){
 
     object FindByEmailScreen: AppScreen("find_by_email")
 
+    object FindByPhoneScreen: AppScreen("find_by_phone")
+
+    object ResultSearchPhoneScreen: AppScreen("result_search_phone")
+
 }

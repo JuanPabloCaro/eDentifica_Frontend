@@ -5,12 +5,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.app.edentifica.ui.screens.FindByEmailScreen
+import com.app.edentifica.ui.screens.FindByPhoneScreen
 import com.app.edentifica.ui.screens.ForgotPasswordScreen
 import com.app.edentifica.ui.screens.HomeScreen
 import com.app.edentifica.ui.screens.LoginScreen
 import com.app.edentifica.ui.screens.ProfileScreen
 import com.app.edentifica.ui.screens.RegisterPhoneScreen
 import com.app.edentifica.ui.screens.RegisterScreen
+import com.app.edentifica.ui.screens.ResultSearchPhoneScreen
 import com.app.edentifica.ui.screens.ValidationOneCheckScreen
 import com.app.edentifica.ui.screens.ValidationOneScreen
 import com.app.edentifica.viewModel.UsersViewModel
@@ -114,6 +116,24 @@ fun AppNavigation(
 
         composable(route=AppScreen.FindByEmailScreen.route){
             FindByEmailScreen(
+                navController = navController,
+                auth= authManager,
+                onSignOutGoogle= onSignOutGoogle,
+                vmUsers= vmUsers
+            )
+        }
+
+        composable(route=AppScreen.FindByPhoneScreen.route){
+            FindByPhoneScreen(
+                navController = navController,
+                auth= authManager,
+                onSignOutGoogle= onSignOutGoogle,
+                vmUsers= vmUsers
+            )
+        }
+
+        composable(route=AppScreen.ResultSearchPhoneScreen.route){
+            ResultSearchPhoneScreen(
                 navController = navController,
                 auth= authManager,
                 onSignOutGoogle= onSignOutGoogle,

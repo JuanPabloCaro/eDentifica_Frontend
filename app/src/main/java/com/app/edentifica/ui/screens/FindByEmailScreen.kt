@@ -211,7 +211,7 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
     var email by remember { mutableStateOf("") }
 
     // Observamos el estado del resultado de la busqueda
-    val searchResult by vmUsers.userSearch.collectAsState()
+    val searchResult by vmUsers.userEmailSearch.collectAsState()
 
     // Estado para controlar si se ha realizado una búsqueda
     var searchPerformed by remember { mutableStateOf(false) }

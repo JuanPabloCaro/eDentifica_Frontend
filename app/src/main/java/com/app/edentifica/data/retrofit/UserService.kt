@@ -13,6 +13,9 @@ interface UserService {
     @GET("edentifica/users/get_by_email/{email}")
     suspend fun getByEmail(@Path("email")email: String): Response<User>
 
+    @GET("edentifica/users/get_by_phone/{phonenumber}")
+    suspend fun getByPhone(@Path("phonenumber")phonenumber: String): Response<User>
+
     @PUT("edentifica/users/update")
     suspend fun updateUser(@Body user: User): Response<Boolean>
     @POST("edentifica/users/insert")
