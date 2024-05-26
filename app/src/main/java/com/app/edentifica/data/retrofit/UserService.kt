@@ -11,7 +11,13 @@ import retrofit2.http.Query
 
 interface UserService {
     @GET("edentifica/users/get_by_email/{email}")
-    suspend fun getByEmail(@Path("email")email: String): Response<User>
+    suspend fun getByEmail(@Path("email") email: String): Response<User>
+
+    @GET("edentifica/users/get_by_phone/{phonenumber}")
+    suspend fun getByPhone(@Path("phonenumber") phonenumber: String): Response<User>
+
+    @GET("edentifica/users/get_by_type_and_social_network/{type}/{socialname}")
+    suspend fun getBySocialNetwork(@Path("type") type: String, @Path("socialname") socialname: String): Response<User>
 
     @PUT("edentifica/users/update")
     suspend fun updateUser(@Body user: User): Response<Boolean>

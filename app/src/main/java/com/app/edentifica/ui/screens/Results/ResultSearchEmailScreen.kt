@@ -1,11 +1,10 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.Results
 
-import  android.annotation.SuppressLint
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,114 +20,81 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.runtime.getValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.edentifica.R
-import com.app.edentifica.data.model.Email
-import com.app.edentifica.data.model.Phone
-import com.app.edentifica.data.model.Profile
-import com.app.edentifica.navigation.AppScreen
-import com.app.edentifica.viewModel.UsersViewModel
-import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.data.model.User
-import com.app.edentifica.ui.screens.Validations.BodyContentValidationOne
+import com.app.edentifica.navigation.AppScreen
+import com.app.edentifica.ui.screens.ClickableProfileImage
+import com.app.edentifica.ui.screens.Search.BodyContentFindBySocial
+import com.app.edentifica.ui.screens.Search.LogoutDialogFindBySocial
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
-
+import com.app.edentifica.utils.AuthManager
+import com.app.edentifica.viewModel.UsersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(
+fun ResultSearchEmailScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
 ) {
     //VARIABLES Y CONSTANTES
-
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-
     //recojo al user Actual
     val user = auth.getCurrentUser()
-
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
-
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
     Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
     Log.e("userValidation", userState?.toString().toString())
 
-    //si el user es existe le pregunto si ya esta validado
-    if(userState != null){
-        if(userState?.validations?.get(0)?.isValidated==false){
-            navController.navigate(AppScreen.ValidationOneScreen.route){
-                popUpTo(AppScreen.HomeScreen.route){
-                    inclusive= true
-                }
-            }
-        }
-    }else if(auth.getCurrentUser()?.email !=null){// si el usuario no existe lo inserto en la base de datos
-        val userToInsert: User = User(
-            null,
-            auth.getCurrentUser()?.displayName.toString(),
-            "",
-            Phone(null,auth.getCurrentUser()?.phoneNumber.toString(),false,null),
-            Email(null,auth.getCurrentUser()?.email.toString(),false,null),
-            Profile(null,"",auth.getCurrentUser()?.photoUrl.toString(),null,null,null,null),
-            null,
-            null
-        )
-        // Llama a la función del ViewModel para insertar el usuario y espera a que se complete
-        LaunchedEffect (Unit) {
-            vmUsers.insertUserVm(userToInsert)
-            vmUsers.getUserByEmail(auth.getCurrentUser()?.email.toString())
-        }
-    }
 
-
-    val onLogoutConfirmed:()->Unit = {
+    val onLogoutConfirmedResultEmail:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -150,8 +116,11 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        if(user?.photoUrl != null) {
-                            if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
+                        if (user?.photoUrl != null) {
+                            if (auth.getCurrentUser()?.email != null && userState?.validations?.get(
+                                    0
+                                )?.isValidated == true
+                            ) {
                                 userState?.profile?.urlImageProfile?.let {
                                     ClickableProfileImage(
                                         navController = navController,
@@ -160,7 +129,7 @@ fun HomeScreen(
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 }
-                            }else{
+                            } else {
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current)
                                         .data(userState?.profile?.urlImageProfile)
@@ -171,17 +140,21 @@ fun HomeScreen(
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
                                         .clip(CircleShape)
-                                        .size(40.dp))
+                                        .size(40.dp)
+                                )
                             }
 
                         } else {
-                            if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
+                            if (auth.getCurrentUser()?.email != null && userState?.validations?.get(
+                                    0
+                                )?.isValidated == true
+                            ) {
                                 ClickableProfileImage(
                                     onClick = {
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 )
-                            } else{
+                            } else {
                                 Image(
                                     painter = painterResource(id = R.drawable.profile),
                                     contentDescription = "image profile default",
@@ -196,13 +169,13 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
+                                text = if (!user?.displayName.isNullOrEmpty() || userState != null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
                                 fontSize = TextSizes.H3,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 color = AppColors.whitePerlaEdentifica
                             )
-                            (if(!user?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
+                            (if (!user?.email.isNullOrEmpty() || userState != null) userState?.email?.email else "Anonimo")?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -222,7 +195,7 @@ fun HomeScreen(
                             navController.navigate(AppScreen.HomeScreen.route)
                         }
                     ) {
-                        Icon(
+                        androidx.compose.material3.Icon(
                             Icons.Outlined.Home,
                             contentDescription = "Home",
                             tint = AppColors.whitePerlaEdentifica
@@ -261,12 +234,12 @@ fun HomeScreen(
         }
     ) {
         //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
-        contentPadding ->
+            contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialog(
+                LogoutDialogResultEmail(
                     onConfirmLogout = {
-                        onLogoutConfirmed()
+                        onLogoutConfirmedResultEmail()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -280,54 +253,64 @@ fun HomeScreen(
                 .fillMaxSize()
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
-        ){
-            BodyContentHome(navController, vmUsers, userState)
+        ) {
+            //funcion composable que pinta el contenido de home
+            BodyContentResultEmail(navController, vmUsers, userState)
         }
 
     }
+
 }
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun BodyContentHome(
-    navController: NavController,
-    vmUsers: UsersViewModel,
-    userState: User?
-) {
+fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
+
+    // Observamos el estado del resultado de la busqueda
+    val searchResultEmail by vmUsers.userEmailSearch.collectAsState()
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        //Title
-        Text(
-            text = "¿Qué quieres buscar?",
-            fontSize = TextSizes.H1,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        if (searchResultEmail != null) {
+            //Image
+            Image(
+                painter = painterResource(id = R.drawable.checkresult),
+                contentDescription = "Check Result",
+                modifier = Modifier
+                    .fillMaxWidth().scale(0.9f).padding(0.dp), // ajusta la altura según sea necesario
+                contentScale = ContentScale.Crop // Escala de la imagen
+            )
+            Text(
+                text = "El Email ${searchResultEmail!!.email.email} le pertenece al usuario ${searchResultEmail!!.name} registrado en eDentifica garantizando la seguridad del perfil",
+                modifier = Modifier.padding(16.dp)
+            )
 
-        //Image
-        Image(
-            painter = painterResource(id = R.drawable.search),
-            contentDescription = "search",
-            modifier = Modifier
-                .fillMaxWidth()
-                .scale(0.7f)
-                .padding(0.dp), // ajusta la altura según sea necesario
-            contentScale = ContentScale.Crop // Escala de la imagen
-        )
+        } else {
+            //Image
+            Image(
+                painter = painterResource(id = R.drawable.warning),
+                contentDescription = "Warning",
+                modifier = Modifier
+                    .fillMaxWidth().scale(0.9f).padding(0.dp), // ajusta la altura según sea necesario
+                contentScale = ContentScale.Crop // Escala de la imagen
+            )
+            Text(
+                text = "Lo sentimos, usuario no encontrado, puede tratarse de una posible suplantacion",
+                modifier = Modifier.padding(16.dp)
+            )
+        }
 
-
-        //Button correo
-        Spacer(modifier = Modifier.height(20.dp))
+        // Botón para volver a hacer otra busqueda
+        Spacer(modifier = Modifier.height(34.dp))
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
+                    vmUsers.putEmailResultNull()
                     navController.navigate(AppScreen.FindByEmailScreen.route)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
@@ -336,88 +319,16 @@ fun BodyContentHome(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Buscar Correo")
-            }
-        }
-
-        //Button telefono
-        Spacer(modifier = Modifier.height(34.dp))
-        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-            Button(
-                onClick = {
-                    navController.navigate(AppScreen.FindByPhoneScreen.route)
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
-                shape = RoundedCornerShape(50.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text(text = "Buscar Telefono")
-            }
-        }
-
-        //Button Red Social
-        Spacer(modifier = Modifier.height(34.dp))
-        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-            Button(
-                onClick = {
-                    navController.navigate(AppScreen.FindBySocialNetworkScreen.route)                },
-                colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
-                shape = RoundedCornerShape(50.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text(text = "Buscar Red Social")
+                Text(text = "Realizar otra Busqueda")
             }
         }
     }
+
 }
 
 
-/**
- * Imagen Clikeable
- */
-@Composable
-fun ClickableProfileImage(onClick: () -> Unit) {
-    Image(
-        painter = painterResource(id = R.drawable.profile),
-        contentDescription = "image profile default",
-        modifier = Modifier
-            .padding(end = 8.dp)
-            .size(40.dp)
-            .clip(CircleShape)
-            .clickable { onClick() }
-    )
-}
-/**
- * Imagen de perfil clikeable
- */
-@Composable
-fun ClickableProfileImage(
-    navController: NavController,  // Assuming you're using NavController for navigation
-    imageUrl: String,
-    onClick: () -> Unit  // Define your click action
-) {
-    Box(
-        modifier = Modifier
-            .clip(CircleShape)
-            .size(40.dp)
-            .clickable { onClick() }
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
-                .crossfade(true)
-                .build(),
-            contentDescription = "Imagen",
-            placeholder = painterResource(id = R.drawable.profile),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.clip(CircleShape)
-        )
-    }
-}
+
+
 
 
 
@@ -426,7 +337,7 @@ fun ClickableProfileImage(
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialog(
+fun LogoutDialogResultEmail(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -454,3 +365,4 @@ fun LogoutDialog(
         }
     )
 }
+

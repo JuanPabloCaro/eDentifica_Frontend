@@ -1,12 +1,12 @@
-package com.app.edentifica.ui.screens
+package com.app.edentifica.ui.screens.LoginAndRegister
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.material3.BottomAppBar
@@ -50,16 +51,15 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.edentifica.R
-import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
+import com.app.edentifica.ui.theme.AppColors
+import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.utils.AuthRes
 import com.app.edentifica.utils.googleAuth.SignInState
@@ -94,12 +94,15 @@ fun LoginScreen(
 
     Scaffold (
         bottomBar = {
-            BottomAppBar (){
+            BottomAppBar(
+                containerColor = AppColors.mainEdentifica,
+                modifier = Modifier.height(44.dp)
+            ) {
                 Text(
                     text = stringResource(R.string.copyrigth),
-                    fontSize = 12.sp,
+                    fontSize = TextSizes.Footer,
                     fontStyle = FontStyle.Italic,
-                    color= Color.DarkGray,
+                    color= AppColors.whitePerlaEdentifica,
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentSize(Alignment.Center)
@@ -107,7 +110,14 @@ fun LoginScreen(
             }
         }
     ){
-        BodyContent(navController,scope,auth,context,onSignInClick, vmUsers)
+        Box(
+            modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
+            .padding(8.dp)
+        ){
+            BodyContent(navController,scope,auth,context,onSignInClick, vmUsers)
+        }
     }
 }
 
@@ -158,22 +168,19 @@ fun FormularioLogin(
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
-        //Title
-        Text(text = "Login", color = Color.DarkGray, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-        Spacer(modifier = Modifier.height(32.dp))
-
         // Campo de email - Field email
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(34.dp))
         TextField(
-            label = { Text(text = "Email") },
+            label = { Text(text = "Email", fontSize = TextSizes.Paragraph) },
             value = email,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            onValueChange = { email = it })
+            onValueChange = { email = it },
+        )
 
         // Campo de password - Field password
         Spacer(modifier = Modifier.height(10.dp))
         TextField(
-            label = { Text(text = "Password") },
+            label = { Text(text = "Password",fontSize = TextSizes.Paragraph) },
             value = password,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -181,7 +188,9 @@ fun FormularioLogin(
 
         // Botón de inicio de sesión - Login Button
         Spacer(modifier = Modifier.height(20.dp))
-        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+        Box(
+            modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)
+        ) {
             Button(
                 onClick = {
                     scope.launch {
@@ -189,15 +198,19 @@ fun FormularioLogin(
                     }
                 },
                 shape = RoundedCornerShape(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Login".uppercase())
+                Text(
+                    text = "Login",
+                    fontSize = TextSizes.H3,
+                    color = AppColors.whitePerlaEdentifica)
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Enlace de "¿Olvidaste tu contraseña?"
         ClickableText(
@@ -207,14 +220,14 @@ fun FormularioLogin(
                 navController.navigate(route = AppScreen.ForgotPasswordScreen.route)
             },
             style = TextStyle(
-                fontSize = 14.sp,
+                fontSize = TextSizes.Paragraph,
                 fontFamily = FontFamily.Default,
                 textDecoration = TextDecoration.Underline,
-                color = Color.Blue
+                color = AppColors.secondaryEdentifica
             )
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Separador con texto "ó"
         Row(
@@ -225,16 +238,17 @@ fun FormularioLogin(
         ) {
             Divider(
                 modifier = Modifier.weight(1f),
-                color = Color.Black,
+                color = AppColors.darkEdentifica,
                 thickness = 1.dp
             )
             Text(
                 text = "ó",
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp),
+                fontSize = TextSizes.Paragraph
             )
             Divider(
                 modifier = Modifier.weight(1f),
-                color = Color.Black,
+                color = AppColors.darkEdentifica,
                 thickness = 1.dp
             )
         }
@@ -260,10 +274,10 @@ fun FormularioLogin(
             },
             text = "Continue as a guest",
             icon = R.drawable.ic_incognito,
-            color = Color(0xFF363636)
+            color = AppColors.grayEdentifica
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(22.dp))
 
         // Enlace de "¿No tienes una cuenta? Regístrate aquí"
         ClickableText(
@@ -275,10 +289,10 @@ fun FormularioLogin(
                 navController.navigate(route = AppScreen.RegisterScreen.route)
             },
             style = TextStyle(
-                fontSize = 14.sp,
+                fontSize = TextSizes.Paragraph,
                 fontFamily = FontFamily.Default,
                 textDecoration = TextDecoration.Underline,
-                color = Color.Blue
+                color = AppColors.secondaryEdentifica
             )
         )
     }

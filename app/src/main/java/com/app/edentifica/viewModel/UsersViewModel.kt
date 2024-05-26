@@ -15,6 +15,15 @@ class UsersViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
+    private val _userEmailSearch = MutableStateFlow<User?>(null)
+    val userEmailSearch: StateFlow<User?> = _userEmailSearch
+
+    private val _userPhoneSearch = MutableStateFlow<User?>(null)
+    val userPhoneSearch: StateFlow<User?> = _userPhoneSearch
+
+    private val _userSocialSearch = MutableStateFlow<User?>(null)
+    val userSocialSearch: StateFlow<User?> = _userSocialSearch
+
     private val _userInserted = MutableStateFlow<Boolean?>(false)
     val userInserted: StateFlow<Boolean?> = _userInserted
 
@@ -24,6 +33,8 @@ class UsersViewModel : ViewModel() {
     private val _answerValidation = MutableStateFlow<Boolean?>(null)
     val answerValidation: StateFlow<Boolean?> = _answerValidation
 
+
+    //CRUD USER
     /**
      * Esta funcion recibe un User y lo inserta en la base de datos
      */
@@ -64,6 +75,132 @@ class UsersViewModel : ViewModel() {
         }
     }
 
+    //BUSQUEDAS
+    /**
+     * Esta funcion recibe un email y nos devuelve al usuario encontrado, esta la utilizamos para las busquedas de correo
+     */
+    fun getUserByEmailSearch(email: String) {
+        viewModelScope.launch {
+            try {
+                val response = userService.getByEmail(email)
+                if (response.isSuccessful) {
+                    //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
+                    //Pendiente agregar la validacion 2
+                    if(response.body()?.validations?.get(0)?.isValidated == true){
+                        _userEmailSearch.value = response.body()
+                    }else{
+                        _userEmailSearch.value = null
+                    }
+                } else {
+                    Log.e("error en userViewModel", "getUserByEmailSearch")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel getUserByEmailSearch", it) }
+            }
+        }
+    }
+
+
+    /**
+     * Esta funcion pone en nulo la respuesta de buscar por email
+     */
+    fun putEmailResultNull() {
+        viewModelScope.launch {
+            try {
+                _userEmailSearch.value=null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel EmailResultNull", it) }
+            }
+        }
+    }
+
+
+
+    /**
+     * Esta funcion recibe un phone y nos devuelve al usuario encontrado, esta la utilizamos para las busquedas de telefonos
+     */
+    fun getUserByPhoneSearch(phone: String) {
+        viewModelScope.launch {
+            try {
+                val response = userService.getByPhone(phone)
+                if (response.isSuccessful) {
+                    //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
+                    //Pendiente agregar la validacion 2
+                    if(response.body()?.validations?.get(0)?.isValidated == true){
+                        _userPhoneSearch.value = response.body()
+                    }else{
+                        _userPhoneSearch.value = null
+                    }
+                } else {
+                    Log.e("error en userViewModel", "getUserByPhoneSearch")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel getUserByPhoneSearch", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone en nulo la respuesta de buscar por telefono
+     */
+    fun putPhoneResultNull() {
+        viewModelScope.launch {
+            try {
+                _userPhoneSearch.value=null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel PhoneResultNull", it) }
+            }
+        }
+    }
+
+
+
+    /**
+     * Esta funcion recibe un phone y nos devuelve al usuario encontrado, esta la utilizamos para las busquedas de telefonos
+     */
+    fun getUserBySocialSearch(type: String, socialname: String) {
+        viewModelScope.launch {
+            try {
+                val response = userService.getBySocialNetwork(type,socialname)
+                if (response.isSuccessful) {
+                    //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
+                    //Pendiente agregar la validacion 2
+                    if(response.body()?.validations?.get(0)?.isValidated == true){
+                        _userSocialSearch.value = response.body()
+                    }else{
+                        _userPhoneSearch.value = null
+                    }
+                } else {
+                    Log.e("error en userViewModel", "getUserBySocialSearch")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel getUserBySocialSearch", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone en nulo la respuesta de buscar por telefono
+     */
+    fun putSocialNetworkResultNull() {
+        viewModelScope.launch {
+            try {
+                _userSocialSearch.value=null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel SocialNetworkResultNull", it) }
+            }
+        }
+    }
+
+
+
+    //FUNCIONES VALIDACIONES
 
     /**
      * Esta funcion recibe un usuario para realizar la llamada de la validacion one

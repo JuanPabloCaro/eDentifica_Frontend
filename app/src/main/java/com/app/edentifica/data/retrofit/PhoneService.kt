@@ -11,4 +11,7 @@ import retrofit2.http.Path
 interface PhoneService {
     @PUT("edentifica/phones/update")
     suspend fun updatePhone(@Body phone: Phone): Response<Boolean>
+
+    @GET("edentifica/phones/get/{idprofile}")
+    suspend fun listPhonesUser(@Path("idprofile") idprofile: String): Response<Set<Phone>>
 }
