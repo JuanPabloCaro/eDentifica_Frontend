@@ -13,6 +13,8 @@ import com.app.edentifica.ui.screens.ProfileUser.ProfileScreen
 import com.app.edentifica.ui.screens.LoginAndRegister.RegisterPhoneScreen
 import com.app.edentifica.ui.screens.LoginAndRegister.RegisterScreen
 import com.app.edentifica.ui.screens.ProfileUser.EmailsScreen
+import com.app.edentifica.ui.screens.ProfileUser.add.EmailsAddScreen
+import com.app.edentifica.ui.screens.ProfileUser.edit.EmailsEditScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchEmailScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchPhoneScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchSocialScreen
@@ -25,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.app.edentifica.utils.googleAuth.SignInState
 import com.app.edentifica.viewModel.EmailViewModel
 import com.app.edentifica.viewModel.PhonesViewModel
+import com.app.edentifica.viewModel.ProfileViewModel
 
 
 @Composable
@@ -34,7 +37,8 @@ fun AppNavigation(
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
     vmPhones: PhonesViewModel,
-    vmEmails: EmailViewModel
+    vmEmails: EmailViewModel,
+    vmProfiles: ProfileViewModel
 ) {
     //Aqui se maneja toda la navegacion entre nuestras pantallas
     //This handles all the navigation between our screens.
@@ -183,6 +187,26 @@ fun AppNavigation(
                 vmEmails=vmEmails
             )
         }
-    }
 
+        composable(route=AppScreen.EmailsEditScreen.route){
+            EmailsEditScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmEmails=vmEmails
+            )
+        }
+
+        composable(route=AppScreen.EmailsAddScreen.route){
+            EmailsAddScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmEmails=vmEmails,
+                vmProfiles=vmProfiles
+            )
+        }
+    }
 }

@@ -26,6 +26,7 @@ import com.app.edentifica.utils.googleAuth.GoogleAuthUiClient
 import com.app.edentifica.utils.googleAuth.SignInViewModel
 import com.app.edentifica.viewModel.EmailViewModel
 import com.app.edentifica.viewModel.PhonesViewModel
+import com.app.edentifica.viewModel.ProfileViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
     val vmUsers by viewModels<UsersViewModel>()
     val vmPhones by viewModels<PhonesViewModel>()
     val vmEmails by viewModels<EmailViewModel>()
+    val vmProfiles by viewModels<ProfileViewModel>()
 
     private val googleAuthUiClient by lazy{
         GoogleAuthUiClient(
@@ -132,7 +134,8 @@ class MainActivity : ComponentActivity() {
                         },
                         vmUsers= vmUsers,
                         vmPhones=vmPhones,
-                        vmEmails=vmEmails
+                        vmEmails=vmEmails,
+                        vmProfiles=vmProfiles
                     )
 
                 }

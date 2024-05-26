@@ -1,12 +1,13 @@
-package com.app.edentifica.ui.screens.ProfileUser
+package com.app.edentifica.ui.screens.ProfileUser.add
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,9 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Home
@@ -25,15 +25,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -49,35 +43,38 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.edentifica.R
 import com.app.edentifica.data.model.Email
+import com.app.edentifica.data.model.Phone
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.EmailViewModel
+import com.app.edentifica.viewModel.ProfileViewModel
 import com.app.edentifica.viewModel.UsersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun EmailsScreen(
+fun EmailsAddScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
     vmEmails: EmailViewModel,
+    vmProfiles: ProfileViewModel
 ) {
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
@@ -90,10 +87,10 @@ fun EmailsScreen(
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
-    val emails by vmEmails.listEmail.collectAsState()
+    val emailCurrent by vmEmails.emailEdit.collectAsState()
 
 
-    val onLogoutConfirmedEmailsScreen:()->Unit = {
+    val onLogoutConfirmedEmailsAddScreen:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -167,26 +164,15 @@ fun EmailsScreen(
                         .wrapContentSize(Alignment.Center)
                 )
             }
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate(AppScreen.EmailsAddScreen.route)
-              },
-                containerColor = AppColors.FocusEdentifica,
-                contentColor = AppColors.whitePerlaEdentifica
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Agregar")
-            }
         }
     ) {
         //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogEmails(
+                LogoutDialogEmailsAdd(
                     onConfirmLogout = {
-                        onLogoutConfirmedEmailsScreen()
+                        onLogoutConfirmedEmailsAddScreen()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -201,8 +187,7 @@ fun EmailsScreen(
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
         ){
-            //funcion composable que pinta el contenido de home
-            BodyContentEmailsScreen(navController,vmEmails, userState,emails)
+            BodyContentEmailsAddScreen(navController,vmEmails,vmProfiles,userState)
         }
 
     }
@@ -213,74 +198,78 @@ fun EmailsScreen(
 
 
 
-
-
 @Composable
-fun BodyContentEmailsScreen(
+fun BodyContentEmailsAddScreen(
     navController: NavController,
     vmEmails: EmailViewModel,
+    vmProfiles: ProfileViewModel,
     userState: User?,
-    emails: Set<Email>?
 ) {
-    userState?.profile?.id?.let { vmEmails.getListEmails(it) }
-
-    // Convertir el conjunto de correos electrónicos a una lista mutable
-    val emailList = emails?.toMutableList() ?: mutableListOf()
-
-
+    //VARIABLES
+    var email by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicación
-            .padding(vertical = 60.dp, horizontal = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Lista de correos electrónicos
-        LazyColumn{
-            items(emailList) {
-                Box(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(AppColors.secondaryEdentifica)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(8.dp)
-                    ) {
-                        Text(text = it.email, color = AppColors.whitePerlaEdentifica)
-                        IconButton(
-                            onClick = {
-                                if (userState != null) {
-                                    if(!it.email.equals(userState.email.email)){
-                                        vmEmails.saveEmailEdit(it)
-                                        navController.navigate(AppScreen.EmailsEditScreen.route)
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Editar", tint = AppColors.whitePerlaEdentifica)
-                        }
-                        IconButton(
-                            onClick = {
-                                if (userState != null) {
-                                    if(!it.email.equals(userState.email.email)){
-                                        it.id?.let { it1 -> vmEmails.deleteEmailVM(it1) }
-                                        navController.navigate(AppScreen.EmailsScreen.route)
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Borrar",tint = AppColors.whitePerlaEdentifica)
+
+        Spacer(modifier = Modifier.height(68.dp))
+        //Image
+        Image(
+            painter = painterResource(id = R.drawable.email),
+            contentDescription = "Mobile",
+            modifier = Modifier
+                .fillMaxWidth()
+                .scale(0.7f)
+                .padding(0.dp), // ajusta la altura según sea necesario
+            contentScale = ContentScale.Crop // Escala de la imagen
+        )
+
+        Text(
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = "Inserta un email",
+            color = AppColors.mainEdentifica,
+            fontSize = TextSizes.H2
+        )
+
+        // Campo de entrada para el correo electrónico
+        Spacer(modifier = Modifier.height(34.dp))
+        TextField(
+            label = { Text(text = "Correo", fontSize = TextSizes.Paragraph) },
+            value = email,
+            onValueChange = { email = it },
+        )
+        Spacer(modifier = Modifier.height(34.dp))
+
+        // Botón para insertar el correo electrónico
+        Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
+            Button(
+                onClick = {
+                    // Insertar el correo electrónico llamando a la función del ViewModel
+                    userState?.let { user ->
+                        val emailToInsert = Email(id = null, email = email, isVerified = false, idProfileUser = null)
+                        user.profile?.id?.let { profileId ->
+                            vmProfiles.insertEmailVm(emailToInsert, profileId)
                         }
                     }
-                }
+                    navController.popBackStack()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
+                shape = RoundedCornerShape(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = "Insertar Correo",
+                    fontSize = TextSizes.H3,
+                    color = AppColors.whitePerlaEdentifica
+                )
             }
         }
     }
-
 }
 
 
@@ -290,7 +279,7 @@ fun BodyContentEmailsScreen(
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogEmails(
+fun LogoutDialogEmailsAdd(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {
