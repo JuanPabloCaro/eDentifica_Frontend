@@ -319,9 +319,6 @@ fun LogoutDialogValidation(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {
-
-
-
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
@@ -346,27 +343,5 @@ fun LogoutDialogValidation(
         }
     )
 
-
-//    AlertDialog(
-//        onDismissRequest = onDismiss,
-//        title = { Text("Cerrar sesión") },
-//        text = { Text("¿Estás seguro que deseas cerrar sesión?") },
-//        confirmButton = {
-//            Button(
-//                onClick = onConfirmLogout,
-//                colors = ButtonDefaults.buttonColors(containerColor = Color.Green)
-//            ) {
-//                Text("Aceptar",color= Color.White)
-//            }
-//        },
-//        dismissButton = {
-//            Button(
-//                onClick = onDismiss,
-//                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-//            ) {
-//                Text("Cancelar",color= Color.White)
-//            }
-//        }
-//    )
 }
 
