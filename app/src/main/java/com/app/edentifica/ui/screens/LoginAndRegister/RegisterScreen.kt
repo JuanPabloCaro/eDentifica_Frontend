@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.TextField
+import androidx.compose.material3.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
@@ -92,7 +92,11 @@ fun RegisterScreen(
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
-                        Icon(imageVector= Icons.Default.ArrowBack, contentDescription="ArrowBack", tint = AppColors.whitePerlaEdentifica)
+                        Icon(
+                            imageVector= Icons.Default.ArrowBack,
+                            contentDescription="ArrowBack",
+                            tint = AppColors.whitePerlaEdentifica
+                        )
                     }
                 },
                 title = {
