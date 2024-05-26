@@ -15,6 +15,8 @@ class PhonesViewModel: ViewModel() {
     private val _phoneUpdated = MutableStateFlow<Boolean?>(false)
     val phoneUpdated: StateFlow<Boolean?> = _phoneUpdated
 
+    private val _listPhones = MutableStateFlow<Set<Phone>?>(null)
+    val listPhone: StateFlow<Set<Phone>?> = _listPhones
 
     /**
      * Esta funcion recibe un Phone y lo actualiza
@@ -34,4 +36,28 @@ class PhonesViewModel: ViewModel() {
             }
         }
     }
+
+
+
+
+    /**
+     * Esta funcion recibe un idProfile y devuelve la lista de phones
+     */
+    fun listPhones(idProfile: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitApi.phoneService.listPhonesUser(idProfile)
+                if (response.isSuccessful) {
+                    _listPhones.value = response.body()
+                } else {
+                    Log.e("error en phoneViewModel", "list Phone")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch phoneViewModel list", it) }
+            }
+        }
+    }
+
+
 }
