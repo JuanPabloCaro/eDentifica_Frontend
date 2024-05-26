@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "694564092160",
+    "project_id": "edentifica-cc5aa",
+    "storage_bucket": "edentifica-cc5aa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:694564092160:android:9efa2401b25c3ef4b69be5",
+        "android_client_info": {
+          "package_name": "com.app.edentifica"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "694564092160-lsndc0lhnda2ecvg3mc3vu9u4etr9ood.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.edentifica",
+            "certificate_hash": "c80b5e0ee0424ebede690a32ed1b0ccb1e42d79a"
+          }
+        },
+        {
+          "client_id": "694564092160-tk7hkpsat4muhcti68f27dllsa2rqafl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnMcjfecrJhEuqMeeyMRvn1mvDo6L3Sjg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "694564092160-tk7hkpsat4muhcti68f27dllsa2rqafl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
