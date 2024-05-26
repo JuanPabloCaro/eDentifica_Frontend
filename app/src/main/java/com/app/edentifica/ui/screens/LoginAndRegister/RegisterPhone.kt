@@ -23,7 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.ButtonDefaults
@@ -51,7 +51,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -147,7 +146,7 @@ fun RegisterPhoneScreen(
                 containerColor = AppColors.mainEdentifica,
                 modifier = Modifier.height(44.dp)
             ) {
-                androidx.compose.material3.Text(
+                Text(
                     text = stringResource(R.string.copyrigth),
                     fontSize = TextSizes.Footer,
                     fontStyle = FontStyle.Italic,
@@ -162,7 +161,7 @@ fun RegisterPhoneScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White) //Color de fondo de la aplicacion
+                .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(horizontal = 8.dp)
         ){
             //funcion composable que pinta el contenido de home
@@ -202,18 +201,17 @@ fun BodyContentRegisterPhone(
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
     ) {
+
+        Spacer(modifier = Modifier.height(68.dp))
         //Image
         Image(
-            painter = painterResource(id = R.drawable.undraw_apps_aomb),
+            painter = painterResource(id = R.drawable.movil),
             contentDescription = "Mobile",
             modifier = Modifier
-                .fillMaxWidth().scale(0.6f).padding(0.dp), // ajusta la altura según sea necesario
+                .fillMaxWidth().scale(0.7f).padding(0.dp), // ajusta la altura según sea necesario
             contentScale = ContentScale.Crop // Escala de la imagen
         )
-
-
 
         Text(
             modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
@@ -221,11 +219,6 @@ fun BodyContentRegisterPhone(
             color = AppColors.mainEdentifica,
             fontSize = TextSizes.H2
         )
-//        Text(
-//            text = "Por favor introduce tu numero de telefono",
-//            color = AppColors.mainEdentifica,
-//            fontSize = TextSizes.H2
-//        )
 
         // Campo de entrada para la respuesta del usuario
         Spacer(modifier = Modifier.height(34.dp))
@@ -236,15 +229,6 @@ fun BodyContentRegisterPhone(
             onValueChange = { userPhone = it },
         )
         Spacer(modifier = Modifier.height(34.dp))
-//        OutlinedTextField(
-//            value = userPhone,
-//            onValueChange = { userPhone = it },
-//            label = { Text("phone") },
-//            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp)
-//        )
 
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
