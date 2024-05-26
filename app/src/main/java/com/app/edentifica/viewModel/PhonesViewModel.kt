@@ -43,7 +43,7 @@ class PhonesViewModel: ViewModel() {
     /**
      * Esta funcion recibe un idProfile y devuelve la lista de phones
      */
-    fun listPhones(idProfile: String) {
+    fun getListPhones(idProfile: String) {
         viewModelScope.launch {
             try {
                 val response = RetrofitApi.phoneService.listPhonesUser(idProfile)

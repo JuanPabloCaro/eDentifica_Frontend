@@ -43,7 +43,7 @@ class EmailViewModel: ViewModel()  {
     /**
      * Esta funcion recibe un idProfile y devuelve la lista de emails
      */
-    fun listEmails(idProfile: String) {
+    fun getListEmails(idProfile: String) {
         viewModelScope.launch {
             try {
                 val response = RetrofitApi.emailService.listEmailsUser(idProfile)

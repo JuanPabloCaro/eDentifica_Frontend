@@ -30,5 +30,6 @@ sealed class AppScreen(val route: String){
     object ResultSearchEmailScreen: AppScreen("result_search_email")
 
     object ResultSearchSocialScreen: AppScreen("result_search_social_network")
+    object EmailsScreen: AppScreen("emails_user")
 
 }

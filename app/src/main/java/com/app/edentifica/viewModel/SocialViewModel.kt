@@ -43,7 +43,7 @@ class SocialViewModel: ViewModel() {
     /**
      * Esta funcion recibe un idProfile y devuelve la lista de redes Sociales
      */
-    fun listSocialNetworks(idProfile: String) {
+    fun getListSocialNetworks(idProfile: String) {
         viewModelScope.launch {
             try {
                 val response = RetrofitApi.socialNetworkService.listSocialNetworksUser(idProfile)

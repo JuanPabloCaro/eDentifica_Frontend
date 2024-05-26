@@ -12,6 +12,7 @@ import com.app.edentifica.ui.screens.LoginAndRegister.LoginScreen
 import com.app.edentifica.ui.screens.ProfileUser.ProfileScreen
 import com.app.edentifica.ui.screens.LoginAndRegister.RegisterPhoneScreen
 import com.app.edentifica.ui.screens.LoginAndRegister.RegisterScreen
+import com.app.edentifica.ui.screens.ProfileUser.EmailsScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchEmailScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchPhoneScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchSocialScreen
@@ -22,6 +23,7 @@ import com.app.edentifica.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
 import com.google.firebase.auth.FirebaseUser
 import com.app.edentifica.utils.googleAuth.SignInState
+import com.app.edentifica.viewModel.EmailViewModel
 import com.app.edentifica.viewModel.PhonesViewModel
 
 
@@ -31,7 +33,8 @@ fun AppNavigation(
     onSignInClickGoogle: () -> Unit,
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
-    vmPhones: PhonesViewModel
+    vmPhones: PhonesViewModel,
+    vmEmails: EmailViewModel
 ) {
     //Aqui se maneja toda la navegacion entre nuestras pantallas
     //This handles all the navigation between our screens.
@@ -168,6 +171,16 @@ fun AppNavigation(
                 auth = authManager,
                 onSignOutGoogle = onSignOutGoogle,
                 vmUsers = vmUsers
+            )
+        }
+
+        composable(route=AppScreen.EmailsScreen.route){
+            EmailsScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmEmails=vmEmails
             )
         }
     }
