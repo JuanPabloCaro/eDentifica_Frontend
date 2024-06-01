@@ -116,7 +116,7 @@ fun HomeScreen(
             "",
             Phone(null,auth.getCurrentUser()?.phoneNumber.toString(),false,null),
             Email(null,auth.getCurrentUser()?.email.toString(),false,null),
-            Profile(null,"",auth.getCurrentUser()?.photoUrl.toString(),null,null,null,null),
+            Profile(null,"",auth.getCurrentUser()?.photoUrl.toString(),null),
             null,
             null
         )

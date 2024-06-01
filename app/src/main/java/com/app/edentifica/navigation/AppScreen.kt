@@ -49,4 +49,6 @@ sealed class AppScreen(val route: String){
 
     object SocialNetworksAddScreen: AppScreen("social_networks_add_user")
 
+    object ProfileUserEditScreen: AppScreen("profile_user_edit_user")
+
 }

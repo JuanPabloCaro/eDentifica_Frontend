@@ -281,7 +281,7 @@ private suspend fun signUp(
             lastName,
             Phone(null,phone,null,null),
             Email(null,email,null,null),
-            Profile(null,"","",null,null,null,null),
+            Profile(null,"","",null),
             null,
             null
         )

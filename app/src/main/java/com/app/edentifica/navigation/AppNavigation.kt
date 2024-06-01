@@ -20,6 +20,7 @@ import com.app.edentifica.ui.screens.ProfileUser.add.PhonesAddScreen
 import com.app.edentifica.ui.screens.ProfileUser.add.SocialNetworksAddScreen
 import com.app.edentifica.ui.screens.ProfileUser.edit.EmailsEditScreen
 import com.app.edentifica.ui.screens.ProfileUser.edit.PhonesEditScreen
+import com.app.edentifica.ui.screens.ProfileUser.edit.ProfileUserEditScreen
 import com.app.edentifica.ui.screens.ProfileUser.edit.SocialNetworksEditScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchEmailScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchPhoneScreen
@@ -128,7 +129,8 @@ fun AppNavigation(
                 navController = navController,
                 auth= authManager,
                 onSignOutGoogle= onSignOutGoogle,
-                vmUsers= vmUsers
+                vmUsers= vmUsers,
+                vmProfiles=vmProfiles
             )
         }
 
@@ -188,8 +190,17 @@ fun AppNavigation(
         }
 
         //PROFILE
+        composable(route=AppScreen.ProfileUserEditScreen.route){
+            ProfileUserEditScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmProfile=vmProfiles
+            )
+        }
 
-            //EMAIL
+            //EMAIL-PROFILE
         composable(route=AppScreen.EmailsScreen.route){
             EmailsScreen(
                 navController = navController,
@@ -221,7 +232,7 @@ fun AppNavigation(
             )
         }
 
-            //PHONE
+            //PHONE-PROFILE
         composable(route=AppScreen.PhonesScreen.route){
             PhonesScreen(
                 navController = navController,
@@ -253,7 +264,7 @@ fun AppNavigation(
             )
         }
 
-            //SOCIAL NETWORKS
+            //SOCIAL NETWORKS-PROFILE
         composable(route=AppScreen.SocialNetworksScreen.route){
             SocialNetworksScreen(
                 navController = navController,

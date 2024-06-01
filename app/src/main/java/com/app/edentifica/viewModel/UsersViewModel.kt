@@ -4,7 +4,9 @@ package com.app.edentifica.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.app.edentifica.data.model.Profile
 import com.app.edentifica.data.model.User
+import com.app.edentifica.data.retrofit.RetrofitApi
 import com.app.edentifica.data.retrofit.RetrofitApi.userService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +34,9 @@ class UsersViewModel : ViewModel() {
 
     private val _answerValidation = MutableStateFlow<Boolean?>(null)
     val answerValidation: StateFlow<Boolean?> = _answerValidation
+
+    private val _userUpdate = MutableStateFlow<Boolean?>(false)
+    val userUpdate: StateFlow<Boolean?> = _userUpdate
 
 
     //CRUD USER
@@ -283,6 +288,26 @@ class UsersViewModel : ViewModel() {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch userViewModel validationOneCheckNegative", it) }
+            }
+        }
+    }
+
+
+    /**
+     * Esta funcion recibe un User y lo actualiza
+     */
+    fun updateUserVM(user:User) {
+        viewModelScope.launch {
+            try {
+                val response = userService.updateUser(user)
+                if (response.isSuccessful) {
+                    _userUpdate.value = response.body()
+                } else {
+                    Log.e("error en userViewModel", "update user")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel update", it) }
             }
         }
     }
