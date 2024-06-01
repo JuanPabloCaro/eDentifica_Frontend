@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitApi {
-    private val  BASE_URL = "http://192.168.1.41:8080/" //IMPORTANTE CAMBIAR DEPENDIENDO DEL WIFI O RED
+    private val  BASE_URL = "https://rnql1vx4-8080.uks1.devtunnels.ms/" //IMPORTANTE CAMBIAR DEPENDIENDO DEL WIFI O RED
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
