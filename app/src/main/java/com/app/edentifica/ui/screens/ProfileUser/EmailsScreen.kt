@@ -3,10 +3,10 @@ package com.app.edentifica.ui.screens.ProfileUser
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,19 +25,17 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material.Card
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -52,12 +50,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.edentifica.R
 import com.app.edentifica.data.model.Email
@@ -82,8 +77,8 @@ fun EmailsScreen(
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-    //recojo al user Actual
-    val user = auth.getCurrentUser()
+//    //recojo al user Actual
+//    val user = auth.getCurrentUser()
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
@@ -109,6 +104,17 @@ fun EmailsScreen(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.mainEdentifica),
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.navigate(AppScreen.ProfileUserScreen.route)
+                    }) {
+                        Icon(
+                            imageVector= Icons.Default.ArrowBack,
+                            contentDescription="ArrowBack",
+                            tint = AppColors.whitePerlaEdentifica
+                        )
+                    }
+                },
                 title = {
                     Row(
                         horizontalArrangement = Arrangement.Start,
@@ -116,7 +122,7 @@ fun EmailsScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Perfil",
+                            text = "Mis Correos",
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -233,7 +239,7 @@ fun BodyContentEmailsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicación
-            .padding(vertical = 60.dp, horizontal = 8.dp),
+            .padding(vertical = 60.dp, horizontal = 2.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Lista de correos electrónicos
@@ -244,37 +250,60 @@ fun BodyContentEmailsScreen(
                         .padding(8.dp)
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(AppColors.secondaryEdentifica)
+                        .border(
+                            width = 2.dp,
+                            color = AppColors.mainEdentifica,
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .background(Color.Transparent) // Fondo transparente
                 ) {
                     Row(
                         modifier = Modifier
-                            .padding(8.dp)
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = it.email, color = AppColors.whitePerlaEdentifica)
-                        IconButton(
-                            onClick = {
-                                if (userState != null) {
-                                    if(!it.email.equals(userState.email.email)){
-                                        vmEmails.saveEmailEdit(it)
-                                        navController.navigate(AppScreen.EmailsEditScreen.route)
-                                    }
+                        if (userState != null) {
+                            if(!it.email.equals(userState.email.email)){
+                                Text(text = it.email, color = AppColors.mainEdentifica)
+                            }else{
+                                Column {
+                                    Text(text = "Predeterminado:", color = AppColors.FocusEdentifica)
+                                    Text(text = it.email, color = AppColors.mainEdentifica)
                                 }
                             }
-                        ) {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Editar", tint = AppColors.whitePerlaEdentifica)
                         }
-                        IconButton(
-                            onClick = {
-                                if (userState != null) {
-                                    if(!it.email.equals(userState.email.email)){
-                                        it.id?.let { it1 -> vmEmails.deleteEmailVM(it1) }
-                                        navController.navigate(AppScreen.EmailsScreen.route)
+
+                        Spacer(modifier = Modifier.weight(1f)) // Spacer flexible para empujar el Box a la derecha
+
+                        Box {
+                            Row {
+                                IconButton(
+                                    onClick = {
+                                        if (userState != null) {
+                                            if(!it.email.equals(userState.email.email)){
+                                                vmEmails.saveEmailEdit(it)
+                                                navController.navigate(AppScreen.EmailsEditScreen.route)
+                                            }
+                                        }
                                     }
+                                ) {
+                                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Editar", tint = AppColors.mainEdentifica)
+                                }
+                                IconButton(
+                                    onClick = {
+                                        if (userState != null) {
+                                            if(!it.email.equals(userState.email.email)){
+                                                it.id?.let { it1 -> vmEmails.deleteEmailVM(it1) }
+                                                navController.navigate(AppScreen.EmailsScreen.route)
+                                            }
+                                        }
+                                    }
+                                ) {
+                                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Borrar",tint = AppColors.mainEdentifica)
                                 }
                             }
-                        ) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Borrar",tint = AppColors.whitePerlaEdentifica)
                         }
+
                     }
                 }
             }

@@ -2,6 +2,7 @@ package com.app.edentifica.ui.screens.ProfileUser.edit
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.AlertDialog
@@ -41,6 +43,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -94,6 +99,17 @@ fun EmailsEditScreen(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.mainEdentifica),
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.navigate(AppScreen.EmailsScreen.route)
+                    }) {
+                        Icon(
+                            imageVector= Icons.Default.ArrowBack,
+                            contentDescription="ArrowBack",
+                            tint = AppColors.whitePerlaEdentifica
+                        )
+                    }
+                },
                 title = {
                     Row(
                         horizontalArrangement = Arrangement.Start,
@@ -101,7 +117,7 @@ fun EmailsEditScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Perfil",
+                            text = "Editar Correo",
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -202,7 +218,17 @@ fun BodyContentEmailsEditScreen(
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(120.dp))
+        Spacer(modifier = Modifier.height(68.dp))
+        //Image
+        Image(
+            painter = painterResource(id = R.drawable.editemail),
+            contentDescription = "edit email",
+            modifier = Modifier
+                .fillMaxWidth()
+                .scale(0.7f)
+                .padding(0.dp), // ajusta la altura según sea necesario
+            contentScale = ContentScale.Crop // Escala de la imagen
+        )
 
         TextField(
             label = { Text(text = "Correo", fontSize = TextSizes.Paragraph) },

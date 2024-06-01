@@ -13,8 +13,14 @@ import com.app.edentifica.ui.screens.ProfileUser.ProfileScreen
 import com.app.edentifica.ui.screens.LoginAndRegister.RegisterPhoneScreen
 import com.app.edentifica.ui.screens.LoginAndRegister.RegisterScreen
 import com.app.edentifica.ui.screens.ProfileUser.EmailsScreen
+import com.app.edentifica.ui.screens.ProfileUser.PhonesScreen
+import com.app.edentifica.ui.screens.ProfileUser.SocialNetworksScreen
 import com.app.edentifica.ui.screens.ProfileUser.add.EmailsAddScreen
+import com.app.edentifica.ui.screens.ProfileUser.add.PhonesAddScreen
+import com.app.edentifica.ui.screens.ProfileUser.add.SocialNetworksAddScreen
 import com.app.edentifica.ui.screens.ProfileUser.edit.EmailsEditScreen
+import com.app.edentifica.ui.screens.ProfileUser.edit.PhonesEditScreen
+import com.app.edentifica.ui.screens.ProfileUser.edit.SocialNetworksEditScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchEmailScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchPhoneScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchSocialScreen
@@ -28,6 +34,7 @@ import com.app.edentifica.utils.googleAuth.SignInState
 import com.app.edentifica.viewModel.EmailViewModel
 import com.app.edentifica.viewModel.PhonesViewModel
 import com.app.edentifica.viewModel.ProfileViewModel
+import com.app.edentifica.viewModel.SocialViewModel
 
 
 @Composable
@@ -38,7 +45,8 @@ fun AppNavigation(
     vmUsers: UsersViewModel,
     vmPhones: PhonesViewModel,
     vmEmails: EmailViewModel,
-    vmProfiles: ProfileViewModel
+    vmProfiles: ProfileViewModel,
+    vmSocialNetworks: SocialViewModel
 ) {
     //Aqui se maneja toda la navegacion entre nuestras pantallas
     //This handles all the navigation between our screens.
@@ -124,6 +132,7 @@ fun AppNavigation(
             )
         }
 
+        //GENERAL
         composable(route=AppScreen.FindByEmailScreen.route){
             FindByEmailScreen(
                 navController = navController,
@@ -178,6 +187,9 @@ fun AppNavigation(
             )
         }
 
+        //PROFILE
+
+            //EMAIL
         composable(route=AppScreen.EmailsScreen.route){
             EmailsScreen(
                 navController = navController,
@@ -208,5 +220,70 @@ fun AppNavigation(
                 vmProfiles=vmProfiles
             )
         }
+
+            //PHONE
+        composable(route=AppScreen.PhonesScreen.route){
+            PhonesScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmPhones=vmPhones
+            )
+        }
+
+        composable(route=AppScreen.PhonesEditScreen.route){
+            PhonesEditScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmPhones=vmPhones
+            )
+        }
+
+        composable(route=AppScreen.PhonesAddScreen.route){
+            PhonesAddScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmPhones=vmPhones,
+                vmProfiles=vmProfiles
+            )
+        }
+
+            //SOCIAL NETWORKS
+        composable(route=AppScreen.SocialNetworksScreen.route){
+            SocialNetworksScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmSocial=vmSocialNetworks
+            )
+        }
+
+        composable(route=AppScreen.SocialNetworksEditScreen.route){
+            SocialNetworksEditScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmSocial=vmSocialNetworks
+            )
+        }
+
+        composable(route=AppScreen.SocialNetworksAddScreen.route){
+            SocialNetworksAddScreen(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
+                vmSocial=vmSocialNetworks,
+                vmProfiles=vmProfiles
+            )
+        }
+
     }
 }

@@ -313,7 +313,7 @@ fun BodyContentHome(
 
         //Image
         Image(
-            painter = painterResource(id = R.drawable.search),
+            painter = painterResource(id = R.drawable.searchhome),
             contentDescription = "search",
             modifier = Modifier
                 .fillMaxWidth()
