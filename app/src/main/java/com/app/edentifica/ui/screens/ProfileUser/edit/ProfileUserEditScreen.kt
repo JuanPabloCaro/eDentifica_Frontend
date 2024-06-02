@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Build
-import android.widget.DatePicker
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -47,13 +46,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.app.edentifica.R
 import com.app.edentifica.data.model.Profile
@@ -64,9 +63,22 @@ import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.ProfileViewModel
 import com.app.edentifica.viewModel.UsersViewModel
+import java.util.Calendar
+import android.os.Bundle
+import android.widget.DatePicker
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -88,7 +100,7 @@ fun ProfileUserEditScreen(
     }
     // Observa el flujo de email A editar en el ViewModel
     val profileCurrent by vmProfile.profileEdit.collectAsState()
-    val user by vmUsers.user.collectAsState()
+    val userCurrent by vmUsers.user.collectAsState()
 
 
     val onLogoutConfirmedProfileEditScreen:()->Unit = {
@@ -200,7 +212,7 @@ fun ProfileUserEditScreen(
                 .padding(24.dp)
         ){
             //funcion composable que pinta el contenido de home
-            profileCurrent?.let { BodyContentProfileEditScreen(navController = navController, vmProfile = vmProfile,vmUsers=vmUsers, profileCurrent = it, user = user) }
+            profileCurrent?.let { userCurrent?.let { it1 -> BodyContentProfileEditScreen(navController = navController, vmProfile = vmProfile,vmUsers=vmUsers, profileCurrent = it, user = it1) } }
         }
 
     }
@@ -218,15 +230,16 @@ fun BodyContentProfileEditScreen(
     vmProfile: ProfileViewModel,
     navController: NavController,
     profileCurrent: Profile,
-    user: User?,
+    user: User,
     vmUsers: UsersViewModel
 ) {
-    var name by remember { mutableStateOf(user?.name ?: user?.name) }
-    var lastname by remember { mutableStateOf(user?.lastName ?: user?.lastName) }
-    var dateBirth by remember { mutableStateOf<LocalDate?>(profileCurrent.dateBirth) }
+    var name by remember { mutableStateOf(user.name) }
+    var lastname by remember { mutableStateOf(user.lastName) }
     var description by remember { mutableStateOf(profileCurrent.description) }
 
-    val context = LocalContext.current
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    var showDatePicker by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -248,52 +261,53 @@ fun BodyContentProfileEditScreen(
 
 
         //NAME
-        name?.let {
-            TextField(
-                label = { Text(text = "Nombre", fontSize = TextSizes.Paragraph) },
-                value = it,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                onValueChange = { name = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
-        }
+        TextField(
+            label = { Text(text = "Nombre", fontSize = TextSizes.Paragraph) },
+            value = name,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            onValueChange = { name = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
 
         //LASTNAME
-        lastname?.let {
-            TextField(
-                label = { Text(text = "Apellidos", fontSize = TextSizes.Paragraph) },
-                value = it,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                onValueChange = { lastname = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
-        }
+        TextField(
+            label = { Text(text = "Apellidos", fontSize = TextSizes.Paragraph) },
+            value = lastname,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            onValueChange = { lastname = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
 
         //DATEBIRTH
         Column(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = dateBirth?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) ?: "No date selected",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(8.dp)
-            )
+            Button(onClick = {
+                showDatePicker = true
+            }) {
+                Text("Seleccionar Fecha de Nacimiento")
+            }
 
-            Button(
-                onClick = {
-                    showDatePickerDialog(context) { date ->
-                        dateBirth = date
+            Spacer(modifier = Modifier.height(16.dp))
+
+            selectedDate?.let {
+                Text("Fecha seleccionada: ${it.format(formatter)}")
+            }
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    onDateSelected = { date ->
+                        selectedDate = date
+                        showDatePicker = false
                     }
-                }
-            ) {
-                Text(text = "Select Date")
+                )
             }
         }
 
@@ -315,16 +329,17 @@ fun BodyContentProfileEditScreen(
             Button(
                 onClick = {
                     //Actualizar el profile
-                    val updateProfile = profileCurrent.copy(dateBirth=dateBirth, description = description)
+                    val updateProfile = profileCurrent.copy(dateBirth=selectedDate, description = description)
+                    //Actualizar el user
+                    val updateUser = user.copy(name = name, lastName = lastname)
+                    vmUsers.updateUserVM(updateUser)
+                    vmUsers.toNullUserEdit()
                     vmProfile.updateProfileVM(updateProfile)
                     vmProfile.toNullProfileEdit()
 
-                    //Actualizar el user
-                    val updateUser = name?.let { lastname?.let { it1 -> user?.copy(name = it, lastName = it1) } }
-                    if (updateUser != null) {
-                        vmUsers.updateUserVM(updateUser)
-                    }
-                    navController.popBackStack()
+                    vmUsers.getUserByEmail(user.email.email)
+
+                    navController.navigate(AppScreen.ProfileUserScreen.route)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
@@ -345,24 +360,29 @@ fun BodyContentProfileEditScreen(
 
 
 
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun showDatePickerDialog(context: Context, onDateSelected: (LocalDate) -> Unit) {
+@Composable
+fun DatePickerDialog(
+    onDismissRequest: () -> Unit,
+    onDateSelected: (LocalDate) -> Unit
+) {
+    val context = LocalContext.current
     val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-    val datePickerDialog = DatePickerDialog(
-        context,
-        { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDayOfMonth: Int ->
-            val date = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth)
-            onDateSelected(date)
-        }, year, month, day
-    )
-    datePickerDialog.show()
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+    ) {
+        DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                onDateSelected(LocalDate.of(year, month + 1, dayOfMonth))
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
 }
-
 
 
 

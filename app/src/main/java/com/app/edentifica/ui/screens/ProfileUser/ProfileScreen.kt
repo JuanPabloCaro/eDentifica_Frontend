@@ -1,4 +1,4 @@
-package com.app.edentifica.ui.screens.ProfileUser
+package com.app.edentifica.ui.screens .ProfileUser
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -78,14 +79,24 @@ fun ProfileScreen(
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-    //recojo al user Actual
-    val user = auth.getCurrentUser()
-    // Llama a getUserByEmail cuando se inicia HomeScreen
+//    //recojo al user Actual
+//    val user = auth.getCurrentUser()
+
+    // Llama a getUserByEmail cuando se inicia Profile
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
+
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
+
+    // Función para actualizar los datos del usuario
+    LaunchedEffect(userState) {
+        userState?.let { user ->
+            vmUsers.getUserByEmail(user.email.email) // Vuelve a obtener los datos del usuario
+        }
+    }
+
 
 
     val onLogoutConfirmedProfile:()->Unit = {
@@ -106,7 +117,7 @@ fun ProfileScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.mainEdentifica),
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
+                        navController.navigate(AppScreen.HomeScreen.route)
                     }) {
                         Icon(
                             imageVector= Icons.Default.ArrowBack,
@@ -228,7 +239,7 @@ fun BodyContentProfile(
                 .clip(CircleShape)
                 .background(color = Color.Gray) // Color de fondo opcional
         ) {
-            if (userState != null) {
+            if (userState != null && !userState.profile?.urlImageProfile.equals("")) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(userState.profile?.urlImageProfile)
@@ -244,11 +255,13 @@ fun BodyContentProfile(
             } else {
                 Image(
                     painter = painterResource(id = R.drawable.profile),
-                    contentDescription = "image profile default",
+                    contentDescription = "edit image",
                     modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(40.dp)
-                        .clip(CircleShape)
+                        .fillMaxWidth()
+                        .scale(1f)
+                        .padding(0.dp)
+                        .clip(CircleShape), // ajusta la altura según sea necesario
+                    contentScale = ContentScale.Crop // Escala de la imagen
                 )
             }
         }
@@ -335,6 +348,7 @@ fun BodyContentProfile(
                     onClick = {
                         if (userState != null) {
                             userState.profile?.let { vmProfiles.saveProfileEdit(it) }
+                            vmUsers.saveUserEdit(userState)
                             navController.navigate(AppScreen.ProfileUserEditScreen.route)
 
                         }

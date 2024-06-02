@@ -38,6 +38,9 @@ class UsersViewModel : ViewModel() {
     private val _userUpdate = MutableStateFlow<Boolean?>(false)
     val userUpdate: StateFlow<Boolean?> = _userUpdate
 
+    private val _userEdit = MutableStateFlow<User?>(null)
+    val userEdit: StateFlow<User?> = _userEdit
+
 
     //CRUD USER
     /**
@@ -308,6 +311,42 @@ class UsersViewModel : ViewModel() {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch userViewModel update", it) }
+            }
+        }
+    }
+
+
+
+    /**
+     * Esta funcion recibe un User y lo guarda
+     */
+    fun saveUserEdit(user: User) {
+        viewModelScope.launch {
+            try {
+                val response = userService.getByEmail(user.email.email)
+                if (response.isSuccessful) {
+                    _userEdit.value = response.body()
+                } else {
+                    Log.e("error en userViewModel", "edit user")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel edit", it) }
+            }
+        }
+    }
+
+
+    /**
+     * Esta funcion pone a nulo el userEdit
+     */
+    fun toNullUserEdit() {
+        viewModelScope.launch {
+            try {
+                _userEdit.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch userViewModel edit null", it) }
             }
         }
     }

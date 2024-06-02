@@ -216,18 +216,18 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    //Botton Home
-                    IconButton(
-                        onClick = {
-                            navController.navigate(AppScreen.HomeScreen.route)
-                        }
-                    ) {
-                        Icon(
-                            Icons.Outlined.Home,
-                            contentDescription = "Home",
-                            tint = AppColors.whitePerlaEdentifica
-                        )
-                    }
+//                    //Botton Home
+//                    IconButton(
+//                        onClick = {
+//                            navController.navigate(AppScreen.HomeScreen.route)
+//                        }
+//                    ) {
+//                        Icon(
+//                            Icons.Outlined.Home,
+//                            contentDescription = "Home",
+//                            tint = AppColors.whitePerlaEdentifica
+//                        )
+//                    }
                     //boton de accion para salir cerrar sesion
                     IconButton(
                         onClick = {
