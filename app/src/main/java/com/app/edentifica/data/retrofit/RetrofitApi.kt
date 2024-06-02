@@ -2,20 +2,21 @@ package com.app.edentifica.data.retrofit
 
 import com.app.edentifica.data.retrofit.adapters.LocalDateAdapter
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.lang.reflect.Type
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
 
 object RetrofitApi {
     private val  BASE_URL = "https://rnql1vx4-8080.uks1.devtunnels.ms/" //IMPORTANTE CAMBIAR DEPENDIENDO DEL WIFI O RED
+
+    // Configurar OkHttpClient con tiempos de espera personalizados
+    val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)  // Tiempo de espera de conexión
+        .readTimeout(30, TimeUnit.SECONDS)     // Tiempo de espera de lectura
+        .writeTimeout(30, TimeUnit.SECONDS)    // Tiempo de espera de escritura
+        .build()
 
     val gson = GsonBuilder()
         .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
@@ -24,6 +25,7 @@ object RetrofitApi {
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
+        .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
 

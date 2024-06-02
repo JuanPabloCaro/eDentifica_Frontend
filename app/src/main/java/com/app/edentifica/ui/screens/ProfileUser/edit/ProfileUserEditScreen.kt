@@ -237,7 +237,7 @@ fun BodyContentProfileEditScreen(
     var lastname by remember { mutableStateOf(user.lastName) }
     var description by remember { mutableStateOf(profileCurrent.description) }
 
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(profileCurrent.dateBirth) }
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -248,17 +248,6 @@ fun BodyContentProfileEditScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(68.dp))
-        //Image
-//        Image(
-//            painter = painterResource(id = R.drawable.editphone),
-//            contentDescription = "edit email",
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .scale(0.7f)
-//                .padding(0.dp), // ajusta la altura según sea necesario
-//            contentScale = ContentScale.Crop // Escala de la imagen
-//        )
-
 
         //NAME
         TextField(
@@ -288,17 +277,26 @@ fun BodyContentProfileEditScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
+            Text(text = "Fecha de nacimiento:", fontSize = TextSizes.H3, color = AppColors.mainEdentifica)
             Button(onClick = {
                 showDatePicker = true
             }) {
-                Text("Seleccionar Fecha de Nacimiento")
+                Text("Seleccionar Fecha")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+//            if(selectedDate == null){
+//                Text("Fecha seleccionada: ${profileCurrent.dateBirth.toString()}")
+//            }else{
+//                selectedDate?.let {
+//                    Text("Fecha seleccionada: ${it.format(formatter)}")
+//                }
+//            }
 
             selectedDate?.let {
                 Text("Fecha seleccionada: ${it.format(formatter)}")
             }
+
 
             if (showDatePicker) {
                 DatePickerDialog(
