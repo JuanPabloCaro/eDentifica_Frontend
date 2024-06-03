@@ -285,13 +285,6 @@ fun BodyContentProfileEditScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-//            if(selectedDate == null){
-//                Text("Fecha seleccionada: ${profileCurrent.dateBirth.toString()}")
-//            }else{
-//                selectedDate?.let {
-//                    Text("Fecha seleccionada: ${it.format(formatter)}")
-//                }
-//            }
 
             selectedDate?.let {
                 Text("Fecha seleccionada: ${it.format(formatter)}")
