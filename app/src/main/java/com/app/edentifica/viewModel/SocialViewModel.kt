@@ -17,6 +17,13 @@ class SocialViewModel: ViewModel() {
     private val _listSocialNetworks = MutableStateFlow<Set<SocialNetwork>?>(null)
     val listSocialNetworks: StateFlow<Set<SocialNetwork>?> = _listSocialNetworks
 
+    private val _socialEdit = MutableStateFlow<SocialNetwork?>(null)
+    val socialEdit: StateFlow<SocialNetwork?> = _socialEdit
+
+    private val _socialdeleted = MutableStateFlow<Boolean?>(null)
+    val socialdeleted: StateFlow<Boolean?> = _socialdeleted
+
+
 
     /**
      * Esta funcion recibe una Red Social y la actualiza
@@ -59,6 +66,61 @@ class SocialViewModel: ViewModel() {
         }
     }
 
+
+    /**
+     * Esta funcion recibe una red social y la guarda
+     */
+    fun saveSocialEdit(socialNetwork: SocialNetwork) {
+        viewModelScope.launch {
+            try {
+                val response = socialNetwork.id?.let { RetrofitApi.socialNetworkService.getSocialNetwork(it) }
+                if (response != null) {
+                    if (response.isSuccessful) {
+                        _socialEdit.value = response.body()
+                    } else {
+                        Log.e("error en SocialViewModel", "edit SocialNetwork")
+                    }
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch socialViewModel edit", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion recibe un id de red social y lo elimina
+     */
+    fun deleteSocialNetworkVM(id:String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitApi.socialNetworkService.deleteSocialNetwork(id)
+                if (response.isSuccessful) {
+                    _socialdeleted.value = response.body()
+                } else {
+                    Log.e("error en socialViewModel", "delete Social")
+                }
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch socialViewModel delete", it) }
+            }
+        }
+    }
+
+
+    /**
+     * Esta funcion pone a nulo la socialEdit
+     */
+    fun toNullSocialNetworkEdit() {
+        viewModelScope.launch {
+            try {
+                _socialEdit.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch socialViewModel edit null", it) }
+            }
+        }
+    }
 
 
 }

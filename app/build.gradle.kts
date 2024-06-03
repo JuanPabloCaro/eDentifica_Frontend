@@ -54,6 +54,10 @@ android {
 }
 
 dependencies {
+    //localdate
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3") // o la última versión disponible
+
+
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation("androidx.compose.material3:material3-android:1.2.1")

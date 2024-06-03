@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -43,7 +45,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,23 +57,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.edentifica.R
-import com.app.edentifica.data.model.Email
+import com.app.edentifica.data.model.NetworkType
+import com.app.edentifica.data.model.SocialNetwork
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
-import com.app.edentifica.viewModel.EmailViewModel
+import com.app.edentifica.viewModel.SocialViewModel
 import com.app.edentifica.viewModel.UsersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun EmailsEditScreen(
+fun SocialNetworksEditScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
-    vmEmails: EmailViewModel
+    vmSocial: SocialViewModel
 ) {
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
@@ -80,10 +85,10 @@ fun EmailsEditScreen(
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
     // Observa el flujo de email A editar en el ViewModel
-    val emailCurrent by vmEmails.emailEdit.collectAsState()
+    val socialCurrent by vmSocial.socialEdit.collectAsState()
 
 
-    val onLogoutConfirmedEmailsEditScreen:()->Unit = {
+    val onLogoutConfirmedSocialsEditScreen:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -101,7 +106,7 @@ fun EmailsEditScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.mainEdentifica),
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigate(AppScreen.EmailsScreen.route)
+                        navController.navigate(AppScreen.SocialNetworksScreen.route)
                     }) {
                         Icon(
                             imageVector= Icons.Default.ArrowBack,
@@ -117,7 +122,7 @@ fun EmailsEditScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Editar Correo",
+                            text = "Editar Red Social",
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -174,9 +179,9 @@ fun EmailsEditScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogEmailsEdit(
+                LogoutDialogSocialsEdit(
                     onConfirmLogout = {
-                        onLogoutConfirmedEmailsEditScreen()
+                        onLogoutConfirmedSocialsEditScreen()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -192,7 +197,7 @@ fun EmailsEditScreen(
                 .padding(24.dp)
         ){
             //funcion composable que pinta el contenido de home
-            emailCurrent?.let { BodyContentEmailsEditScreen(navController = navController, vmEmails = vmEmails, email = it) }
+            socialCurrent?.let { BodyContentSocialsEditScreen(navController = navController, vmSocial = vmSocial, social = it) }
         }
 
     }
@@ -205,12 +210,13 @@ fun EmailsEditScreen(
 
 
 @Composable
-fun BodyContentEmailsEditScreen(
+fun BodyContentSocialsEditScreen(
     navController: NavController,
-    vmEmails: EmailViewModel,
-    email: Email
+    vmSocial: SocialViewModel,
+    social: SocialNetwork
 ) {
-    var currentEmail by remember { mutableStateOf(email.email) }
+    var currentType by remember { mutableStateOf(social.networkType) }
+    var currentSocialname by remember { mutableStateOf(social.socialName) }
 
     Column(
         modifier = Modifier
@@ -221,7 +227,7 @@ fun BodyContentEmailsEditScreen(
         Spacer(modifier = Modifier.height(68.dp))
         //Image
         Image(
-            painter = painterResource(id = R.drawable.editemail),
+            painter = painterResource(id = R.drawable.socialtype),
             contentDescription = "edit email",
             modifier = Modifier
                 .fillMaxWidth()
@@ -230,11 +236,33 @@ fun BodyContentEmailsEditScreen(
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
+        Spacer(modifier = Modifier.height(34.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .border(
+                    width = 2.dp,
+                    color = AppColors.FocusEdentifica,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .background(Color.Transparent), // Fondo transparente
+            contentAlignment = Alignment.Center // Centra el contenido dentro del Box
+        ) {
+            Text(
+                text = currentType.toString(),
+                fontSize = TextSizes.H3,
+                color = AppColors.FocusEdentifica
+            )
+
+        }
+
         TextField(
-            label = { Text(text = "Correo", fontSize = TextSizes.Paragraph) },
-            value = currentEmail,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            onValueChange = { currentEmail = it },
+            label = { Text(text = "Nombre del perfil", fontSize = TextSizes.Paragraph) },
+            value = currentSocialname,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            onValueChange = { currentSocialname = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -243,10 +271,10 @@ fun BodyContentEmailsEditScreen(
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
                 onClick = {
-                    //Actualizar el email
-                    val updatedEmail = email.copy(email = currentEmail)
-                    vmEmails.updateEmailVM(updatedEmail)
-                    vmEmails.toNullEmailEdit()
+                    //Actualizar la red Social
+                    val updateSocial = social.copy(socialName = currentSocialname)
+                    vmSocial.updateSocialVM(updateSocial)
+                    vmSocial.toNullSocialNetworkEdit()
                     navController.popBackStack()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
@@ -267,12 +295,15 @@ fun BodyContentEmailsEditScreen(
 
 
 
+
+
+
 /**
  * Funcion composable que se encarga de mostrar un alert para preguntar al
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogEmailsEdit(
+fun LogoutDialogSocialsEdit(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {

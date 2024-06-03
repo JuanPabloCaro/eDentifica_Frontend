@@ -54,22 +54,24 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.edentifica.R
 import com.app.edentifica.data.model.Email
+import com.app.edentifica.data.model.Phone
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.EmailViewModel
+import com.app.edentifica.viewModel.PhonesViewModel
 import com.app.edentifica.viewModel.UsersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun EmailsEditScreen(
+fun PhonesEditScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
-    vmEmails: EmailViewModel
+    vmPhones: PhonesViewModel
 ) {
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
@@ -80,10 +82,10 @@ fun EmailsEditScreen(
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
     // Observa el flujo de email A editar en el ViewModel
-    val emailCurrent by vmEmails.emailEdit.collectAsState()
+    val phoneCurrent by vmPhones.phoneEdit.collectAsState()
 
 
-    val onLogoutConfirmedEmailsEditScreen:()->Unit = {
+    val onLogoutConfirmedPhonesEditScreen:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -101,7 +103,7 @@ fun EmailsEditScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.mainEdentifica),
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigate(AppScreen.EmailsScreen.route)
+                        navController.navigate(AppScreen.PhonesScreen.route)
                     }) {
                         Icon(
                             imageVector= Icons.Default.ArrowBack,
@@ -117,7 +119,7 @@ fun EmailsEditScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Editar Correo",
+                            text = "Editar Telefono",
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -174,9 +176,9 @@ fun EmailsEditScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogEmailsEdit(
+                LogoutDialogPhonesEdit(
                     onConfirmLogout = {
-                        onLogoutConfirmedEmailsEditScreen()
+                        onLogoutConfirmedPhonesEditScreen()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -192,7 +194,7 @@ fun EmailsEditScreen(
                 .padding(24.dp)
         ){
             //funcion composable que pinta el contenido de home
-            emailCurrent?.let { BodyContentEmailsEditScreen(navController = navController, vmEmails = vmEmails, email = it) }
+            phoneCurrent?.let { BodyContentPhonesEditScreen(navController = navController, vmPhones = vmPhones, phone = it) }
         }
 
     }
@@ -205,12 +207,12 @@ fun EmailsEditScreen(
 
 
 @Composable
-fun BodyContentEmailsEditScreen(
+fun BodyContentPhonesEditScreen(
     navController: NavController,
-    vmEmails: EmailViewModel,
-    email: Email
+    vmPhones : PhonesViewModel,
+    phone: Phone
 ) {
-    var currentEmail by remember { mutableStateOf(email.email) }
+    var currentPhone by remember { mutableStateOf(phone.phoneNumber) }
 
     Column(
         modifier = Modifier
@@ -221,7 +223,7 @@ fun BodyContentEmailsEditScreen(
         Spacer(modifier = Modifier.height(68.dp))
         //Image
         Image(
-            painter = painterResource(id = R.drawable.editemail),
+            painter = painterResource(id = R.drawable.editphone),
             contentDescription = "edit email",
             modifier = Modifier
                 .fillMaxWidth()
@@ -230,11 +232,12 @@ fun BodyContentEmailsEditScreen(
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
+
         TextField(
-            label = { Text(text = "Correo", fontSize = TextSizes.Paragraph) },
-            value = currentEmail,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            onValueChange = { currentEmail = it },
+            label = { Text(text = "Telefono", fontSize = TextSizes.Paragraph) },
+            value = currentPhone,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            onValueChange = { currentPhone = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -243,10 +246,10 @@ fun BodyContentEmailsEditScreen(
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
                 onClick = {
-                    //Actualizar el email
-                    val updatedEmail = email.copy(email = currentEmail)
-                    vmEmails.updateEmailVM(updatedEmail)
-                    vmEmails.toNullEmailEdit()
+                    //Actualizar el phone
+                    val updatePhone = phone.copy(phoneNumber = currentPhone)
+                    vmPhones.updatePhoneVM(updatePhone)
+                    vmPhones.toNullPhoneEdit()
                     navController.popBackStack()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
@@ -272,7 +275,7 @@ fun BodyContentEmailsEditScreen(
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogEmailsEdit(
+fun LogoutDialogPhonesEdit(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {

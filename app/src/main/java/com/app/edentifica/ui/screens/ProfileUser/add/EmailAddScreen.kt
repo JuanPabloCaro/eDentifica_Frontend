@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.AlertDialog
@@ -79,15 +80,15 @@ fun EmailsAddScreen(
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-    //recojo al user Actual
-    val user = auth.getCurrentUser()
+//    //recojo al user Actual
+//    val user = auth.getCurrentUser()
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
-    val emailCurrent by vmEmails.emailEdit.collectAsState()
+//    val emailCurrent by vmEmails.emailEdit.collectAsState()
 
 
     val onLogoutConfirmedEmailsAddScreen:()->Unit = {
@@ -106,6 +107,17 @@ fun EmailsAddScreen(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.mainEdentifica),
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.navigate(AppScreen.EmailsScreen.route)
+                    }) {
+                        Icon(
+                            imageVector= Icons.Default.ArrowBack,
+                            contentDescription="ArrowBack",
+                            tint = AppColors.whitePerlaEdentifica
+                        )
+                    }
+                },
                 title = {
                     Row(
                         horizontalArrangement = Arrangement.Start,
@@ -113,7 +125,7 @@ fun EmailsAddScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Perfil",
+                            text = "Agregar Correo",
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -217,7 +229,7 @@ fun BodyContentEmailsAddScreen(
         //Image
         Image(
             painter = painterResource(id = R.drawable.email),
-            contentDescription = "Mobile",
+            contentDescription = "email",
             modifier = Modifier
                 .fillMaxWidth()
                 .scale(0.7f)
@@ -240,6 +252,8 @@ fun BodyContentEmailsAddScreen(
             label = { Text(text = "Correo", fontSize = TextSizes.Paragraph) },
             value = email,
             onValueChange = { email = it },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            placeholder = { Text(text = "ejemplo@ejemplo.com") }
         )
         Spacer(modifier = Modifier.height(34.dp))
 

@@ -1,4 +1,4 @@
-package com.app.edentifica.ui.screens.ProfileUser.edit
+package com.app.edentifica.ui.screens.ProfileUser.add
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
@@ -54,36 +54,43 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.edentifica.R
 import com.app.edentifica.data.model.Email
+import com.app.edentifica.data.model.Phone
+import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.EmailViewModel
+import com.app.edentifica.viewModel.PhonesViewModel
+import com.app.edentifica.viewModel.ProfileViewModel
 import com.app.edentifica.viewModel.UsersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun EmailsEditScreen(
+fun PhonesAddScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
-    vmEmails: EmailViewModel
+    vmPhones: PhonesViewModel,
+    vmProfiles: ProfileViewModel
 ) {
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-
-    // Llama a getUserByEmail pa
+//    //recojo al user Actual
+//    val user = auth.getCurrentUser()
+    // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
-    // Observa el flujo de email A editar en el ViewModel
-    val emailCurrent by vmEmails.emailEdit.collectAsState()
+    // Observa el flujo de usuario en el ViewModel
+    val userState by vmUsers.user.collectAsState()
+//    val emailCurrent by vmEmails.emailEdit.collectAsState()
 
 
-    val onLogoutConfirmedEmailsEditScreen:()->Unit = {
+    val onLogoutConfirmedPhonesAddScreen:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -101,7 +108,7 @@ fun EmailsEditScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.mainEdentifica),
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigate(AppScreen.EmailsScreen.route)
+                        navController.navigate(AppScreen.PhonesScreen.route)
                     }) {
                         Icon(
                             imageVector= Icons.Default.ArrowBack,
@@ -117,7 +124,7 @@ fun EmailsEditScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Editar Correo",
+                            text = "Agregar Correo",
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -174,9 +181,9 @@ fun EmailsEditScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogEmailsEdit(
+                LogoutDialogPhonesAdd(
                     onConfirmLogout = {
-                        onLogoutConfirmedEmailsEditScreen()
+                        onLogoutConfirmedPhonesAddScreen()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -191,8 +198,7 @@ fun EmailsEditScreen(
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
         ){
-            //funcion composable que pinta el contenido de home
-            emailCurrent?.let { BodyContentEmailsEditScreen(navController = navController, vmEmails = vmEmails, email = it) }
+            BodyContentPhonesAddScreen(navController,vmPhones,vmProfiles,userState)
         }
 
     }
@@ -203,26 +209,26 @@ fun EmailsEditScreen(
 
 
 
-
 @Composable
-fun BodyContentEmailsEditScreen(
+fun BodyContentPhonesAddScreen(
     navController: NavController,
-    vmEmails: EmailViewModel,
-    email: Email
+    vmPhones: PhonesViewModel,
+    vmProfiles: ProfileViewModel,
+    userState: User?,
 ) {
-    var currentEmail by remember { mutableStateOf(email.email) }
+    //VARIABLES
+    var phone by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
-            .padding(top = 30.dp)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
         Spacer(modifier = Modifier.height(68.dp))
         //Image
         Image(
-            painter = painterResource(id = R.drawable.editemail),
-            contentDescription = "edit email",
+            painter = painterResource(id = R.drawable.addphone),
+            contentDescription = "Mobile",
             modifier = Modifier
                 .fillMaxWidth()
                 .scale(0.7f)
@@ -230,23 +236,37 @@ fun BodyContentEmailsEditScreen(
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
-        TextField(
-            label = { Text(text = "Correo", fontSize = TextSizes.Paragraph) },
-            value = currentEmail,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            onValueChange = { currentEmail = it },
+        Text(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = "Inserta un Telefono",
+            color = AppColors.mainEdentifica,
+            fontSize = TextSizes.H2
         )
 
+        // Campo de entrada para el correo electrónico
+        Spacer(modifier = Modifier.height(34.dp))
+        TextField(
+            label = { Text(text = "Telefono", fontSize = TextSizes.Paragraph) },
+            value = phone,
+            onValueChange = { phone = it },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            placeholder = { Text(text = "ejemplo: 34628296060") }
+        )
+        Spacer(modifier = Modifier.height(34.dp))
+
+        // Botón para insertar el telefono
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
                 onClick = {
-                    //Actualizar el email
-                    val updatedEmail = email.copy(email = currentEmail)
-                    vmEmails.updateEmailVM(updatedEmail)
-                    vmEmails.toNullEmailEdit()
+                    // Insertar el telefono llamando a la función del ViewModel
+                    userState?.let { user ->
+                        val phoneToInsert = Phone(id = null, phoneNumber = phone, isVerified = false, idProfileUser = null)
+                        user.profile?.id?.let { profileId ->
+                            vmProfiles.insertPhoneVm(phoneToInsert, profileId)
+                        }
+                    }
                     navController.popBackStack()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
@@ -256,7 +276,7 @@ fun BodyContentEmailsEditScreen(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Editar",
+                    text = "Insertar Telefono",
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica
                 )
@@ -272,7 +292,7 @@ fun BodyContentEmailsEditScreen(
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogEmailsEdit(
+fun LogoutDialogPhonesAdd(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {

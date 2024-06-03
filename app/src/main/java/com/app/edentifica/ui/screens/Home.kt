@@ -116,7 +116,7 @@ fun HomeScreen(
             "",
             Phone(null,auth.getCurrentUser()?.phoneNumber.toString(),false,null),
             Email(null,auth.getCurrentUser()?.email.toString(),false,null),
-            Profile(null,"",auth.getCurrentUser()?.photoUrl.toString(),null,null,null,null),
+            Profile(null,"",auth.getCurrentUser()?.photoUrl.toString(),null),
             null,
             null
         )
@@ -216,18 +216,18 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    //Botton Home
-                    IconButton(
-                        onClick = {
-                            navController.navigate(AppScreen.HomeScreen.route)
-                        }
-                    ) {
-                        Icon(
-                            Icons.Outlined.Home,
-                            contentDescription = "Home",
-                            tint = AppColors.whitePerlaEdentifica
-                        )
-                    }
+//                    //Botton Home
+//                    IconButton(
+//                        onClick = {
+//                            navController.navigate(AppScreen.HomeScreen.route)
+//                        }
+//                    ) {
+//                        Icon(
+//                            Icons.Outlined.Home,
+//                            contentDescription = "Home",
+//                            tint = AppColors.whitePerlaEdentifica
+//                        )
+//                    }
                     //boton de accion para salir cerrar sesion
                     IconButton(
                         onClick = {
@@ -313,7 +313,7 @@ fun BodyContentHome(
 
         //Image
         Image(
-            painter = painterResource(id = R.drawable.search),
+            painter = painterResource(id = R.drawable.searchhome),
             contentDescription = "search",
             modifier = Modifier
                 .fillMaxWidth()

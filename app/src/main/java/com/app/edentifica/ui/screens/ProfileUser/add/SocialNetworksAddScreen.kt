@@ -1,4 +1,4 @@
-package com.app.edentifica.ui.screens.ProfileUser.edit
+package com.app.edentifica.ui.screens.ProfileUser.add
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
@@ -31,6 +31,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -50,40 +51,49 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.edentifica.R
-import com.app.edentifica.data.model.Email
+import com.app.edentifica.data.model.NetworkType
+import com.app.edentifica.data.model.Phone
+import com.app.edentifica.data.model.SocialNetwork
+import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
+import com.app.edentifica.ui.screens.Search.SelectSocialTypeDropdown
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
-import com.app.edentifica.viewModel.EmailViewModel
+import com.app.edentifica.viewModel.ProfileViewModel
+import com.app.edentifica.viewModel.SocialViewModel
 import com.app.edentifica.viewModel.UsersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun EmailsEditScreen(
+fun SocialNetworksAddScreen(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
-    vmEmails: EmailViewModel
+    vmSocial: SocialViewModel,
+    vmProfiles: ProfileViewModel
 ) {
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-
-    // Llama a getUserByEmail pa
+//    //recojo al user Actual
+//    val user = auth.getCurrentUser()
+    // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
-    // Observa el flujo de email A editar en el ViewModel
-    val emailCurrent by vmEmails.emailEdit.collectAsState()
+    // Observa el flujo de usuario en el ViewModel
+    val userState by vmUsers.user.collectAsState()
+//    val emailCurrent by vmEmails.emailEdit.collectAsState()
 
 
-    val onLogoutConfirmedEmailsEditScreen:()->Unit = {
+    val onLogoutConfirmedSocialsAddScreen:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -101,7 +111,7 @@ fun EmailsEditScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.mainEdentifica),
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigate(AppScreen.EmailsScreen.route)
+                        navController.navigate(AppScreen.SocialNetworksScreen.route)
                     }) {
                         Icon(
                             imageVector= Icons.Default.ArrowBack,
@@ -117,7 +127,7 @@ fun EmailsEditScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Editar Correo",
+                            text = "Agregar Correo",
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -174,9 +184,9 @@ fun EmailsEditScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogEmailsEdit(
+                LogoutDialogSocialsAdd(
                     onConfirmLogout = {
-                        onLogoutConfirmedEmailsEditScreen()
+                        onLogoutConfirmedSocialsAddScreen()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -191,8 +201,7 @@ fun EmailsEditScreen(
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
         ){
-            //funcion composable que pinta el contenido de home
-            emailCurrent?.let { BodyContentEmailsEditScreen(navController = navController, vmEmails = vmEmails, email = it) }
+            BodyContentSocialsAddScreen(navController,vmProfiles,userState)
         }
 
     }
@@ -203,26 +212,27 @@ fun EmailsEditScreen(
 
 
 
-
 @Composable
-fun BodyContentEmailsEditScreen(
+fun BodyContentSocialsAddScreen(
     navController: NavController,
-    vmEmails: EmailViewModel,
-    email: Email
+    vmProfiles: ProfileViewModel,
+    userState: User?
 ) {
-    var currentEmail by remember { mutableStateOf(email.email) }
+    //VARIABLES
+    // Estado para almacenar el tipo de red social seleccionado
+    var selectedSocialType by remember { mutableStateOf<String?>(null) }
+    var nameSocial by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
-            .padding(top = 30.dp)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
         Spacer(modifier = Modifier.height(68.dp))
         //Image
         Image(
-            painter = painterResource(id = R.drawable.editemail),
-            contentDescription = "edit email",
+            painter = painterResource(id = R.drawable.socialinsert),
+            contentDescription = "Mobile",
             modifier = Modifier
                 .fillMaxWidth()
                 .scale(0.7f)
@@ -230,24 +240,51 @@ fun BodyContentEmailsEditScreen(
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
-        TextField(
-            label = { Text(text = "Correo", fontSize = TextSizes.Paragraph) },
-            value = currentEmail,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            onValueChange = { currentEmail = it },
+        Text(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = "Inserta una Red Social",
+            color = AppColors.mainEdentifica,
+            fontSize = TextSizes.H2
         )
 
+        // Campo de entrada para el tipo de red social
+        Spacer(modifier = Modifier.height(34.dp))
+        // Componente de selección de tipo de red social
+        SelectSocialTypeDropdownAdd(
+            socialTypes = listOf("Facebook", "Instagram", "Twitter"),
+            onSelectionChanged = { selectedType ->
+                // Cuando se selecciona un tipo de red social, almacenar el valor
+                selectedSocialType = selectedType
+            }
+        )
+
+        // Campo de entrada para el nombre del perfil de la red social
+        Spacer(modifier = Modifier.height(34.dp))
+        TextField(
+            label = { Text(text = "Nombre del perfil", fontSize = TextSizes.Paragraph) },
+            value = nameSocial,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            onValueChange = { nameSocial = it },
+        )
+        Spacer(modifier = Modifier.height(34.dp))
+
+        // Botón para insertar la red social
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
                 onClick = {
-                    //Actualizar el email
-                    val updatedEmail = email.copy(email = currentEmail)
-                    vmEmails.updateEmailVM(updatedEmail)
-                    vmEmails.toNullEmailEdit()
-                    navController.popBackStack()
+                    //si hay tipo seleccionado se inserta
+                    selectedSocialType?.let { type ->
+                        // Insertar la red social llamando a la función del ViewModel
+                        userState?.let { user ->
+                            val socialToInsert = SocialNetwork(id = null, networkType = NetworkType.fromString(selectedSocialType.toString())!!, socialName = nameSocial ,isVerified = false, idProfileUser = null)
+                            user.profile?.id?.let { profileId ->
+                                vmProfiles.insertSocialNetworkVm(socialToInsert, profileId)
+                                navController.popBackStack()
+                            }
+                        }
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
@@ -256,7 +293,7 @@ fun BodyContentEmailsEditScreen(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Editar",
+                    text = "Insertar Red Social",
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica
                 )
@@ -267,12 +304,92 @@ fun BodyContentEmailsEditScreen(
 
 
 
+
+
+
+
+
+
+@Composable
+fun SelectSocialTypeDropdownAdd(
+    socialTypes: List<String>,
+    onSelectionChanged: (String) -> Unit
+) {
+//    var expanded by remember { mutableStateOf(false) }
+    var selectedType by remember { mutableStateOf<String?>(null) }
+
+    val dialog = remember { mutableStateOf(false) }
+
+    Column {
+        // Botón que muestra el tipo seleccionado y abre el diálogo al hacer clic
+        Spacer(modifier = Modifier.height(34.dp))
+        Box(modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 0.dp)) {
+            OutlinedButton(
+                onClick = {
+                    dialog.value = true
+                },
+                border = BorderStroke(1.dp, AppColors.FocusEdentifica),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
+            ) {
+                Text(
+                    selectedType ?: "Seleccionar Tipo de Red Social",
+                    fontSize = TextSizes.H3,
+                    color = AppColors.FocusEdentifica
+                )
+            }
+        }
+
+        if (dialog.value) {
+            androidx.compose.material.AlertDialog(
+                contentColor = AppColors.whitePerlaEdentifica,
+                onDismissRequest = { dialog.value = false },
+                title = {
+                    Text(
+                        modifier = Modifier.padding(vertical = 16.dp),
+                        text = "Seleccionar tipo de red social:",
+                        fontSize = TextSizes.H3,
+                        color = AppColors.mainEdentifica
+                    )
+                },
+                buttons = {
+                    socialTypes.forEach { type ->
+                        TextButton(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
+                            onClick = {
+                                selectedType = type
+                                onSelectionChanged(type)
+                                dialog.value = false
+                            }
+                        ) {
+                            Text(
+                                text = type,
+                                fontSize = TextSizes.Paragraph,
+                                color = AppColors.whitePerlaEdentifica
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
 /**
  * Funcion composable que se encarga de mostrar un alert para preguntar al
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogEmailsEdit(
+fun LogoutDialogSocialsAdd(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {
