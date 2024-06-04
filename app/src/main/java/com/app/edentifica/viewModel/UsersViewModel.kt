@@ -4,6 +4,7 @@ package com.app.edentifica.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.edentifica.data.model.Profile
 import com.app.edentifica.data.model.User
 import com.app.edentifica.data.retrofit.RetrofitApi
@@ -350,5 +351,7 @@ class UsersViewModel : ViewModel() {
             }
         }
     }
+
+
 
 }

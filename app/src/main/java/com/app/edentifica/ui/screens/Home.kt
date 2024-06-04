@@ -70,6 +70,7 @@ import com.app.edentifica.data.model.User
 import com.app.edentifica.ui.screens.Validations.BodyContentValidationOne
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
+import com.google.firebase.auth.FirebaseUser
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,13 +82,12 @@ fun HomeScreen(
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
 ) {
-    //VARIABLES Y CONSTANTES
-
+    // VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
 
     //recojo al user Actual
-    val user = auth.getCurrentUser()
+    val currentUser = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
@@ -97,11 +97,9 @@ fun HomeScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
-    Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
-    Log.e("userValidation", userState?.toString().toString())
-
     //si el user es existe le pregunto si ya esta validado
     if(userState != null){
+        Log.e("entra 1", "entra en user state")
         if(userState?.validations?.get(0)?.isValidated==false){
             navController.navigate(AppScreen.ValidationOneScreen.route){
                 popUpTo(AppScreen.HomeScreen.route){
@@ -109,22 +107,26 @@ fun HomeScreen(
                 }
             }
         }
-    }else if(auth.getCurrentUser()?.email !=null){// si el usuario no existe lo inserto en la base de datos
-        val userToInsert: User = User(
-            null,
-            auth.getCurrentUser()?.displayName.toString(),
-            "",
-            Phone(null,auth.getCurrentUser()?.phoneNumber.toString(),false,null),
-            Email(null,auth.getCurrentUser()?.email.toString(),false,null),
-            Profile(null,"",auth.getCurrentUser()?.photoUrl.toString(),null),
-            null,
-            null
-        )
-        // Llama a la función del ViewModel para insertar el usuario y espera a que se complete
-        LaunchedEffect (Unit) {
-            vmUsers.insertUserVm(userToInsert)
-            vmUsers.getUserByEmail(auth.getCurrentUser()?.email.toString())
-        }
+    }else if (currentUser?.email != null && userState == null) {// si el usuario existe en firebase y no existe en la base de datos lo inserto en la base de datos
+        Log.e("entra 2", "entra en user state y currentUser")
+            val userToInsert: User = User(
+                null,
+                null,
+                auth.getCurrentUser()?.displayName.toString(),
+                "",
+                Phone(null,auth.getCurrentUser()?.phoneNumber.toString(),false,null),
+                Email(null,auth.getCurrentUser()?.email.toString(),false,null),
+                Profile(null,"",auth.getCurrentUser()?.photoUrl.toString(),null),
+                null,
+                null
+            )
+            // Llama a la función del ViewModel para insertar el usuario y espera a que se complete
+            LaunchedEffect (Unit) {
+                Log.e("entra 3", "entra en user state")
+                vmUsers.insertUserVm(userToInsert)
+                vmUsers.getUserByEmail(auth.getCurrentUser()?.email.toString())
+            }
+
     }
 
 
@@ -150,7 +152,7 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        if(user?.photoUrl != null) {
+                        if(currentUser?.photoUrl != null) {
                             if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
                                 userState?.profile?.urlImageProfile?.let {
                                     ClickableProfileImage(
@@ -196,13 +198,13 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
+                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
                                 fontSize = TextSizes.H3,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 color = AppColors.whitePerlaEdentifica
                             )
-                            (if(!user?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -419,6 +421,22 @@ fun ClickableProfileImage(
     }
 }
 
+/**
+ * Function to create a user
+ */
+private fun createUserFromAuth(authUser: FirebaseUser?): User {
+    return User(
+        null,
+        null,
+        authUser?.displayName.toString(),
+        "",
+        Phone(null, authUser?.phoneNumber.toString(), false, null),
+        Email(null, authUser?.email.toString(), false, null),
+        Profile(null, "", authUser?.photoUrl.toString(), null),
+        null,
+        null
+    )
+}
 
 
 /**

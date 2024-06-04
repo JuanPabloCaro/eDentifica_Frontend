@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -277,6 +278,7 @@ private suspend fun signUp(
     if(name.isNotEmpty() && lastName.isNotEmpty() && phone.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()){
         val userToInsert: User = User(
             null,
+            null,
             name,
             lastName,
             Phone(null,phone,null,null),
@@ -289,6 +291,8 @@ private suspend fun signUp(
         val isUserInserted = coroutineScope {
             async { vmUsers.insertUserVm(userToInsert) }
         }.await()
+
+
 
         if(isUserInserted){
             when(val result = auth.createUserWithEmailandPassword(email, password)){
