@@ -71,6 +71,7 @@ import com.app.edentifica.ui.screens.Validations.BodyContentValidationOne
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.google.firebase.auth.FirebaseUser
+import kotlin.coroutines.suspendCoroutine
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,7 +92,10 @@ fun HomeScreen(
 
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
-        auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
+        val userEmail = auth.getCurrentUser()?.email
+        if (userEmail != null) {
+            vmUsers.getUserByEmail(userEmail)
+        }
     }
 
     // Observa el flujo de usuario en el ViewModel
@@ -107,8 +111,9 @@ fun HomeScreen(
                 }
             }
         }
-    }else if (currentUser?.email != null && userState == null) {// si el usuario existe en firebase y no existe en la base de datos lo inserto en la base de datos
-        Log.e("entra 2", "entra en user state y currentUser")
+    }else {
+        if(currentUser?.email != null) {// si el usuario existe en firebase y no existe en la base de datos lo inserto en la base de datos
+            Log.e("entra 2", "entra en user state y currentUser")
             val userToInsert: User = User(
                 null,
                 null,
@@ -126,6 +131,7 @@ fun HomeScreen(
                 vmUsers.insertUserVm(userToInsert)
                 vmUsers.getUserByEmail(auth.getCurrentUser()?.email.toString())
             }
+        }
 
     }
 
@@ -288,7 +294,6 @@ fun HomeScreen(
 
     }
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
