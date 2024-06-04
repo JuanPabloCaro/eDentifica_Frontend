@@ -284,7 +284,7 @@ fun BodyContentResultSocial(navController: NavController, vmUsers: UsersViewMode
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
             Text(
-                text = "La red social le pertenece al usuario ${searchResultSocial!!.name} registrado en eDentifica garantizando la seguridad del perfil",
+                text = "La red social le pertenece al usuario ${searchResultSocial!!.name} con eDentificador ${searchResultSocial!!.edentificador} garantizando la seguridad del perfil",
                 modifier = Modifier.padding(16.dp)
             )
 

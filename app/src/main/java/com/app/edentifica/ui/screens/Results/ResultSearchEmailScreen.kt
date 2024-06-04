@@ -286,7 +286,7 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
             Text(
-                text = "El Email ${searchResultEmail!!.email.email} le pertenece al usuario ${searchResultEmail!!.name} registrado en eDentifica garantizando la seguridad del perfil",
+                text = "El Email ${searchResultEmail!!.email.email} le pertenece al usuario ${searchResultEmail!!.name} con eDentificador ${searchResultEmail!!.edentificador} garantizando la seguridad del perfil",
                 modifier = Modifier.padding(16.dp)
             )
 

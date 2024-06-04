@@ -285,7 +285,7 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
             Text(
-                text = "El Telefono ${searchResultPhone!!.phone.phoneNumber} le pertenece al usuario ${searchResultPhone!!.name} registrado en eDentifica garantizando la seguridad del perfil",
+                text = "El Telefono ${searchResultPhone!!.phone.phoneNumber} le pertenece al usuario ${searchResultPhone!!.name} con eDentificador ${searchResultPhone!!.edentificador} garantizando la seguridad del perfil",
                 modifier = Modifier.padding(16.dp)
             )
 

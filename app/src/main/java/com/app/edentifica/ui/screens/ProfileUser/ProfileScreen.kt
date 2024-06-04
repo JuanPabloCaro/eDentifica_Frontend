@@ -277,6 +277,7 @@ fun BodyContentProfile(
             Spacer(modifier = Modifier.height(22.dp))
         }
 
+        item { UserInfoItem(label = "eDentificador", value = userState?.edentificador ?: "") }
         item { UserInfoItem(label = "Nombre", value = userState?.name ?: "") }
         item { UserInfoItem(label = "Apellido", value = userState?.lastName ?: "") }
         item { UserInfoItem(label = "Fecha de Nacimiento", value = userState?.profile?.dateBirth.toString()) }
@@ -452,15 +453,15 @@ fun UserInfoItem(label: String, value: String) {
         Text(text = "$label: ", fontWeight = FontWeight.Bold, color = AppColors.mainEdentifica)
         Box(
             modifier = Modifier
-            .padding(top=4.dp,bottom = 16.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(
-                width = 2.dp,
-                color = AppColors.mainEdentifica,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .background(Color.Transparent)
+                .padding(top = 4.dp, bottom = 16.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .border(
+                    width = 2.dp,
+                    color = AppColors.mainEdentifica,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .background(Color.Transparent)
          ){
             Text(
                 text = value,
