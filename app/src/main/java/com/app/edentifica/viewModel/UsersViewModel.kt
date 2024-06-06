@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.edentifica.data.model.Profile
 import com.app.edentifica.data.model.User
+import com.app.edentifica.data.model.dto.UserDto
 import com.app.edentifica.data.retrofit.RetrofitApi
 import com.app.edentifica.data.retrofit.RetrofitApi.userService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,13 +19,13 @@ class UsersViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
-    private val _userEmailSearch = MutableStateFlow<User?>(null)
-    val userEmailSearch: StateFlow<User?> = _userEmailSearch
+    private val _userEmailSearch = MutableStateFlow<UserDto?>(null)//DTO
+    val userEmailSearch: StateFlow<UserDto?> = _userEmailSearch
 
-    private val _userPhoneSearch = MutableStateFlow<User?>(null)
+    private val _userPhoneSearch = MutableStateFlow<User?>(null)//FALTA DTO
     val userPhoneSearch: StateFlow<User?> = _userPhoneSearch
 
-    private val _userSocialSearch = MutableStateFlow<User?>(null)
+    private val _userSocialSearch = MutableStateFlow<User?>(null)//FALTA DTO
     val userSocialSearch: StateFlow<User?> = _userSocialSearch
 
     private val _userInserted = MutableStateFlow<Boolean?>(false)
@@ -91,7 +92,7 @@ class UsersViewModel : ViewModel() {
     fun getUserByEmailSearch(email: String) {
         viewModelScope.launch {
             try {
-                val response = userService.getByEmail(email)
+                val response = userService.getDtoByEmail(email)
                 if (response.isSuccessful) {
                     //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
                     //Pendiente agregar la validacion 2

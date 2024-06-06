@@ -1,6 +1,7 @@
 package com.app.edentifica.data.retrofit
 
 import com.app.edentifica.data.model.User
+import com.app.edentifica.data.model.dto.UserDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -12,6 +13,9 @@ import retrofit2.http.Query
 interface UserService {
     @GET("edentifica/users/get_by_email/{email}")
     suspend fun getByEmail(@Path("email") email: String): Response<User>
+
+    @GET("edentifica/users/get_dto_by_email")
+    suspend fun getDtoByEmail(@Query("email") email: String): Response<UserDto>
 
     @GET("edentifica/users/get_by_phone/{phonenumber}")
     suspend fun getByPhone(@Path("phonenumber") phonenumber: String): Response<User>
