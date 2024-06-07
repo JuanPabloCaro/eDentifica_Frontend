@@ -126,6 +126,8 @@ fun ResultSearchEmailScreen(
                                         navController = navController,
                                         imageUrl = it
                                     ) {
+                                        vmUsers.putEmailResultNull()
+                                        vmUsers.toNullfindString()
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 }
@@ -151,6 +153,8 @@ fun ResultSearchEmailScreen(
                             ) {
                                 ClickableProfileImage(
                                     onClick = {
+                                        vmUsers.putEmailResultNull()
+                                        vmUsers.toNullfindString()
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 )
@@ -192,6 +196,8 @@ fun ResultSearchEmailScreen(
                     //Botton Home
                     IconButton(
                         onClick = {
+                            vmUsers.putEmailResultNull()
+                            vmUsers.toNullfindString()
                             navController.navigate(AppScreen.HomeScreen.route)
                         }
                     ) {
@@ -270,6 +276,8 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
 
     // Observamos el estado del resultado de la busqueda
     val searchResultEmail by vmUsers.userEmailSearch.collectAsState()
+    // Es el parametro que busco el usuario
+    val findString by vmUsers.findString.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -286,7 +294,7 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
             Text(
-                text = "El Email ${searchResultEmail!!.email.email} le pertenece al usuario ${searchResultEmail!!.name} con eDentificador ${searchResultEmail!!.edentificador} garantizando la seguridad del perfil",
+                text = "El Email ${findString} le pertenece al usuario ${searchResultEmail!!.name} con eDentificador ${searchResultEmail!!.edentificador} garantizando la seguridad del perfil",
                 modifier = Modifier.padding(16.dp)
             )
 
@@ -311,6 +319,7 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
             Button(
                 onClick = {
                     vmUsers.putEmailResultNull()
+                    vmUsers.toNullfindString()
                     navController.navigate(AppScreen.FindByEmailScreen.route)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),

@@ -124,6 +124,8 @@ fun ResultSearchSocialScreen(
                                         navController = navController,
                                         imageUrl = it
                                     ) {
+                                        vmUsers.putSocialNetworkResultNull()
+                                        vmUsers.toNullfindString()
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 }
@@ -146,6 +148,8 @@ fun ResultSearchSocialScreen(
                             if (auth.getCurrentUser()?.email != null && userState?.validations?.get(0)?.isValidated == true) {
                                 ClickableProfileImage(
                                     onClick = {
+                                        vmUsers.putSocialNetworkResultNull()
+                                        vmUsers.toNullfindString()
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 )
@@ -187,6 +191,8 @@ fun ResultSearchSocialScreen(
                     //Botton Home
                     IconButton(
                         onClick = {
+                            vmUsers.putSocialNetworkResultNull()
+                            vmUsers.toNullfindString()
                             navController.navigate(AppScreen.HomeScreen.route)
                         }
                     ) {
@@ -268,7 +274,8 @@ fun BodyContentResultSocial(navController: NavController, vmUsers: UsersViewMode
 
     // Observamos el estado del resultado de la busqueda
     val searchResultSocial by vmUsers.userSocialSearch.collectAsState()
-
+    // Es el parametro que busco el usuario
+    val findString by vmUsers.findString.collectAsState()
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -284,7 +291,7 @@ fun BodyContentResultSocial(navController: NavController, vmUsers: UsersViewMode
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
             Text(
-                text = "La red social le pertenece al usuario ${searchResultSocial!!.name} con eDentificador ${searchResultSocial!!.edentificador} garantizando la seguridad del perfil",
+                text = "La red social de ${findString} le pertenece al usuario ${searchResultSocial!!.name} con eDentificador ${searchResultSocial!!.edentificador} garantizando la seguridad del perfil",
                 modifier = Modifier.padding(16.dp)
             )
 
@@ -309,6 +316,7 @@ fun BodyContentResultSocial(navController: NavController, vmUsers: UsersViewMode
             Button(
                 onClick = {
                     vmUsers.putSocialNetworkResultNull()
+                    vmUsers.toNullfindString()
                     navController.navigate(AppScreen.FindBySocialNetworkScreen.route)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),

@@ -302,6 +302,7 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
                 onClick = {
                     // Llamar a la función del ViewModel para buscar por correo electrónico
                     vmUsers.getUserByEmailSearch(email)
+                    vmUsers.saveFindString(email)
                     searchPerformedEmail = true
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),

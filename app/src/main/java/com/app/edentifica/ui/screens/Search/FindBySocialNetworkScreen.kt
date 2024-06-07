@@ -326,6 +326,7 @@ fun BodyContentFindBySocial(navController: NavController, vmUsers: UsersViewMode
                     // Llamar a la función del ViewModel para buscar por red social
                     selectedSocialType?.let { type ->
                         vmUsers.getUserBySocialSearch(type, socialName)
+                        vmUsers.saveFindString(type)
                         searchPerformedSocial = true
                     }
                 },

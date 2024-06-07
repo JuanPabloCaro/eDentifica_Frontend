@@ -20,8 +20,14 @@ interface UserService {
     @GET("edentifica/users/get_by_phone/{phonenumber}")
     suspend fun getByPhone(@Path("phonenumber") phonenumber: String): Response<User>
 
+    @GET("edentifica/users/get_dto_by_phone")
+    suspend fun getDtoByPhone(@Query("phonenumber") phonenumber: String): Response<UserDto>
+
     @GET("edentifica/users/get_by_type_and_social_network/{type}/{socialname}")
     suspend fun getBySocialNetwork(@Path("type") type: String, @Path("socialname") socialname: String): Response<User>
+
+    @GET("edentifica/users/get_dto_by_type_and_social_network/{type}/{socialname}")
+    suspend fun getDtoBySocialNetwork(@Path("type") type: String, @Path("socialname") socialname: String): Response<UserDto>
 
     @PUT("edentifica/users/update")
     suspend fun updateUser(@Body user: User): Response<Boolean>

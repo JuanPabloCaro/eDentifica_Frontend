@@ -308,6 +308,7 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
                 onClick = {
                     // Llamar a la función del ViewModel para buscar por telefono
                     vmUsers.getUserByPhoneSearch(phone)
+                    vmUsers.saveFindString(phone)
                     searchPerformedPhone = true
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),

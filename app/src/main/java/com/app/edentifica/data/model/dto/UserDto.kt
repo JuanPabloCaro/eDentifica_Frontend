@@ -10,7 +10,5 @@ data class UserDto(
     @SerializedName("edentificador") var edentificador:String?,
     @SerializedName("name")var name:String,
     @SerializedName("lastName")var lastName:String,
-    @SerializedName("validations")var validations: List<Validation>?,
-    @SerializedName("phone")var phone: Phone,
-    @SerializedName("email")var email: Email
+    @SerializedName("validations")var validations: List<Validation>?
 )

@@ -124,6 +124,8 @@ fun ResultSearchPhoneScreen(
                                         navController = navController,
                                         imageUrl = it
                                     ) {
+                                        vmUsers.putPhoneResultNull()
+                                        vmUsers.toNullfindString()
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 }
@@ -146,6 +148,8 @@ fun ResultSearchPhoneScreen(
                             if (auth.getCurrentUser()?.email != null && userState?.validations?.get(0)?.isValidated == true) {
                                 ClickableProfileImage(
                                     onClick = {
+                                        vmUsers.putPhoneResultNull()
+                                        vmUsers.toNullfindString()
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 )
@@ -187,6 +191,8 @@ fun ResultSearchPhoneScreen(
                     //Botton Home
                     IconButton(
                         onClick = {
+                            vmUsers.putPhoneResultNull()
+                            vmUsers.toNullfindString()
                             navController.navigate(AppScreen.HomeScreen.route)
                         }
                     ) {
@@ -269,6 +275,8 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
 
     // Observamos el estado del resultado de la busqueda
     val searchResultPhone by vmUsers.userPhoneSearch.collectAsState()
+    // Es el parametro que busco el usuario
+    val findString by vmUsers.findString.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -285,7 +293,7 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
             Text(
-                text = "El Telefono ${searchResultPhone!!.phone.phoneNumber} le pertenece al usuario ${searchResultPhone!!.name} con eDentificador ${searchResultPhone!!.edentificador} garantizando la seguridad del perfil",
+                text = "El Telefono +${findString} le pertenece al usuario ${searchResultPhone!!.name} con eDentificador ${searchResultPhone!!.edentificador} garantizando la seguridad del perfil",
                 modifier = Modifier.padding(16.dp)
             )
 
@@ -310,6 +318,7 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
             Button(
                 onClick = {
                     vmUsers.putPhoneResultNull()
+                    vmUsers.toNullfindString()
                     navController.navigate(AppScreen.FindByPhoneScreen.route)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
