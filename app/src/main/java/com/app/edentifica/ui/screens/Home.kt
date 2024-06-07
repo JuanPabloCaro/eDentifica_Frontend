@@ -426,22 +426,23 @@ fun ClickableProfileImage(
     }
 }
 
-/**
- * Function to create a user
- */
-private fun createUserFromAuth(authUser: FirebaseUser?): User {
-    return User(
-        null,
-        null,
-        authUser?.displayName.toString(),
-        "",
-        Phone(null, authUser?.phoneNumber.toString(), false, null),
-        Email(null, authUser?.email.toString(), false, null),
-        Profile(null, "", authUser?.photoUrl.toString(), null),
-        null,
-        null
-    )
-}
+//
+///**
+// * Function to create a user
+// */
+//private fun createUserFromAuth(authUser: FirebaseUser?): User {
+//    return User(
+//        null,
+//        null,
+//        authUser?.displayName.toString(),
+//        "",
+//        Phone(null, authUser?.phoneNumber.toString(), false, null),
+//        Email(null, authUser?.email.toString(), false, null),
+//        Profile(null, "", authUser?.photoUrl.toString(), null),
+//        null,
+//        null
+//    )
+//}
 
 
 /**

@@ -1,5 +1,6 @@
 package com.app.edentifica.navigation
 
+import android.provider.ContactsContract.Contacts.Photo
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,6 +19,7 @@ import com.app.edentifica.ui.screens.ProfileUser.SocialNetworksScreen
 import com.app.edentifica.ui.screens.ProfileUser.add.EmailsAddScreen
 import com.app.edentifica.ui.screens.ProfileUser.add.PhonesAddScreen
 import com.app.edentifica.ui.screens.ProfileUser.add.SocialNetworksAddScreen
+import com.app.edentifica.ui.screens.ProfileUser.edit.EditPhoto
 import com.app.edentifica.ui.screens.ProfileUser.edit.EmailsEditScreen
 import com.app.edentifica.ui.screens.ProfileUser.edit.PhonesEditScreen
 import com.app.edentifica.ui.screens.ProfileUser.edit.ProfileUserEditScreen
@@ -292,6 +294,16 @@ fun AppNavigation(
                 onSignOutGoogle = onSignOutGoogle,
                 vmUsers = vmUsers,
                 vmSocial=vmSocialNetworks,
+                vmProfiles=vmProfiles
+            )
+        }
+
+        composable(route=AppScreen.ProfileUserPhotoEditScreen.route){
+            EditPhoto(
+                navController = navController,
+                auth = authManager,
+                onSignOutGoogle = onSignOutGoogle,
+                vmUsers = vmUsers,
                 vmProfiles=vmProfiles
             )
         }

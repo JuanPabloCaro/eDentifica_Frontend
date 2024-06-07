@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -249,29 +250,43 @@ fun BodyContentProfile(
                     .background(color = Color.Gray) // Color de fondo opcional
             ) {
                 if (userState != null && !userState.profile?.urlImageProfile.equals("")) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(userState.profile?.urlImageProfile)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "Imagen",
-                        placeholder = painterResource(id = R.drawable.profile),
-                        contentScale = ContentScale.Crop, // Ajusta la escala de contenido según tus necesidades
-                        modifier = Modifier
-                            .size(150.dp) // Ajusta el tamaño deseado
-                            .clip(CircleShape)
-                    )
+                    userState?.profile?.urlImageProfile?.let {
+                        ClickableProfileImage(
+                            navController = navController,
+                            imageUrl = it
+                        ) {
+                            navController.navigate(AppScreen.ProfileUserPhotoEditScreen.route)
+                        }
+                    }
+//                    AsyncImage(
+//                        model = ImageRequest.Builder(LocalContext.current)
+//                            .data(userState.profile?.urlImageProfile)
+//                            .crossfade(true)
+//                            .build(),
+//                        contentDescription = "Imagen",
+//                        placeholder = painterResource(id = R.drawable.profile),
+//                        contentScale = ContentScale.Crop, // Ajusta la escala de contenido según tus necesidades
+//                        modifier = Modifier
+//                            .size(150.dp) // Ajusta el tamaño deseado
+//                            .clip(CircleShape)
+//                    )
                 } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile),
-                        contentDescription = "edit image",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .scale(1f)
-                            .padding(0.dp)
-                            .clip(CircleShape), // ajusta la altura según sea necesario
-                        contentScale = ContentScale.Crop // Escala de la imagen
+                    ClickableProfileImage(
+                        onClick = {
+                            navController.navigate(AppScreen.ProfileUserPhotoEditScreen.route)
+                        }
                     )
+
+//                    Image(
+//                        painter = painterResource(id = R.drawable.profile),
+//                        contentDescription = "edit image",
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .scale(1f)
+//                            .padding(0.dp)
+//                            .clip(CircleShape), // ajusta la altura según sea necesario
+//                        contentScale = ContentScale.Crop // Escala de la imagen
+//                    )
                 }
             }
             Spacer(modifier = Modifier.height(22.dp))
@@ -472,6 +487,52 @@ fun UserInfoItem(label: String, value: String) {
 }
 
 
+
+
+/**
+ * Imagen Clikeable
+ */
+@Composable
+fun ClickableProfileImage(onClick: () -> Unit) {
+    Image(
+        painter = painterResource(id = R.drawable.profile),
+        contentDescription = "image profile default",
+        modifier = Modifier
+            .padding(end = 8.dp)
+            .size(40.dp)
+            .clip(CircleShape)
+            .clickable { onClick() }
+    )
+}
+/**
+ * Imagen de perfil clikeable
+ */
+@Composable
+fun ClickableProfileImage(
+    navController: NavController,  // Assuming you're using NavController for navigation
+    imageUrl: String,
+    onClick: () -> Unit  // Define your click action
+) {
+    Box(
+        modifier = Modifier
+            .clip(CircleShape)
+            .size(40.dp)
+            .clickable { onClick() }
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .crossfade(true)
+                .build(),
+            contentDescription = "Imagen",
+            placeholder = painterResource(id = R.drawable.profile),
+            contentScale = ContentScale.Crop, // Ajusta la escala de contenido según tus necesidades
+            modifier = Modifier
+                .size(150.dp) // Ajusta el tamaño deseado
+                .clip(CircleShape)
+        )
+    }
+}
 
 
 

@@ -1,11 +1,15 @@
 package com.app.edentifica.ui.screens.ProfileUser.edit
 
+
 import android.annotation.SuppressLint
-import android.app.DatePickerDialog
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.graphics.Bitmap
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,24 +22,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -46,50 +47,47 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.app.edentifica.R
-import com.app.edentifica.data.model.Profile
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
-import com.app.edentifica.viewModel.ProfileViewModel
 import com.app.edentifica.viewModel.UsersViewModel
-import java.util.Calendar
-import android.os.Bundle
-import android.widget.DatePicker
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.*
+import androidx.compose.ui.res.painterResource
+import coil.compose.rememberImagePainter
+import com.app.edentifica.viewModel.ProfileViewModel
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
+import java.io.FileOutputStream
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ProfileUserEditScreen(
+fun EditPhoto(
     navController: NavController,
     auth: AuthManager,
     onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
-    vmProfile: ProfileViewModel
+    vmProfiles: ProfileViewModel
 ) {
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
@@ -99,12 +97,11 @@ fun ProfileUserEditScreen(
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
-    // Observa el flujo de email A editar en el ViewModel
-    val profileCurrent by vmProfile.profileEdit.collectAsState()
+    // Observa el flujo del user
     val userCurrent by vmUsers.user.collectAsState()
 
 
-    val onLogoutConfirmedProfileEditScreen:()->Unit = {
+    val onLogoutConfirmedPhotoEdit:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -122,8 +119,6 @@ fun ProfileUserEditScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.mainEdentifica),
                 navigationIcon = {
                     IconButton(onClick = {
-                        vmProfile.toNullProfileEdit()
-                        vmUsers.toNullUserEdit()
                         navController.navigate(AppScreen.ProfileUserScreen.route)
                     }) {
                         Icon(
@@ -140,7 +135,7 @@ fun ProfileUserEditScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Editar Perfil",
+                            text = "Editar Foto",
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -152,8 +147,6 @@ fun ProfileUserEditScreen(
                     //Botton Home
                     IconButton(
                         onClick = {
-                            vmProfile.toNullProfileEdit()
-                            vmUsers.toNullUserEdit()
                             navController.navigate(AppScreen.HomeScreen.route)
                         }
                     ) {
@@ -199,9 +192,9 @@ fun ProfileUserEditScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogProfileEdit(
+                LogoutDialogPhotoEdit(
                     onConfirmLogout = {
-                        onLogoutConfirmedProfileEditScreen()
+                        onLogoutConfirmedPhotoEdit()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -217,7 +210,7 @@ fun ProfileUserEditScreen(
                 .padding(24.dp)
         ){
             //funcion composable que pinta el contenido de home
-            profileCurrent?.let { userCurrent?.let { it1 -> BodyContentProfileEditScreen(navController = navController, vmProfile = vmProfile,vmUsers=vmUsers, profileCurrent = it, user = it1) } }
+            BodyContentPhotoEdit(navController = navController, userCurrent, vmProfiles)
         }
 
     }
@@ -229,126 +222,127 @@ fun ProfileUserEditScreen(
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun BodyContentProfileEditScreen(
-    vmProfile: ProfileViewModel,
+fun BodyContentPhotoEdit(
     navController: NavController,
-    profileCurrent: Profile,
-    user: User,
-    vmUsers: UsersViewModel
+    userCurrent: User?,
+    vmProfiles: ProfileViewModel
 ) {
-    var name by remember { mutableStateOf(user.name) }
-    var lastname by remember { mutableStateOf(user.lastName) }
-    var description by remember { mutableStateOf(profileCurrent.description) }
-
-    var selectedDate by remember { mutableStateOf<LocalDate?>(profileCurrent.dateBirth) }
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    var showDatePicker by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .padding(top = 30.dp)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(68.dp))
-
-        //NAME
-        TextField(
-            label = { Text(text = "Nombre", fontSize = TextSizes.Paragraph) },
-            value = name,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            onValueChange = { name = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
-
-        //LASTNAME
-        TextField(
-            label = { Text(text = "Apellidos", fontSize = TextSizes.Paragraph) },
-            value = lastname,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            onValueChange = { lastname = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
-
-        //DATEBIRTH
-        Column(
-            modifier = Modifier
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(text = "Fecha de nacimiento:", fontSize = TextSizes.H3, color = AppColors.mainEdentifica)
-            Button(onClick = {
-                showDatePicker = true
-            }) {
-                Text("Seleccionar Fecha")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            selectedDate?.let {
-                Text("Fecha seleccionada: ${it.format(formatter)}")
-            }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var imageSelected = false
 
 
-            if (showDatePicker) {
-                DatePickerDialog(
-                    onDismissRequest = { showDatePicker = false },
-                    onDateSelected = { date ->
-                        selectedDate = date
-                        showDatePicker = false
+    Column {
+        Spacer(modifier = Modifier.height(64.dp))
+        ImagePicker(onImageSelected = { uri ->
+            selectedImageUri = uri
+            uri?.let {
+                scope.launch {
+                    try {
+                        val imageUrl = uploadImageToFirebase(it, context)
+                        //Actualizar el profile
+                        val updateProfile =userCurrent?.profile?.copy(urlImageProfile = imageUrl)
+                        if (updateProfile != null) {
+                            vmProfiles.updateProfileVM(updateProfile)
+                        }
+                    } catch (e: Exception) {
+                        // Maneja el error
                     }
-                )
+                }
             }
-        }
+        })
 
-
-        //DESCRIPTION
-        TextField(
-            label = { Text(text = "Descripcion", fontSize = TextSizes.Paragraph) },
-            value = description,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            onValueChange = { description = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
-
-
-
-        Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
-            Button(
-                onClick = {
-                    //Actualizar el profile
-                    val updateProfile = profileCurrent.copy(dateBirth=selectedDate, description = description)
-                    //Actualizar el user
-                    val updateUser = user.copy(name = name, lastName = lastname)
-                    vmUsers.updateUserVM(updateUser)
-                    vmUsers.toNullUserEdit()
-                    vmProfile.updateProfileVM(updateProfile)
-                    vmProfile.toNullProfileEdit()
-
-                    vmUsers.getUserByEmail(user.email.email)
-
-                    navController.navigate(AppScreen.ProfileUserScreen.route)
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
-                shape = RoundedCornerShape(50.dp),
+        selectedImageUri?.let { uri ->
+            Image(
+                painter = rememberImagePainter(data = uri),
+                contentDescription = "image selected",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text(
-                    text = "Editar",
-                    fontSize = TextSizes.H3,
-                    color = AppColors.whitePerlaEdentifica
+                    .scale(1f)
+                    .padding(0.dp), // ajusta la altura según sea necesario
+                contentScale = ContentScale.Crop // Escala de la imagen
+            )
+            imageSelected= true
+        }
+
+        if (imageSelected){
+            Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
+                Button(
+                    onClick = {
+                        navController.navigate(AppScreen.ProfileUserScreen.route)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
+                    shape = RoundedCornerShape(50.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Text(
+                        text = "Seleccionar",
+                        fontSize = TextSizes.H3,
+                        color = AppColors.whitePerlaEdentifica
+                    )
+                }
+            }
+        }else{
+            // Muestra la imagen actual del perfil si existe
+            userCurrent?.profile?.urlImageProfile?.let { imageUrl ->
+                //Image
+                Image(
+                    painter = rememberImagePainter(data = imageUrl),
+                    contentDescription = "image profile",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .scale(1f)
+                        .padding(0.dp), // ajusta la altura según sea necesario
+                    contentScale = ContentScale.Crop // Escala de la imagen
                 )
             }
+        }
+    }
+}
+
+suspend fun uploadImageToFirebase(uri: Uri, context: Context): String {
+    val storage = FirebaseStorage.getInstance()
+    val storageRef = storage.reference
+    val imagesRef: StorageReference = storageRef.child("images/${uri.lastPathSegment}")
+
+    val uploadTask = imagesRef.putFile(uri)
+    val taskSnapshot = uploadTask.await()
+
+    return taskSnapshot.storage.downloadUrl.await().toString()
+}
+
+
+@Composable
+fun ImagePicker(
+    onImageSelected: (Uri?) -> Unit
+) {
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = onImageSelected
+    )
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview(),
+        onResult = { bitmap ->
+            val uri = bitmap?.let {
+                saveBitmapToInternalStorage(context, it)
+            }
+            onImageSelected(uri)
+        }
+    )
+
+    Column {
+        Button(onClick = { launcher.launch("image/*") }) {
+            Text(text = "Select from Gallery")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { cameraLauncher.launch() }) {
+            Text(text = "Take a Photo")
         }
     }
 }
@@ -356,28 +350,24 @@ fun BodyContentProfileEditScreen(
 
 
 
-@Composable
-fun DatePickerDialog(
-    onDismissRequest: () -> Unit,
-    onDateSelected: (LocalDate) -> Unit
-) {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance()
 
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
-    ) {
-        DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth ->
-                onDateSelected(LocalDate.of(year, month + 1, dayOfMonth))
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+fun saveBitmapToInternalStorage(context: Context, bitmap: Bitmap): Uri? {
+    val filename = "profile_image_${System.currentTimeMillis()}.jpg"
+    var fos: FileOutputStream? = null
+    var uri: Uri?
+    try {
+        fos = context.openFileOutput(filename, Context.MODE_PRIVATE)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+        fos.close()
+        val file = File(context.filesDir, filename)
+        uri = Uri.fromFile(file)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        uri = null
+    } finally {
+        fos?.close()
     }
+    return uri
 }
 
 
@@ -388,7 +378,7 @@ fun DatePickerDialog(
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogProfileEdit(
+fun LogoutDialogPhotoEdit(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -416,3 +406,46 @@ fun LogoutDialogProfileEdit(
         }
     )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// funcion para habilitar permisos
+//{
+//    var showPermissionDialog by remember { mutableStateOf(false) }
+//        if (showPermissionDialog) {
+//            AlertDialog(
+//                onDismissRequest = { showPermissionDialog = false },
+//                confirmButton = {
+//                    TextButton(
+//                        onClick = {
+//                            showPermissionDialog = false
+//                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+//                            val uri = Uri.fromParts("package", context.packageName, null)
+//                            intent.data = uri
+//                            context.startActivity(intent)
+//                        }
+//                    ) {
+//                        Text("Go to Settings")
+//                    }
+//                },
+//                dismissButton = {
+//                    TextButton(onClick = { showPermissionDialog = false }) {
+//                        Text("Cancel")
+//                    }
+//                },
+//                title = { Text("Permissions Required") },
+//                text = { Text("Camera and Storage permissions are required to change your profile photo. Please enable them in the app settings.") }
+//            )
+//        }
