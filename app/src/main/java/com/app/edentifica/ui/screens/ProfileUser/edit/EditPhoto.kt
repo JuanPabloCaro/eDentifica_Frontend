@@ -267,6 +267,8 @@ fun BodyContentPhotoEdit(
             imageSelected= true
         }
 
+        Spacer(modifier = Modifier.height(50.dp))
+
         if (imageSelected){
             Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
                 Button(
@@ -323,7 +325,9 @@ fun ImagePicker(
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = onImageSelected
+        onResult = { bitmap ->
+            onImageSelected(bitmap)
+        }
     )
 
     val cameraLauncher = rememberLauncherForActivityResult(
@@ -337,13 +341,36 @@ fun ImagePicker(
     )
 
     Column {
-        Button(onClick = { launcher.launch("image/*") }) {
-            Text(text = "Select from Gallery")
+        Button(
+            onClick = { launcher.launch("image/*") },
+            colors = ButtonDefaults.buttonColors(containerColor = AppColors.secondaryEdentifica),
+            shape = RoundedCornerShape(50.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+            Text(
+                text = "Select from Gallery",
+                fontSize = TextSizes.H3,
+                color = AppColors.whitePerlaEdentifica
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { cameraLauncher.launch() }) {
-            Text(text = "Take a Photo")
+        Button(
+            onClick = { cameraLauncher.launch() },
+            colors = ButtonDefaults.buttonColors(containerColor = AppColors.secondaryEdentifica),
+            shape = RoundedCornerShape(50.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+            Text(
+                text = "Take a Photo",
+                fontSize = TextSizes.H3,
+                color = AppColors.whitePerlaEdentifica
+            )
         }
+        Spacer(modifier = Modifier.height(22.dp))
     }
 }
 
