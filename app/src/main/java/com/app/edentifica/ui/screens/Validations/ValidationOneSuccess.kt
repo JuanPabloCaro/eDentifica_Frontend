@@ -21,16 +21,17 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,7 +53,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -65,10 +65,10 @@ import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.UsersViewModel
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ValidationOneCheckScreen(
+fun ValidationOneSuccessScreen(
     navController: NavController,
     auth: AuthManager,
     vmUsers: UsersViewModel,
@@ -86,7 +86,6 @@ fun ValidationOneCheckScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
-    Log.e("userBBDD", userState.toString())
 
 
 
@@ -147,7 +146,7 @@ fun ValidationOneCheckScreen(
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
         ){
-            BodyContentValidationOneCheck(navController, vmUsers, userState, context)
+            BodyContentValidationOneSuccess(navController, vmUsers, userState, context)
         }
     }
 
@@ -155,70 +154,48 @@ fun ValidationOneCheckScreen(
 }
 
 @Composable
-fun BodyContentValidationOneCheck(
+fun BodyContentValidationOneSuccess(
     navController: NavController,
     vmUsers: UsersViewModel,
     userState: User?,
     context: Context
 ) {
-    // Observa el estado de validationOneCheck
-    val validationOneCheckState = vmUsers.answerValidation.collectAsState()
-
-    // Estado para almacenar la respuesta del usuario
-    var userResponse by remember { mutableStateOf("") }
-
-    // Estado para verificar si se ha presionado el botón
-    var buttonPressed by remember { mutableStateOf(false) }
-
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        //Title
-        Text(
-            text = "Validacion Llamada",
-            fontSize = TextSizes.H1,
-            color = AppColors.mainEdentifica
-        )
-
         //Image
         Image(
-            painter = painterResource(id = R.drawable.check_call),
-            contentDescription = "check Call",
+            painter = painterResource(id = R.drawable.check_green),
+            contentDescription = "search",
             modifier = Modifier
-                .fillMaxWidth().scale(0.7f).padding(0.dp), // ajusta la altura según sea necesario
+                .fillMaxWidth()
+                .scale(0.7f)
+                .padding(0.dp), // ajusta la altura según sea necesario
             contentScale = ContentScale.Crop // Escala de la imagen
         )
+        Spacer(modifier = Modifier.height(10.dp))
 
+        // Text debajo del icono
         Text(
-            text = "Por favor introduce la respuesta del reto matemático:",
-            fontSize = TextSizes.H3
+            text = "Validación Uno Exitosa",
+            fontSize = TextSizes.H2,
+            modifier = Modifier.padding(top = 8.dp),
+            color = AppColors.greenEdentifica
         )
 
-        // Campo de entrada para la respuesta del usuario
-        Spacer(modifier = Modifier.height(20.dp))
-        TextField(
-            label = {
-                Text(
-                    text = "Respuesta",
-                    fontSize = TextSizes.Paragraph
-                )
-            },
-            value = userResponse,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            onValueChange = { userResponse = it })
-
-
-        //Button
-        Spacer(modifier = Modifier.height(20.dp))
+        //Boton empezar
+        Spacer(modifier = Modifier.height(54.dp))
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-                    // Llamar a la función del ViewModel
-                    if (userState != null) {
-                        vmUsers.answerMathByUser(userResponse.toInt(), userState)
-                        buttonPressed = true // Marcar el botón como presionado
+                    navController.navigate(AppScreen.HomeScreen.route){
+                        popUpTo(AppScreen.HomeScreen.route){
+                            inclusive= true
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
@@ -227,41 +204,7 @@ fun BodyContentValidationOneCheck(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(
-                    text = "Validar respuesta",
-                    fontSize = TextSizes.H3,
-                    color = AppColors.whitePerlaEdentifica)
-            }
-        }
-
-        // Observar cambios en validationOneCheckState
-        LaunchedEffect(validationOneCheckState.value) {
-            // Si validationOneCheckState es false y el botón ha sido presionado
-            if (validationOneCheckState.value == false && buttonPressed) {
-                Toast.makeText(
-                    context,
-                    "Respuesta inválida",
-                    Toast.LENGTH_LONG
-                ).show()
-
-                // Reiniciar variables y navegar a la pantalla anterior
-                buttonPressed = false
-                vmUsers.validationOneNegative()
-                vmUsers.validationOneCheckNegative()
-                navController.navigate(AppScreen.ValidationOneScreen.route){
-                    popUpTo(AppScreen.ValidationOneCheckScreen.route){
-                        inclusive= true
-                    }
-                }
-            }
-        }
-
-        // Si validationOneCheckState es true, navegar a la pantalla HomeScreen
-        if (validationOneCheckState.value == true) {
-            navController.navigate(AppScreen.ValidationOneSuccessScreen.route){
-                popUpTo(AppScreen.ValidationOneSuccessScreen.route){
-                    inclusive= true
-                }
+                androidx.compose.material3.Text(text = "Haz click para empezar")
             }
         }
     }

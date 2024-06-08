@@ -158,7 +158,6 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        if(currentUser?.photoUrl != null) {
                             if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
                                 userState?.profile?.urlImageProfile?.let {
                                     ClickableProfileImage(
@@ -168,46 +167,11 @@ fun HomeScreen(
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 }
-                            }else{
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(userState?.profile?.urlImageProfile)
-                                        .crossfade(true)
-                                        .build(),
-                                    contentDescription = "Imagen",
-                                    placeholder = painterResource(id = R.drawable.profile),
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .size(40.dp)
-                                )
                             }
-
-                        } else {
-                            if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
-                                userState?.profile?.urlImageProfile?.let {
-                                    ClickableProfileImage(
-                                        navController = navController,
-                                        imageUrl = it
-                                    ) {
-                                        navController.navigate(AppScreen.ProfileUserScreen.route)
-                                    }
-                                }
-
-                            } else{
-                                Image(
-                                    painter = painterResource(id = R.drawable.profile),
-                                    contentDescription = "image profile default",
-                                    modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .size(40.dp)
-                                        .clip(CircleShape)
-                                )
-                            }
-                        }
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
                                 fontSize = TextSizes.H3,
@@ -215,7 +179,7 @@ fun HomeScreen(
                                 overflow = TextOverflow.Ellipsis,
                                 color = AppColors.whitePerlaEdentifica
                             )
-                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Usuario Anonimo")?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -415,14 +379,23 @@ fun ClickableProfileImage(
             )
         }
     }else{
-        Image(
-            painter = painterResource(id = R.drawable.profile),
-            contentDescription = "image profile default",
+        Box(
             modifier = Modifier
-                .padding(end = 8.dp)
-                .size(40.dp)
                 .clip(CircleShape)
-        )
+                .size(40.dp)
+                .clickable { onClick() }
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(R.drawable.profile)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Imagen",
+                placeholder = painterResource(id = R.drawable.profile),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.clip(CircleShape)
+            )
+        }
     }
 
 

@@ -1,6 +1,8 @@
 package com.app.edentifica.navigation
 
+import android.os.Build
 import android.provider.ContactsContract.Contacts.Photo
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +32,7 @@ import com.app.edentifica.ui.screens.Results.ResultSearchSocialScreen
 import com.app.edentifica.ui.screens.Search.FindBySocialNetworkScreen
 import com.app.edentifica.ui.screens.Validations.ValidationOneCheckScreen
 import com.app.edentifica.ui.screens.Validations.ValidationOneScreen
+import com.app.edentifica.ui.screens.Validations.ValidationOneSuccessScreen
 import com.app.edentifica.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
 import com.google.firebase.auth.FirebaseUser
@@ -40,6 +43,7 @@ import com.app.edentifica.viewModel.ProfileViewModel
 import com.app.edentifica.viewModel.SocialViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(
     state: SignInState,
@@ -111,6 +115,14 @@ fun AppNavigation(
 
         composable(route=AppScreen.ValidationOneCheckScreen.route){
             ValidationOneCheckScreen(
+                navController = navController,
+                auth= authManager,
+                vmUsers=vmUsers
+            )
+        }
+
+        composable(route=AppScreen.ValidationOneSuccessScreen.route){
+            ValidationOneSuccessScreen(
                 navController = navController,
                 auth= authManager,
                 vmUsers=vmUsers

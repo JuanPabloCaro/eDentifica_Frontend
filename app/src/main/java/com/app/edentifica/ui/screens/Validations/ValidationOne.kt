@@ -124,28 +124,6 @@ fun ValidationOneScreen(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if(user?.photoUrl != null) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(user?.photoUrl)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = "Imagen",
-                                placeholder = painterResource(id = R.drawable.profile),
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .size(40.dp))
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.profile),
-                                contentDescription = "image profile default",
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                            )
-                        }
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
@@ -157,7 +135,7 @@ fun ValidationOneScreen(
                                 color = AppColors.whitePerlaEdentifica
                             )
                             Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
+                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Usuario Anonimo",
                                 fontSize = TextSizes.Footer,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
