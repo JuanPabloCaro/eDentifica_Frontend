@@ -89,7 +89,7 @@ fun FindBySocialNetworkScreen(
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
     //recojo al user Actual
-    val user = auth.getCurrentUser()
+    val currentUser = auth.getCurrentUser()
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
@@ -123,11 +123,8 @@ fun FindBySocialNetworkScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        if (user?.photoUrl != null) {
-                            if (auth.getCurrentUser()?.email != null && userState?.validations?.get(
-                                    0
-                                )?.isValidated == true
-                            ) {
+                        if(currentUser?.photoUrl != null) {
+                            if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
                                 userState?.profile?.urlImageProfile?.let {
                                     ClickableProfileImage(
                                         navController = navController,
@@ -136,7 +133,7 @@ fun FindBySocialNetworkScreen(
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
                                 }
-                            } else {
+                            }else{
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current)
                                         .data(userState?.profile?.urlImageProfile)
@@ -152,16 +149,17 @@ fun FindBySocialNetworkScreen(
                             }
 
                         } else {
-                            if (auth.getCurrentUser()?.email != null && userState?.validations?.get(
-                                    0
-                                )?.isValidated == true
-                            ) {
-                                ClickableProfileImage(
-                                    onClick = {
+                            if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
+                                userState?.profile?.urlImageProfile?.let {
+                                    ClickableProfileImage(
+                                        navController = navController,
+                                        imageUrl = it
+                                    ) {
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
-                                )
-                            } else {
+                                }
+
+                            } else{
                                 Image(
                                     painter = painterResource(id = R.drawable.profile),
                                     contentDescription = "image profile default",
@@ -176,13 +174,13 @@ fun FindBySocialNetworkScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if (!user?.displayName.isNullOrEmpty() || userState != null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
+                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
                                 fontSize = TextSizes.H3,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 color = AppColors.whitePerlaEdentifica
                             )
-                            (if (!user?.email.isNullOrEmpty() || userState != null) userState?.email?.email else "Anonimo")?.let {
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,

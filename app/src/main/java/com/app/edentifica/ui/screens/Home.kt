@@ -179,16 +179,21 @@ fun HomeScreen(
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
                                         .clip(CircleShape)
-                                        .size(40.dp))
+                                        .size(40.dp)
+                                )
                             }
 
                         } else {
                             if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
-                                ClickableProfileImage(
-                                    onClick = {
+                                userState?.profile?.urlImageProfile?.let {
+                                    ClickableProfileImage(
+                                        navController = navController,
+                                        imageUrl = it
+                                    ) {
                                         navController.navigate(AppScreen.ProfileUserScreen.route)
                                     }
-                                )
+                                }
+
                             } else{
                                 Image(
                                     painter = painterResource(id = R.drawable.profile),
@@ -224,18 +229,18 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-//                    //Botton Home
-//                    IconButton(
-//                        onClick = {
-//                            navController.navigate(AppScreen.HomeScreen.route)
-//                        }
-//                    ) {
-//                        Icon(
-//                            Icons.Outlined.Home,
-//                            contentDescription = "Home",
-//                            tint = AppColors.whitePerlaEdentifica
-//                        )
-//                    }
+                    //Botton Home
+                    IconButton(
+                        onClick = {
+                            navController.navigate(AppScreen.HomeScreen.route)
+                        }
+                    ) {
+                        Icon(
+                            Icons.Outlined.Home,
+                            contentDescription = "Home",
+                            tint = AppColors.whitePerlaEdentifica
+                        )
+                    }
                     //boton de accion para salir cerrar sesion
                     IconButton(
                         onClick = {
@@ -382,22 +387,6 @@ fun BodyContentHome(
     }
 }
 
-
-/**
- * Imagen Clikeable
- */
-@Composable
-fun ClickableProfileImage(onClick: () -> Unit) {
-    Image(
-        painter = painterResource(id = R.drawable.profile),
-        contentDescription = "image profile default",
-        modifier = Modifier
-            .padding(end = 8.dp)
-            .size(40.dp)
-            .clip(CircleShape)
-            .clickable { onClick() }
-    )
-}
 /**
  * Imagen de perfil clikeable
  */
@@ -407,23 +396,36 @@ fun ClickableProfileImage(
     imageUrl: String,
     onClick: () -> Unit  // Define your click action
 ) {
-    Box(
-        modifier = Modifier
-            .clip(CircleShape)
-            .size(40.dp)
-            .clickable { onClick() }
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
-                .crossfade(true)
-                .build(),
-            contentDescription = "Imagen",
-            placeholder = painterResource(id = R.drawable.profile),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.clip(CircleShape)
+    if(!imageUrl.equals("")){
+        Box(
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(40.dp)
+                .clickable { onClick() }
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Imagen",
+                placeholder = painterResource(id = R.drawable.profile),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.clip(CircleShape)
+            )
+        }
+    }else{
+        Image(
+            painter = painterResource(id = R.drawable.profile),
+            contentDescription = "image profile default",
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .size(40.dp)
+                .clip(CircleShape)
         )
     }
+
+
 }
 
 //

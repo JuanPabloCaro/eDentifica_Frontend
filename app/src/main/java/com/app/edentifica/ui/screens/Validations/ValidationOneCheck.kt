@@ -59,6 +59,7 @@ import coil.request.ImageRequest
 import com.app.edentifica.R
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
+import com.app.edentifica.ui.screens.ClickableProfileImage
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
@@ -75,7 +76,7 @@ fun ValidationOneCheckScreen(
     //VARIABLES Y CONSTANTES
     val context = LocalContext.current
 
-    val user = auth.getCurrentUser()
+    val currentUser = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia ValidationOneScreen
     LaunchedEffect(Unit) {
@@ -98,46 +99,75 @@ fun ValidationOneCheckScreen(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if(user?.photoUrl != null) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(user?.photoUrl)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = "Imagen",
-                                placeholder = painterResource(id = R.drawable.profile),
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .size(40.dp))
+
+                        if(currentUser?.photoUrl != null) {
+                            if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
+                                userState?.profile?.urlImageProfile?.let {
+                                    ClickableProfileImage(
+                                        navController = navController,
+                                        imageUrl = it
+                                    ) {
+                                        navController.navigate(AppScreen.ProfileUserScreen.route)
+                                    }
+                                }
+                            }else{
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(userState?.profile?.urlImageProfile)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = "Imagen",
+                                    placeholder = painterResource(id = R.drawable.profile),
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .size(40.dp)
+                                )
+                            }
+
                         } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.profile),
-                                contentDescription = "image profile default",
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                            )
+                            if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
+                                userState?.profile?.urlImageProfile?.let {
+                                    ClickableProfileImage(
+                                        navController = navController,
+                                        imageUrl = it
+                                    ) {
+                                        navController.navigate(AppScreen.ProfileUserScreen.route)
+                                    }
+                                }
+
+                            } else{
+                                Image(
+                                    painter = painterResource(id = R.drawable.profile),
+                                    contentDescription = "image profile default",
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
                         }
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenid@",//welcomeMessage,
+                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
                                 fontSize = TextSizes.H3,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 color = AppColors.whitePerlaEdentifica
                             )
-                            Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
-                                fontSize = TextSizes.Footer,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = TextSizes.Footer,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
                         }
+
                     }
                 }
             )

@@ -249,8 +249,8 @@ fun BodyContentProfile(
                     .clip(CircleShape)
                     .background(color = Color.Gray) // Color de fondo opcional
             ) {
-                if (userState != null && !userState.profile?.urlImageProfile.equals("")) {
-                    userState?.profile?.urlImageProfile?.let {
+                if (userState != null) {
+                    userState.profile?.urlImageProfile?.let {
                         ClickableProfileImage(
                             navController = navController,
                             imageUrl = it
@@ -258,36 +258,8 @@ fun BodyContentProfile(
                             navController.navigate(AppScreen.ProfileUserPhotoEditScreen.route)
                         }
                     }
-//                    AsyncImage(
-//                        model = ImageRequest.Builder(LocalContext.current)
-//                            .data(userState.profile?.urlImageProfile)
-//                            .crossfade(true)
-//                            .build(),
-//                        contentDescription = "Imagen",
-//                        placeholder = painterResource(id = R.drawable.profile),
-//                        contentScale = ContentScale.Crop, // Ajusta la escala de contenido según tus necesidades
-//                        modifier = Modifier
-//                            .size(150.dp) // Ajusta el tamaño deseado
-//                            .clip(CircleShape)
-//                    )
-                } else {
-                    ClickableProfileImage(
-                        onClick = {
-                            navController.navigate(AppScreen.ProfileUserPhotoEditScreen.route)
-                        }
-                    )
-
-//                    Image(
-//                        painter = painterResource(id = R.drawable.profile),
-//                        contentDescription = "edit image",
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .scale(1f)
-//                            .padding(0.dp)
-//                            .clip(CircleShape), // ajusta la altura según sea necesario
-//                        contentScale = ContentScale.Crop // Escala de la imagen
-//                    )
                 }
+
             }
             Spacer(modifier = Modifier.height(22.dp))
         }
@@ -487,23 +459,6 @@ fun UserInfoItem(label: String, value: String) {
 }
 
 
-
-
-/**
- * Imagen Clikeable
- */
-@Composable
-fun ClickableProfileImage(onClick: () -> Unit) {
-    Image(
-        painter = painterResource(id = R.drawable.profile),
-        contentDescription = "image profile default",
-        modifier = Modifier
-            .padding(end = 8.dp)
-            .size(40.dp)
-            .clip(CircleShape)
-            .clickable { onClick() }
-    )
-}
 /**
  * Imagen de perfil clikeable
  */
@@ -515,22 +470,34 @@ fun ClickableProfileImage(
 ) {
     Box(
         modifier = Modifier
-            .clip(CircleShape)
-            .size(40.dp)
             .clickable { onClick() }
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
-                .crossfade(true)
-                .build(),
-            contentDescription = "Imagen",
-            placeholder = painterResource(id = R.drawable.profile),
-            contentScale = ContentScale.Crop, // Ajusta la escala de contenido según tus necesidades
-            modifier = Modifier
-                .size(150.dp) // Ajusta el tamaño deseado
-                .clip(CircleShape)
-        )
+        if(!imageUrl.equals("")){
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Imagen",
+                placeholder = painterResource(id = R.drawable.profile),
+                contentScale = ContentScale.Crop, // Ajusta la escala de contenido según tus necesidades
+                modifier = Modifier
+                    .size(150.dp) // Ajusta el tamaño deseado
+                    .clip(CircleShape)
+            )
+        }else{
+            Image(
+                painter = painterResource(id = R.drawable.profile),
+                contentDescription = "edit image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .scale(1f)
+                    .padding(0.dp)
+                    .clip(CircleShape), // ajusta la altura según sea necesario
+                contentScale = ContentScale.Crop // Escala de la imagen
+            )
+        }
+
     }
 }
 
