@@ -252,19 +252,24 @@ fun BodyContentValidationTwo(
     var validations= ArrayList<Validation>()
 
 
-    Column {
-        Spacer(modifier = Modifier.height(80.dp))
+    Column (
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Spacer(modifier = Modifier.height(26.dp))
         //Title
         Text(
+            modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
             text = "Validacion 2",
             fontSize = TextSizes.H1,
+            color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
             modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
-            text = "Para continuar con el proceso de validacion, por favor, toma una foto de tu rostro.",
+            text = "¡Estamos casi listos! Para continuar con el proceso de validación, por favor, toma una foto de tu rostro. Selecciona la escala 1:1 de la foto.",
             fontSize = TextSizes.H3,
             color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,

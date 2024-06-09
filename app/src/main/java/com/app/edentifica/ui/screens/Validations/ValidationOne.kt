@@ -234,7 +234,7 @@ fun BodyContentValidationOne(
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+//                verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),

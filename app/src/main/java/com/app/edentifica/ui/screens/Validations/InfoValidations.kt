@@ -231,7 +231,8 @@ fun BodyContentInfoValidations(
             modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
             text = "¡Ups! Aún no has completado tu validación.",
             fontSize = TextSizes.H1,
-            color = AppColors.mainEdentifica
+            color = AppColors.mainEdentifica,
+            textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(16.dp))
         //Image
@@ -247,7 +248,8 @@ fun BodyContentInfoValidations(
             modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
             text = "Para registrarte en eDentifica, necesitas completar un proceso de dos validaciones. Una vez finalizado, podrás utilizar nuestros servicios. Si estás listo, comencemos.",
             fontSize = TextSizes.H3,
-            color = AppColors.mainEdentifica
+            color = AppColors.mainEdentifica,
+            textAlign = TextAlign.Center,
         )
 
         //Button
