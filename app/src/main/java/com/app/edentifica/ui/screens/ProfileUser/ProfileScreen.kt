@@ -86,8 +86,6 @@ fun ProfileScreen(
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-//    //recojo al user Actual
-//    val user = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia Profile
     LaunchedEffect(Unit) {
@@ -140,7 +138,7 @@ fun ProfileScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Perfil",
+                            text = stringResource(R.string.perfil),
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -264,14 +262,12 @@ fun BodyContentProfile(
             Spacer(modifier = Modifier.height(22.dp))
         }
 
-//        item { UserInfoItem(label = "eDentificador", value = userState?.edentificador ?: "") }
 
         item{
-            Text(text = "eDentificador: ", fontWeight = FontWeight.Bold, color = AppColors.mainEdentifica)
+            Text(text = stringResource(R.string.edentificador), fontWeight = FontWeight.Bold, color = AppColors.mainEdentifica)
             Box(
                 modifier = Modifier
                     .padding(top = 4.dp, bottom = 16.dp)
-//                    .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
                     .border(
                         width = 2.dp,
@@ -288,10 +284,10 @@ fun BodyContentProfile(
             }
         }
 
-        item { UserInfoItem(label = "Nombre", value = userState?.name ?: "") }
-        item { UserInfoItem(label = "Apellido", value = userState?.lastName ?: "") }
-        item { UserInfoItem(label = "Fecha de Nacimiento", value = userState?.profile?.dateBirth.toString()) }
-        item { UserInfoItem(label = "Descripción del perfil", value = userState?.profile?.description ?: "") }
+        item { UserInfoItem(label = stringResource(R.string.nombre), value = userState?.name ?: "") }
+        item { UserInfoItem(label = stringResource(R.string.apellido), value = userState?.lastName ?: "") }
+        item { UserInfoItem(label = stringResource(R.string.fecha_de_nacimiento), value = userState?.profile?.dateBirth.toString()) }
+        item { UserInfoItem(label = stringResource(R.string.descripcion_del_perfil), value = userState?.profile?.description ?: "") }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
 
@@ -322,7 +318,7 @@ fun BodyContentProfile(
                         )
                         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                         Text(
-                            "Ver mis correos",
+                            text= stringResource(R.string.ver_mis_correos),
                             fontSize = TextSizes.H3,
                             color = AppColors.mainEdentifica
                         )
@@ -359,7 +355,7 @@ fun BodyContentProfile(
                         )
                         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                         Text(
-                            "Ver mis telefonos",
+                            text= stringResource(R.string.ver_mis_telefonos),
                             fontSize = TextSizes.H3,
                             color = AppColors.mainEdentifica
                         )
@@ -396,7 +392,7 @@ fun BodyContentProfile(
                         )
                         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                         Text(
-                            "Ver mis redes sociales",
+                            text = stringResource(R.string.ver_mis_redes_sociales),
                             fontSize = TextSizes.H3,
                             color = AppColors.mainEdentifica
                         )
@@ -440,7 +436,7 @@ fun BodyContentProfile(
                             )
                             Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                             Text(
-                                "Editar perfil",
+                                stringResource(R.string.editar_perfil),
                                 fontSize = TextSizes.H3,
                                 color = AppColors.whitePerlaEdentifica
                             )
@@ -539,14 +535,14 @@ fun LogoutDialogProfile(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -555,7 +551,7 @@ fun LogoutDialogProfile(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

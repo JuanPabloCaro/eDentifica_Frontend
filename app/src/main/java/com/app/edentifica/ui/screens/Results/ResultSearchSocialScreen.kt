@@ -89,9 +89,6 @@ fun ResultSearchSocialScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
-    Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
-    Log.e("userValidation", userState?.toString().toString())
-
 
     val onLogoutConfirmedResultSocial:()->Unit = {
         auth.signOut()
@@ -129,14 +126,23 @@ fun ResultSearchSocialScreen(
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Usuario Anonimo")?.let {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -249,14 +255,26 @@ fun BodyContentResultSocial(navController: NavController, vmUsers: UsersViewMode
                 painter = painterResource(id = R.drawable.checkresult),
                 contentDescription = "Check Result",
                 modifier = Modifier
-                    .fillMaxWidth().scale(0.9f).padding(0.dp), // ajusta la altura según sea necesario
+                    .fillMaxWidth()
+                    .scale(0.9f)
+                    .padding(0.dp), // ajusta la altura según sea necesario
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
-            Text(
-                text = "La red social de ${findString} le pertenece al usuario ${searchResultSocial!!.name} con eDentificador ${searchResultSocial!!.edentificador} garantizando la seguridad del perfil",
-                modifier = Modifier.padding(16.dp),
-                textAlign = TextAlign.Center,
-            )
+            findString?.let {
+                searchResultSocial!!.edentificador?.let { it1 ->
+                    Text(
+                        text = stringResource(
+                            R.string.la_red_social_de_le_pertenece_al_usuario_con_edentificador_garantizando_la_seguridad_del_perfil,
+                            it,
+                            searchResultSocial!!.name,
+                            it1
+                        ),
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+
+            }
 
         } else {
             //Image
@@ -264,11 +282,13 @@ fun BodyContentResultSocial(navController: NavController, vmUsers: UsersViewMode
                 painter = painterResource(id = R.drawable.warning),
                 contentDescription = "Warning",
                 modifier = Modifier
-                    .fillMaxWidth().scale(0.9f).padding(0.dp), // ajusta la altura según sea necesario
+                    .fillMaxWidth()
+                    .scale(0.9f)
+                    .padding(0.dp), // ajusta la altura según sea necesario
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
             Text(
-                text = "Lo sentimos, usuario no encontrado, puede tratarse de una posible suplantacion",
+                text = stringResource(R.string.lo_sentimos_usuario_no_encontrado_puede_tratarse_de_una_posible_suplantacion),
                 modifier = Modifier.padding(16.dp),
                 textAlign = TextAlign.Center,
             )
@@ -289,7 +309,7 @@ fun BodyContentResultSocial(navController: NavController, vmUsers: UsersViewMode
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Realizar otra Busqueda")
+                Text(text = stringResource(R.string.realizar_otra_busqueda))
             }
         }
     }
@@ -314,14 +334,14 @@ fun LogoutDialogResultSocial(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -330,7 +350,7 @@ fun LogoutDialogResultSocial(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

@@ -99,15 +99,24 @@ fun ValidationTwoSuccessScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Usuario Anonimo")?.let {
-                                Text(
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                androidx.compose.material3.Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
+                                androidx.compose.material3.Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
                                     maxLines = 1,
@@ -177,7 +186,7 @@ fun BodyContentValidationTwoSuccess(
 
         // Text debajo del icono
         Text(
-            text = "Validación 2 Exitosa",
+            text = stringResource(R.string.validaci_n_2_exitosa),
             fontSize = TextSizes.H2,
             modifier = Modifier.padding(top = 8.dp),
             color = AppColors.greenEdentifica,
@@ -202,7 +211,7 @@ fun BodyContentValidationTwoSuccess(
                     .height(50.dp)
             ) {
                 androidx.compose.material3.Text(
-                    text = "Comenzar",
+                    text = stringResource(R.string.comenzar),
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica
                 )

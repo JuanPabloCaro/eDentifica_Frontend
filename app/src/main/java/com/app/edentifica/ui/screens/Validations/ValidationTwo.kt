@@ -87,9 +87,8 @@ fun ValidationTwoScreen(
 
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
-    val user = auth.getCurrentUser()
+    val currentUser = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia ValidationOneScreen
     LaunchedEffect(Unit) {
@@ -106,7 +105,6 @@ fun ValidationTwoScreen(
         }
     }
 
-    Log.e("userBBDD", userState.toString())
 
 
     //Si no tiene ninguna validacion lo envio a las validaciones
@@ -118,13 +116,6 @@ fun ValidationTwoScreen(
             }
         }
 
-//        if(userState?.validations?.get(0)?.isValidated==true && userState?.validations?.get(1)?.isValidated==false){// si le falta la validacion dos lo envio a esa pantalla
-//            navController.navigate(AppScreen.ValidationTwoScreen.route){
-//                popUpTo(AppScreen.HomeScreen.route){
-//                    inclusive= true
-//                }
-//            }
-//        }
     }
 
 
@@ -153,20 +144,31 @@ fun ValidationTwoScreen(
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Usuario Anonimo",
-                                fontSize = TextSizes.Footer,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = TextSizes.Footer,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
                         }
                     }
                 },
@@ -260,16 +262,20 @@ fun BodyContentValidationTwo(
         Spacer(modifier = Modifier.height(26.dp))
         //Title
         Text(
-            modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
-            text = "Validacion 2",
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = stringResource(R.string.validacion_2),
             fontSize = TextSizes.H1,
             color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
-            text = "¡Estamos casi listos! Para continuar con el proceso de validación, por favor, toma una foto de tu rostro. Selecciona la escala 1:1 de la foto.",
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = stringResource(R.string.estamos_casi_listos_para_continuar_con_el_proceso_de_validaci_n_por_favor_toma_una_foto_de_tu_rostro_selecciona_la_escala_1_1_de_la_foto),
             fontSize = TextSizes.H3,
             color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,
@@ -282,24 +288,6 @@ fun BodyContentValidationTwo(
                 scope.launch {
                     try {
                         val imageUrl =uploadImageToFirebaseValidation(it,context)
-//                        //Almaceno las validaciones por separado y cambio la validacion 2 a true
-//                        var validationsUser1= userCurrent?.validations?.get(0)
-//                        var validationsUser2= userCurrent?.validations?.get(1)?.copy(isValidated = true);
-//
-//                        //Agrego las validaciones a la lista
-//                        if (validationsUser1 != null) {
-//                            validations.add(0,validationsUser1)
-//                        };
-//                        if (validationsUser2 != null) {
-//                            validations.add(1,validationsUser2)
-//                        }
-//
-//                        //Actualizar la validacion del usuario con la lista creada anteriormente
-//                        val updateUser =userCurrent?.copy(validations = validations)
-//                        if (updateUser != null) {
-//                            vmUsers.updateUserVM(updateUser)
-//                        }
-
                     } catch (e: Exception) {
                         Log.e("Error Validation 2", e.message.toString())
                     }
@@ -363,28 +351,13 @@ fun BodyContentValidationTwo(
                         .height(50.dp)
                 ) {
                     Text(
-                        text = "Enviar",
+                        text = stringResource(R.string.enviar),
                         fontSize = TextSizes.H3,
                         color = AppColors.whitePerlaEdentifica
                     )
                 }
             }
         }
-//        else{
-//            // Muestra la imagen actual del perfil si existe
-//            userCurrent?.profile?.urlImageProfile?.let { imageUrl ->
-//                //Image
-//                Image(
-//                    painter = rememberImagePainter(data = imageUrl),
-//                    contentDescription = "image profile",
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .scale(1f)
-//                        .padding(0.dp), // ajusta la altura según sea necesario
-//                    contentScale = ContentScale.Crop // Escala de la imagen
-//                )
-//            }
-//        }
     }
 }
 
@@ -405,12 +378,6 @@ fun ImagePickerValidation(
     onImageSelected: (Uri?) -> Unit
 ) {
     val context = LocalContext.current
-//    val launcher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.GetContent(),
-//        onResult = { bitmap ->
-//            onImageSelected(bitmap)
-//        }
-//    )
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview(),
@@ -423,20 +390,6 @@ fun ImagePickerValidation(
     )
 
     Column {
-//        Button(
-//            onClick = { launcher.launch("image/*") },
-//            colors = ButtonDefaults.buttonColors(containerColor = AppColors.secondaryEdentifica),
-//            shape = RoundedCornerShape(50.dp),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(50.dp)
-//        ) {
-//            Text(
-//                text = "Select from Gallery",
-//                fontSize = TextSizes.H3,
-//                color = AppColors.whitePerlaEdentifica
-//            )
-//        }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = { cameraLauncher.launch() },
@@ -447,7 +400,7 @@ fun ImagePickerValidation(
                 .height(50.dp)
         ) {
             Text(
-                text = "Tomar Foto",
+                text = stringResource(R.string.tomar_foto),
                 fontSize = TextSizes.H3,
                 color = AppColors.whitePerlaEdentifica
             )
@@ -482,18 +435,6 @@ fun saveBitmapToInternalStorageValidation(context: Context, bitmap: Bitmap): Uri
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * Funcion composable que se encarga de mostrar un alert para preguntar al
  * usuario si quiere continuar o cerrar sesion
@@ -506,14 +447,14 @@ fun LogoutDialogValidationTwo(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -522,7 +463,7 @@ fun LogoutDialogValidationTwo(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

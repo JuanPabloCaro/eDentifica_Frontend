@@ -99,15 +99,24 @@ fun ValidationOneSuccessScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Usuario Anonimo")?.let {
-                                Text(
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                androidx.compose.material3.Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
+                                androidx.compose.material3.Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
                                     maxLines = 1,
@@ -177,7 +186,7 @@ fun BodyContentValidationOneSuccess(
 
         // Text debajo del icono
         Text(
-            text = "Validación 1 Exitosa",
+            text = stringResource(R.string.validaci_n_1_exitosa),
             fontSize = TextSizes.H2,
             modifier = Modifier.padding(top = 8.dp),
             color = AppColors.greenEdentifica,
@@ -201,7 +210,7 @@ fun BodyContentValidationOneSuccess(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                androidx.compose.material3.Text(text = "Continuar con la validacion 2")
+                Text(text = stringResource(R.string.continuar_con_la_validacion_2))
             }
         }
     }

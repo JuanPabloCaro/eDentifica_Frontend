@@ -112,9 +112,9 @@ fun LoginScreen(
     ){
         Box(
             modifier = Modifier
-            .fillMaxSize()
-            .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
-            .padding(8.dp)
+                .fillMaxSize()
+                .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
+                .padding(8.dp)
         ){
             BodyContent(navController,scope,auth,context,onSignInClick, vmUsers)
         }
@@ -171,7 +171,7 @@ fun FormularioLogin(
         // Campo de email - Field email
         Spacer(modifier = Modifier.height(34.dp))
         TextField(
-            label = { Text(text = "Email", fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.correo), fontSize = TextSizes.Paragraph) },
             value = email,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             onValueChange = { email = it },
@@ -180,7 +180,7 @@ fun FormularioLogin(
         // Campo de password - Field password
         Spacer(modifier = Modifier.height(10.dp))
         TextField(
-            label = { Text(text = "Password",fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.password),fontSize = TextSizes.Paragraph) },
             value = password,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -204,7 +204,7 @@ fun FormularioLogin(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Login",
+                    text = stringResource(R.string.iniciar_sesion),
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica)
             }
@@ -214,7 +214,7 @@ fun FormularioLogin(
 
         // Enlace de "¿Olvidaste tu contraseña?"
         ClickableText(
-            text = AnnotatedString("Forgot your password?"),
+            text = AnnotatedString(stringResource(R.string.has_olvidado_tu_contrasena)),
             modifier = Modifier.padding(vertical = 8.dp),
             onClick = {
                 navController.navigate(route = AppScreen.ForgotPasswordScreen.route)
@@ -258,7 +258,7 @@ fun FormularioLogin(
         // Botón de inicio de sesión con Google
         SocialMediaButton(
             onClick = onSignInClick,
-            text = "Continue with Google",
+            text = stringResource(R.string.continuar_con_google),
             icon = R.drawable.ic_google,
             color = Color(0xFFF1F1F1)
         )
@@ -272,7 +272,7 @@ fun FormularioLogin(
                     incognitoSignIn(auth, context, navController)
                 }
             },
-            text = "Continue as a guest",
+            text = stringResource(R.string.continuar_como_invitado),
             icon = R.drawable.ic_incognito,
             color = AppColors.grayEdentifica
         )
@@ -281,7 +281,7 @@ fun FormularioLogin(
 
         // Enlace de "¿No tienes una cuenta? Regístrate aquí"
         ClickableText(
-            text = AnnotatedString("Don't have an account? Sign up here."),
+            text = AnnotatedString(stringResource(R.string.no_tienes_una_cuenta)),
             modifier = Modifier
                 .padding(bottom = 16.dp)
                 .align(Alignment.CenterHorizontally),
@@ -323,7 +323,11 @@ private suspend fun emailPassSignIn(
             }
         }
     } else {
-        Toast.makeText(context, "There are empty fields", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            context,
+            "There are empty fields",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }
 

@@ -105,7 +105,6 @@ fun HomeScreen(
 
     //si el user es existe le pregunto si ya esta validado
     if(userState != null){
-        Log.e("entra 1", "entra en user state")
 
         //Si no tiene ninguna validacion lo envio a las validaciones
         if(userState?.validations?.get(0)?.isValidated==false || userState?.validations?.get(1)?.isValidated==false) { // importante modificacion en home
@@ -115,19 +114,10 @@ fun HomeScreen(
                     inclusive = true
                 }
             }
-
-//        if(userState?.validations?.get(0)?.isValidated==true && userState?.validations?.get(1)?.isValidated==false){// si le falta la validacion dos lo envio a esa pantalla
-//            navController.navigate(AppScreen.ValidationTwoScreen.route){
-//                popUpTo(AppScreen.HomeScreen.route){
-//                    inclusive= true
-//                }
-//            }
-//        }
         }
 
     }else {
         if(currentUser?.email != null) {// si el usuario existe en firebase y no existe en la base de datos lo inserto en la base de datos
-            Log.e("entra 2", "entra en user state y currentUser")
             val userToInsert: User = User(
                 null,
                 null,
@@ -141,7 +131,6 @@ fun HomeScreen(
             )
             // Llama a la función del ViewModel para insertar el usuario y espera a que se complete
             LaunchedEffect (Unit) {
-                Log.e("entra 3", "entra en user state")
                 vmUsers.insertUserVm(userToInsert)
                 vmUsers.getUserByEmail(auth.getCurrentUser()?.email.toString())
             }
@@ -186,14 +175,22 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Usuario Anonimo")?.let {
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -296,7 +293,7 @@ fun BodyContentHome(
         //Title
         if(userState != null){
             Text(
-                text = "Bienvenido a eDentifica",
+                text = stringResource(R.string.bienvenido_a_edentifica),
                 fontSize = TextSizes.title,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold, // Aumenta el grosor del texto
@@ -306,7 +303,7 @@ fun BodyContentHome(
             )
         }else{
             Text(
-                text = "eDentifica",
+                text = stringResource(R.string.edentifica),
                 fontSize = TextSizes.title,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold, // Aumenta el grosor del texto
@@ -331,7 +328,7 @@ fun BodyContentHome(
         Spacer(modifier = Modifier.height(10.dp))
         //Title
         Text(
-            text = "¡Descubre lo que necesitas! ¿Qué te gustaría buscar?",
+            text = stringResource(R.string.descubre_lo_que_necesitas_qu_te_gustar_a_buscar),
             fontSize = TextSizes.H2,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -351,7 +348,7 @@ fun BodyContentHome(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Buscar Correo")
+                Text(text = stringResource(R.string.buscar_correo))
             }
         }
 
@@ -368,7 +365,7 @@ fun BodyContentHome(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Buscar Telefono")
+                Text(text = stringResource(R.string.buscar_telefono))
             }
         }
 
@@ -384,7 +381,7 @@ fun BodyContentHome(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Buscar Red Social")
+                Text(text = stringResource(R.string.buscar_red_social))
             }
         }
     }
@@ -440,25 +437,6 @@ fun ClickableProfileImage(
 
 }
 
-//
-///**
-// * Function to create a user
-// */
-//private fun createUserFromAuth(authUser: FirebaseUser?): User {
-//    return User(
-//        null,
-//        null,
-//        authUser?.displayName.toString(),
-//        "",
-//        Phone(null, authUser?.phoneNumber.toString(), false, null),
-//        Email(null, authUser?.email.toString(), false, null),
-//        Profile(null, "", authUser?.photoUrl.toString(), null),
-//        null,
-//        null
-//    )
-//}
-
-
 /**
  * Funcion composable que se encarga de mostrar un alert para preguntar al
  * usuario si quiere continuar o cerrar sesion
@@ -471,14 +449,14 @@ fun LogoutDialog(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -487,7 +465,7 @@ fun LogoutDialog(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

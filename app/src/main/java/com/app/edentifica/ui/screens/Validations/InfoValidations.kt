@@ -81,9 +81,8 @@ fun InfoValidationsScreen(
 
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
-    val user = auth.getCurrentUser()
+    val currentUser = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia ValidationOneScreen
     LaunchedEffect(Unit) {
@@ -92,8 +91,6 @@ fun InfoValidationsScreen(
 
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
-
-    Log.e("userBBDD", userState.toString())
 
 
     //Si no tiene ninguna validacion lo envio a las validaciones
@@ -105,13 +102,6 @@ fun InfoValidationsScreen(
             }
         }
 
-//        if(userState?.validations?.get(0)?.isValidated==true && userState?.validations?.get(1)?.isValidated==false){// si le falta la validacion dos lo envio a esa pantalla
-//            navController.navigate(AppScreen.ValidationTwoScreen.route){
-//                popUpTo(AppScreen.HomeScreen.route){
-//                    inclusive= true
-//                }
-//            }
-//        }
     }
 
 
@@ -141,20 +131,31 @@ fun InfoValidationsScreen(
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Usuario Anonimo",
-                                fontSize = TextSizes.Footer,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = TextSizes.Footer,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
                         }
                     }
                 },
@@ -228,8 +229,10 @@ fun BodyContentInfoValidations(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
-            text = "¡Ups! Aún no has completado tu validación.",
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = stringResource(R.string.ups_a_n_no_has_completado_tu_validaci_n),
             fontSize = TextSizes.H1,
             color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,
@@ -240,13 +243,17 @@ fun BodyContentInfoValidations(
             painter = painterResource(id = R.drawable.validations),
             contentDescription = "Mobile",
             modifier = Modifier
-                .fillMaxWidth().scale(0.7f).padding(0.dp), // ajusta la altura según sea necesario
+                .fillMaxWidth()
+                .scale(0.7f)
+                .padding(0.dp), // ajusta la altura según sea necesario
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
         Text(
-            modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
-            text = "Para registrarte en eDentifica, necesitas completar un proceso de dos validaciones. Una vez finalizado, podrás utilizar nuestros servicios. Si estás listo, comencemos.",
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = stringResource(R.string.para_registrarte_en_edentifica_necesitas_completar_un_proceso_de_dos_validaciones_una_vez_finalizado_podr_s_utilizar_nuestros_servicios_si_est_s_listo_comencemos),
             fontSize = TextSizes.H3,
             color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,
@@ -265,7 +272,7 @@ fun BodyContentInfoValidations(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Empezar Validaciones")
+                Text(text = stringResource(R.string.empezar_validaciones))
             }
         }
     }
@@ -285,14 +292,14 @@ fun LogoutDialogInfoValidations(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -301,7 +308,7 @@ fun LogoutDialogInfoValidations(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

@@ -77,7 +77,7 @@ fun RegisterPhoneScreen(
     var context = LocalContext.current
 
     //recojo al user Actual
-    val user = auth.getCurrentUser()
+    val currentUser = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
@@ -100,21 +100,33 @@ fun RegisterPhoneScreen(
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Usuario Anonimo",
-                                fontSize = TextSizes.Footer,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = TextSizes.Footer,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
                         }
+
                     }
                 }
             )
@@ -169,7 +181,7 @@ fun BodyContentRegisterPhone(
         if (phoneUpsateState==true) {
             Toast.makeText(
                 context,
-                "El teléfono se actualizó correctamente",
+                context.getString(R.string.el_tel_fono_se_inserto_correctamente),
                 Toast.LENGTH_SHORT
             ).show()
             navController.navigate(AppScreen.ValidationOneScreen.route)
@@ -187,13 +199,17 @@ fun BodyContentRegisterPhone(
             painter = painterResource(id = R.drawable.movil),
             contentDescription = "Mobile",
             modifier = Modifier
-                .fillMaxWidth().scale(0.7f).padding(0.dp), // ajusta la altura según sea necesario
+                .fillMaxWidth()
+                .scale(0.7f)
+                .padding(0.dp), // ajusta la altura según sea necesario
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
         Text(
-            modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
-            text = "¡Vamos a mantenernos conectados! No tienes un número de teléfono registrado. Por favor, introduce tu número de WhatsApp, incluyendo el prefijo del país.",
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = stringResource(R.string.vamos_a_mantenernos_conectados_no_tienes_un_n_mero_de_tel_fono_registrado_por_favor_introduce_tu_n_mero_de_whatsapp_incluyendo_el_prefijo_del_pa_s),
             color = AppColors.mainEdentifica,
             fontSize = TextSizes.H2
         )
@@ -226,7 +242,7 @@ fun BodyContentRegisterPhone(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Insert phone",
+                    text = stringResource(R.string.insertar_telefono),
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica
                 )

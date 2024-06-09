@@ -98,9 +98,6 @@ fun FindBySocialNetworkScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
-    Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
-    Log.e("userValidation", userState?.toString().toString())
-
 
     val onLogoutConfirmedFindBySocial:()->Unit = {
         auth.signOut()
@@ -137,14 +134,23 @@ fun FindBySocialNetworkScreen(
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Usuario Anonimo")?.let {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -154,7 +160,6 @@ fun FindBySocialNetworkScreen(
                                 )
                             }
                         }
-
                     }
                 },
                 actions = {
@@ -234,9 +239,6 @@ fun FindBySocialNetworkScreen(
 
 
 
-
-
-
 @Composable
 fun BodyContentFindBySocial(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
     // Estado para almacenar el nombre del perfil de la red social ingresado por el usuario
@@ -255,7 +257,7 @@ fun BodyContentFindBySocial(navController: NavController, vmUsers: UsersViewMode
     ) {
         //Title
         Text(
-            text = "¡Vamos a encontrar a esa persona! Selecciona aquí el tipo de red social y escribe el nombre del usuario del perfil. Si es Facebook, pega el enlace del perfil.",
+            text = stringResource(R.string.vamos_a_encontrar_a_esa_persona_selecciona_aqu_el_tipo_de_red_social_y_escribe_el_nombre_del_usuario_del_perfil_si_es_facebook_pega_el_enlace_del_perfil),
             fontSize = TextSizes.H2,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -266,7 +268,9 @@ fun BodyContentFindBySocial(navController: NavController, vmUsers: UsersViewMode
             painter = painterResource(id = R.drawable.redes_sociales),
             contentDescription = "Redes Sociales",
             modifier = Modifier
-                .fillMaxWidth().scale(0.9f).padding(0.dp), // ajusta la altura según sea necesario
+                .fillMaxWidth()
+                .scale(0.9f)
+                .padding(0.dp), // ajusta la altura según sea necesario
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
@@ -282,11 +286,11 @@ fun BodyContentFindBySocial(navController: NavController, vmUsers: UsersViewMode
         // Campo de entrada para el nombre del perfil de la red social
         Spacer(modifier = Modifier.height(34.dp))
         TextField(
-            label = { Text(text = "Nombre de Usuario", fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.nombre_de_usuario), fontSize = TextSizes.Paragraph) },
             value = socialName,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             onValueChange = { socialName = it },
-            placeholder = {Text("ejemplo_de_prueba999")}
+            placeholder = {Text(stringResource(R.string.ejemplo_de_prueba999))}
         )
 
         // Botón para enviar la búsqueda
@@ -307,7 +311,7 @@ fun BodyContentFindBySocial(navController: NavController, vmUsers: UsersViewMode
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Buscar Red Social")
+                Text(text = stringResource(R.string.buscar_red_social))
             }
         }
 
@@ -342,7 +346,7 @@ fun SelectSocialTypeDropdown(
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
                 Text(
-                    selectedType ?: "Seleccionar Tipo de Red Social",
+                    selectedType ?: stringResource(R.string.seleccionar_tipo_de_red_social),
                     fontSize = TextSizes.H3,
                     color = AppColors.FocusEdentifica
                 )
@@ -356,14 +360,16 @@ fun SelectSocialTypeDropdown(
                 title = {
                     Text(
                         modifier = Modifier.padding(vertical = 16.dp),
-                        text = "Seleccionar tipo de red social:",
+                        text = stringResource(R.string.seleccionar_tipo_de_red_social),
                         fontSize = TextSizes.H3,
                         color = AppColors.mainEdentifica
                     ) },
                 buttons = {
                     socialTypes.forEach { type ->
                         TextButton(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                             onClick = {
                                 selectedType = type
@@ -399,14 +405,14 @@ fun LogoutDialogFindBySocial(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -415,7 +421,7 @@ fun LogoutDialogFindBySocial(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

@@ -76,7 +76,6 @@ fun ValidationOneCheckScreen(
 ) {
     //VARIABLES Y CONSTANTES
     val context = LocalContext.current
-
     val currentUser = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia ValidationOneScreen
@@ -86,8 +85,6 @@ fun ValidationOneCheckScreen(
 
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
-
-    Log.e("userBBDD", userState.toString())
 
 
 
@@ -102,14 +99,23 @@ fun ValidationOneCheckScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Usuario Anonimo")?.let {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -178,7 +184,7 @@ fun BodyContentValidationOneCheck(
     ) {
         //Title
         Text(
-            text = "Validacion Llamada",
+            text = stringResource(R.string.validacion_de_la_llamada),
             fontSize = TextSizes.H1,
             color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,
@@ -189,12 +195,14 @@ fun BodyContentValidationOneCheck(
             painter = painterResource(id = R.drawable.check_call),
             contentDescription = "check Call",
             modifier = Modifier
-                .fillMaxWidth().scale(0.7f).padding(0.dp), // ajusta la altura según sea necesario
+                .fillMaxWidth()
+                .scale(0.7f)
+                .padding(0.dp), // ajusta la altura según sea necesario
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
         Text(
-            text = "Por favor introduce la respuesta del reto matemático:",
+            text = stringResource(R.string.por_favor_introduce_la_respuesta_del_reto_matem_tico),
             fontSize = TextSizes.H3
         )
 
@@ -203,7 +211,7 @@ fun BodyContentValidationOneCheck(
         TextField(
             label = {
                 Text(
-                    text = "Respuesta",
+                    text = stringResource(R.string.respuesta),
                     fontSize = TextSizes.Paragraph
                 )
             },
@@ -230,7 +238,7 @@ fun BodyContentValidationOneCheck(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Validar respuesta",
+                    text = stringResource(R.string.validar_respuesta),
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica)
             }
@@ -242,7 +250,7 @@ fun BodyContentValidationOneCheck(
             if (validationOneCheckState.value == false && buttonPressed) {
                 Toast.makeText(
                     context,
-                    "Respuesta inválida",
+                    context.getString(R.string.respuesta_inv_lida),
                     Toast.LENGTH_LONG
                 ).show()
 

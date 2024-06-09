@@ -102,7 +102,7 @@ fun RegisterScreen(
                 },
                 title = {
                     Text(
-                        text = "Login",
+                        text = stringResource(R.string.inicio_de_sesion),
                         fontSize = TextSizes.H3,
                         color= AppColors.whitePerlaEdentifica
                     )
@@ -153,7 +153,7 @@ fun RegisterScreen(
 
                 //title
                 Text(
-                    text = "Create an account",
+                    text = stringResource(R.string.crear_una_cuenta),
                     color = AppColors.mainEdentifica,
                     fontSize = TextSizes.H1
                 )
@@ -163,7 +163,7 @@ fun RegisterScreen(
                 TextField(
                     label = {
                         Text(
-                            text = "Name",
+                            text = stringResource(R.string.nombre),
                             fontSize = TextSizes.Paragraph
                             )
                         },
@@ -177,7 +177,7 @@ fun RegisterScreen(
                 TextField(
                     label = {
                         Text(
-                            text = "Last Name",
+                            text = stringResource(R.string.apellido),
                             fontSize = TextSizes.Paragraph
                             )
                         },
@@ -191,7 +191,7 @@ fun RegisterScreen(
                 TextField(
                     label = {
                         Text(
-                            text = "Número de teléfono (WhatsApp)",
+                            text = stringResource(R.string.n_mero_de_tel_fono_whatsapp),
                             fontSize = TextSizes.Paragraph
                         )
                     },
@@ -206,14 +206,14 @@ fun RegisterScreen(
                 TextField(
                     label = {
                         Text(
-                            text = "Email",
+                            text = stringResource(R.string.correo),
                             fontSize = TextSizes.Paragraph
                         )
                     },
                     value = email,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     onValueChange = { email = it },
-                    placeholder = {Text("ejemplo@gmail.com")}
+                    placeholder = {Text(stringResource(R.string.ejemplo_gmail_com))}
                 )
 
                 //field password
@@ -221,7 +221,7 @@ fun RegisterScreen(
                 TextField(
                     label = {
                         Text(
-                            text = "Contraseña (mín. 6 caracteres)",
+                            text = stringResource(R.string.contrase_a_m_n_6_caracteres),
                             fontSize = TextSizes.Paragraph
                         )
                     },
@@ -247,13 +247,13 @@ fun RegisterScreen(
                             .fillMaxWidth()
                             .height(50.dp)
                     ) {
-                        Text(text = "Sign Up")
+                        Text(text = stringResource(R.string.registrate))
                     }
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
                 ClickableText(
-                    text = AnnotatedString("Already have an account? Sign in"),
+                    text = AnnotatedString(stringResource(R.string.ya_tienes_una_cuenta_inicia_sesion)),
                     onClick = {
                         navController.popBackStack()
                     },
@@ -306,7 +306,8 @@ private suspend fun signUp(
                 // agregar la linea de retrofit para insertar el user en la base de datos
                 is AuthRes.Succes ->{
 
-                    Toast.makeText(context, "Successful registration", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        context.getString(R.string.registro_con_exito), Toast.LENGTH_SHORT).show()
                     navController.popBackStack()
                 }
                 is AuthRes.Error ->{
@@ -314,10 +315,11 @@ private suspend fun signUp(
                 }
             }
         }else{
-            Toast.makeText(context, "Error SignUp: maybe already exists number phone or email", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,
+                context.getString(R.string.error_de_registro_tal_vez_ya_existe_el_correo_o_telefono), Toast.LENGTH_SHORT).show()
         }
 
     }else{
-        Toast.makeText(context, "There are empty fields", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.hay_campos_vacios), Toast.LENGTH_SHORT).show()
     }
 }

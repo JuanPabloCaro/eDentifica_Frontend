@@ -140,7 +140,7 @@ fun ProfileUserEditScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Editar Perfil",
+                            text = stringResource(R.string.editar_perfil),
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -256,7 +256,7 @@ fun BodyContentProfileEditScreen(
 
         //NAME
         TextField(
-            label = { Text(text = "Nombre", fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.nombre)+":", fontSize = TextSizes.Paragraph) },
             value = name,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             onValueChange = { name = it },
@@ -267,7 +267,7 @@ fun BodyContentProfileEditScreen(
 
         //LASTNAME
         TextField(
-            label = { Text(text = "Apellidos", fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.apellido)+":", fontSize = TextSizes.Paragraph) },
             value = lastname,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             onValueChange = { lastname = it },
@@ -282,17 +282,17 @@ fun BodyContentProfileEditScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Fecha de nacimiento:", fontSize = TextSizes.H3, color = AppColors.mainEdentifica)
+            Text(text = stringResource(R.string.fecha_de_nacimiento)+":", fontSize = TextSizes.H3, color = AppColors.mainEdentifica)
             Button(onClick = {
                 showDatePicker = true
             }) {
-                Text("Seleccionar Fecha")
+                Text(stringResource(R.string.seleccionar_fecha))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             selectedDate?.let {
-                Text("Fecha seleccionada: ${it.format(formatter)}")
+                Text(stringResource(R.string.fecha_seleccionada, it.format(formatter)))
             }
 
 
@@ -310,7 +310,7 @@ fun BodyContentProfileEditScreen(
 
         //DESCRIPTION
         TextField(
-            label = { Text(text = "Descripcion", fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.descripcion), fontSize = TextSizes.Paragraph) },
             value = description,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             onValueChange = { description = it },
@@ -344,7 +344,7 @@ fun BodyContentProfileEditScreen(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Editar",
+                    text = stringResource(R.string.editar),
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica
                 )
@@ -356,6 +356,7 @@ fun BodyContentProfileEditScreen(
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DatePickerDialog(
     onDismissRequest: () -> Unit,
@@ -395,14 +396,14 @@ fun LogoutDialogProfileEdit(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -411,7 +412,7 @@ fun LogoutDialogProfileEdit(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

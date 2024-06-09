@@ -135,7 +135,7 @@ fun EditPhoto(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Editar Foto",
+                            text = stringResource(R.string.editar_foto),
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -282,7 +282,7 @@ fun BodyContentPhotoEdit(
                         .height(50.dp)
                 ) {
                     Text(
-                        text = "Seleccionar",
+                        text = stringResource(R.string.seleccionar),
                         fontSize = TextSizes.H3,
                         color = AppColors.whitePerlaEdentifica
                     )
@@ -350,7 +350,7 @@ fun ImagePicker(
                 .height(50.dp)
         ) {
             Text(
-                text = "Select from Gallery",
+                text = stringResource(R.string.select_from_gallery),
                 fontSize = TextSizes.H3,
                 color = AppColors.whitePerlaEdentifica
             )
@@ -365,7 +365,7 @@ fun ImagePicker(
                 .height(50.dp)
         ) {
             Text(
-                text = "Take a Photo",
+                text = stringResource(R.string.take_a_photo),
                 fontSize = TextSizes.H3,
                 color = AppColors.whitePerlaEdentifica
             )
@@ -412,14 +412,14 @@ fun LogoutDialogPhotoEdit(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -428,7 +428,7 @@ fun LogoutDialogPhotoEdit(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

@@ -93,10 +93,6 @@ fun FindByPhoneScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
-    Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
-    Log.e("userValidation", userState?.toString().toString())
-
-
     val onLogoutConfirmedFindByPhone:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
@@ -131,14 +127,23 @@ fun FindByPhoneScreen(
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Usuario Anonimo")?.let {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -225,10 +230,6 @@ fun FindByPhoneScreen(
 
 
 
-
-
-
-
 @Composable
 fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
 
@@ -247,7 +248,7 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
 
         //Title
         Text(
-            text = "¡Vamos a encontrar a esa persona! Introduce aquí el teléfono a buscar, incluyendo el prefijo del país.",
+            text = stringResource(R.string.vamos_a_encontrar_a_esa_persona_introduce_aqu_el_tel_fono_a_buscar_incluyendo_el_prefijo_del_pa_s),
             fontSize = TextSizes.H2,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -258,14 +259,16 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
             painter = painterResource(id = R.drawable.searchphone),
             contentDescription = "Phone",
             modifier = Modifier
-                .fillMaxWidth().scale(0.7f).padding(0.dp), // ajusta la altura según sea necesario
+                .fillMaxWidth()
+                .scale(0.7f)
+                .padding(0.dp), // ajusta la altura según sea necesario
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
         // Campo de entrada para el telefono
         Spacer(modifier = Modifier.height(34.dp))
         TextField(
-            label = { Text(text = "Telefono", fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.telefono), fontSize = TextSizes.Paragraph) },
             value = phone,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             onValueChange = { phone = it },
@@ -288,7 +291,7 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Buscar Telefono")
+                Text(text = stringResource(R.string.buscar_telefono))
             }
         }
 
@@ -300,10 +303,6 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
     }
 
 }
-
-
-
-
 
 
 
@@ -319,14 +318,14 @@ fun LogoutDialogFindByPhone(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -335,7 +334,7 @@ fun LogoutDialogFindByPhone(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )
