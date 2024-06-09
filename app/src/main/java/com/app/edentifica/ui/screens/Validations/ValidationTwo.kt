@@ -109,6 +109,25 @@ fun ValidationTwoScreen(
     Log.e("userBBDD", userState.toString())
 
 
+    //Si no tiene ninguna validacion lo envio a las validaciones
+    if(userState?.validations?.get(1)?.isValidated==true) { // importante modificacion en home
+
+        navController.navigate(AppScreen.HomeScreen.route) {
+            popUpTo(AppScreen.ValidationTwoScreen.route) {
+                inclusive = true
+            }
+        }
+
+//        if(userState?.validations?.get(0)?.isValidated==true && userState?.validations?.get(1)?.isValidated==false){// si le falta la validacion dos lo envio a esa pantalla
+//            navController.navigate(AppScreen.ValidationTwoScreen.route){
+//                popUpTo(AppScreen.HomeScreen.route){
+//                    inclusive= true
+//                }
+//            }
+//        }
+    }
+
+
 
     val onLogoutConfirmedValidationTwo:()->Unit = {
         auth.signOut()
@@ -257,23 +276,23 @@ fun BodyContentValidationTwo(
                 scope.launch {
                     try {
                         val imageUrl =uploadImageToFirebaseValidation(it,context)
-                        //Almaceno las validaciones por separado y cambio la validacion 2 a true
-                        var validationsUser1= userCurrent?.validations?.get(0)
-                        var validationsUser2= userCurrent?.validations?.get(1)?.copy(isValidated = true);
-
-                        //Agrego las validaciones a la lista
-                        if (validationsUser1 != null) {
-                            validations.add(0,validationsUser1)
-                        };
-                        if (validationsUser2 != null) {
-                            validations.add(1,validationsUser2)
-                        }
-
-                        //Actualizar la validacion del usuario con la lista creada anteriormente
-                        val updateUser =userCurrent?.copy(validations = validations)
-                        if (updateUser != null) {
-                            vmUsers.updateUserVM(updateUser)
-                        }
+//                        //Almaceno las validaciones por separado y cambio la validacion 2 a true
+//                        var validationsUser1= userCurrent?.validations?.get(0)
+//                        var validationsUser2= userCurrent?.validations?.get(1)?.copy(isValidated = true);
+//
+//                        //Agrego las validaciones a la lista
+//                        if (validationsUser1 != null) {
+//                            validations.add(0,validationsUser1)
+//                        };
+//                        if (validationsUser2 != null) {
+//                            validations.add(1,validationsUser2)
+//                        }
+//
+//                        //Actualizar la validacion del usuario con la lista creada anteriormente
+//                        val updateUser =userCurrent?.copy(validations = validations)
+//                        if (updateUser != null) {
+//                            vmUsers.updateUserVM(updateUser)
+//                        }
 
                     } catch (e: Exception) {
                         Log.e("Error Validation 2", e.message.toString())
@@ -301,7 +320,35 @@ fun BodyContentValidationTwo(
             Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
                 Button(
                     onClick = {
-                        navController.navigate(AppScreen.ValidationTwoSuccessScreen.route)//cambiar a pantalla exitosa validacion 2
+
+                        try {
+                            //Almaceno las validaciones por separado y cambio la validacion 2 a true
+                            var validationsUser1= userCurrent?.validations?.get(0)
+                            var validationsUser2= userCurrent?.validations?.get(1)?.copy(isValidated = true);
+
+                            //Agrego las validaciones a la lista
+                            if (validationsUser1 != null) {
+                                validations.add(0,validationsUser1)
+                            };
+                            if (validationsUser2 != null) {
+                                validations.add(1,validationsUser2)
+                            }
+
+                            //Actualizar la validacion del usuario con la lista creada anteriormente
+                            val updateUser =userCurrent?.copy(validations = validations)
+                            if (updateUser != null) {
+                                vmUsers.updateUserVM(updateUser)
+                            }
+
+                            if (userCurrent != null) {
+                                vmUsers.getUserByEmail(userCurrent.email.email)
+                            }
+
+                            navController.navigate(AppScreen.ValidationTwoSuccessScreen.route)//cambiar a pantalla exitosa validacion 2
+
+                        } catch (e: Exception) {
+                            Log.e("Error Validation 2", e.message.toString())
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                     shape = RoundedCornerShape(50.dp),

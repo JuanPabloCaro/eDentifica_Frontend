@@ -96,6 +96,26 @@ fun InfoValidationsScreen(
     Log.e("userBBDD", userState.toString())
 
 
+    //Si no tiene ninguna validacion lo envio a las validaciones
+    if(userState?.validations?.get(0)?.isValidated==true) { // importante modificacion en home
+
+        navController.navigate(AppScreen.ValidationTwoScreen.route) {
+            popUpTo(AppScreen.InfoValidationsScreen.route) {
+                inclusive = true
+            }
+        }
+
+//        if(userState?.validations?.get(0)?.isValidated==true && userState?.validations?.get(1)?.isValidated==false){// si le falta la validacion dos lo envio a esa pantalla
+//            navController.navigate(AppScreen.ValidationTwoScreen.route){
+//                popUpTo(AppScreen.HomeScreen.route){
+//                    inclusive= true
+//                }
+//            }
+//        }
+    }
+
+
+
 
     val onLogoutConfirmedInfoValidations:()->Unit = {
         auth.signOut()

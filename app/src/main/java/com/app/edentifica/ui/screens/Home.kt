@@ -104,19 +104,25 @@ fun HomeScreen(
     //si el user es existe le pregunto si ya esta validado
     if(userState != null){
         Log.e("entra 1", "entra en user state")
-        if(userState?.validations?.get(0)?.isValidated==false && userState?.validations?.get(1)?.isValidated==false){ // importante modificacion en home
-            navController.navigate(AppScreen.InfoValidationsScreen.route){
-                popUpTo(AppScreen.HomeScreen.route){
-                    inclusive= true
+
+        //Si no tiene ninguna validacion lo envio a las validaciones
+        if(userState?.validations?.get(0)?.isValidated==false || userState?.validations?.get(1)?.isValidated==false) { // importante modificacion en home
+
+            navController.navigate(AppScreen.InfoValidationsScreen.route) {
+                popUpTo(AppScreen.HomeScreen.route) {
+                    inclusive = true
                 }
             }
-        }else if(userState?.validations?.get(0)?.isValidated==true && userState?.validations?.get(1)?.isValidated==false){
-            navController.navigate(AppScreen.ValidationTwoScreen.route){
-                popUpTo(AppScreen.HomeScreen.route){
-                    inclusive= true
-                }
-            }
+
+//        if(userState?.validations?.get(0)?.isValidated==true && userState?.validations?.get(1)?.isValidated==false){// si le falta la validacion dos lo envio a esa pantalla
+//            navController.navigate(AppScreen.ValidationTwoScreen.route){
+//                popUpTo(AppScreen.HomeScreen.route){
+//                    inclusive= true
+//                }
+//            }
+//        }
         }
+
     }else {
         if(currentUser?.email != null) {// si el usuario existe en firebase y no existe en la base de datos lo inserto en la base de datos
             Log.e("entra 2", "entra en user state y currentUser")
