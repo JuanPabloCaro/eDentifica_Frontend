@@ -55,6 +55,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
@@ -287,17 +289,33 @@ fun BodyContentHome(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(8.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         //Title
-        Text(
-            text = "¿Qué quieres buscar?",
-            fontSize = TextSizes.H1,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        if(userState != null){
+            Text(
+                text = "Bienvenido a eDentifica",
+                fontSize = TextSizes.title,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold, // Aumenta el grosor del texto
+                fontFamily = FontFamily.Cursive, // Aplica la fuente personalizada
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = AppColors.mainEdentifica
+            )
+        }else{
+            Text(
+                text = "eDentifica",
+                fontSize = TextSizes.title,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold, // Aumenta el grosor del texto
+                fontFamily = FontFamily.Cursive, // Aplica la fuente personalizada
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = AppColors.mainEdentifica
+            )
+        }
+
 
         //Image
         Image(
@@ -310,9 +328,18 @@ fun BodyContentHome(
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+        //Title
+        Text(
+            text = "¡Descubre lo que necesitas! ¿Qué te gustaría buscar?",
+            fontSize = TextSizes.H2,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
 
         //Button correo
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {

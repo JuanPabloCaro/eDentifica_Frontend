@@ -240,7 +240,7 @@ fun BodyContentPhonesAddScreen(
             modifier = Modifier
                 .wrapContentSize(Alignment.Center)
                 .padding(horizontal = 32.dp),
-            text = "Inserta un Telefono",
+            text = "¡Conéctate con el mundo! Inserta un teléfono, incluyendo el prefijo del país.",
             color = AppColors.mainEdentifica,
             fontSize = TextSizes.H2
         )
@@ -252,7 +252,7 @@ fun BodyContentPhonesAddScreen(
             value = phone,
             onValueChange = { phone = it },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            placeholder = { Text(text = "ejemplo: 34628296060") }
+            placeholder = { Text(text = "ejemplo: 34xxxxxxxxx") }
         )
         Spacer(modifier = Modifier.height(34.dp))
 

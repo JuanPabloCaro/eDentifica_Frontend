@@ -56,6 +56,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -244,6 +245,15 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        //Title
+        Text(
+            text = "¡Vamos a encontrar a esa persona! Introduce su correo electrónico aquí.",
+            fontSize = TextSizes.H2,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         //Image
         Image(
             painter = painterResource(id = R.drawable.email),
@@ -261,6 +271,7 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
             value = email,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             onValueChange = { email = it },
+            placeholder = {Text("ejemplo@gmail.com")}
         )
 
         // Botón para enviar la búsqueda

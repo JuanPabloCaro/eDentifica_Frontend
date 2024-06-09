@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -252,7 +253,8 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
             )
             Text(
                 text = "El Email ${findString} le pertenece al usuario ${searchResultEmail!!.name} con eDentificador ${searchResultEmail!!.edentificador} garantizando la seguridad del perfil",
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Center,
             )
 
         } else {
@@ -266,7 +268,8 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
             )
             Text(
                 text = "Lo sentimos, usuario no encontrado, puede tratarse de una posible suplantacion",
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Center,
             )
         }
 

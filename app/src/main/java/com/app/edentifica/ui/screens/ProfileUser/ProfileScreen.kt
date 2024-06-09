@@ -264,7 +264,30 @@ fun BodyContentProfile(
             Spacer(modifier = Modifier.height(22.dp))
         }
 
-        item { UserInfoItem(label = "eDentificador", value = userState?.edentificador ?: "") }
+//        item { UserInfoItem(label = "eDentificador", value = userState?.edentificador ?: "") }
+
+        item{
+            Text(text = "eDentificador: ", fontWeight = FontWeight.Bold, color = AppColors.mainEdentifica)
+            Box(
+                modifier = Modifier
+                    .padding(top = 4.dp, bottom = 16.dp)
+//                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(
+                        width = 2.dp,
+                        color = AppColors.mainEdentifica,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .background(AppColors.mainEdentifica)
+            ){
+                Text(
+                    text = userState?.edentificador.toString(),
+                    modifier = Modifier.padding(top = 10.dp, bottom = 10.dp, start= 16.dp, end= 16.dp),
+                    color = AppColors.whitePerlaEdentifica
+                )
+            }
+        }
+
         item { UserInfoItem(label = "Nombre", value = userState?.name ?: "") }
         item { UserInfoItem(label = "Apellido", value = userState?.lastName ?: "") }
         item { UserInfoItem(label = "Fecha de Nacimiento", value = userState?.profile?.dateBirth.toString()) }

@@ -56,6 +56,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -243,6 +244,15 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        //Title
+        Text(
+            text = "¡Vamos a encontrar a esa persona! Introduce aquí el teléfono a buscar, incluyendo el prefijo del país.",
+            fontSize = TextSizes.H2,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         //Image
         Image(
             painter = painterResource(id = R.drawable.searchphone),
@@ -259,6 +269,7 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
             value = phone,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             onValueChange = { phone = it },
+            placeholder = {Text("34xxxxxxxxxx")}
         )
 
         // Botón para enviar la búsqueda

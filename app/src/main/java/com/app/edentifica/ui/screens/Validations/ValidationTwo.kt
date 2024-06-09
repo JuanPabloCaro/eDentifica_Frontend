@@ -266,7 +266,8 @@ fun BodyContentValidationTwo(
             modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
             text = "Para continuar con el proceso de validacion, por favor, toma una foto de tu rostro.",
             fontSize = TextSizes.H3,
-            color = AppColors.mainEdentifica
+            color = AppColors.mainEdentifica,
+            textAlign = TextAlign.Center,
         )
 
         Spacer(modifier = Modifier.height(10.dp))

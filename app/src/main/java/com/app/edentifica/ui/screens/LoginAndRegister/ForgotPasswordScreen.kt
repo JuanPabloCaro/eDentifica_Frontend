@@ -42,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.edentifica.R
@@ -145,7 +146,12 @@ fun FormularioForgotPassword(
         Spacer(modifier = Modifier.height(60.dp))
 
         //Title
-        Text(text = "Forgot your password", color = AppColors.mainEdentifica, fontSize = TextSizes.H1)
+        Text(
+            text = "Forgot your password",
+            color = AppColors.mainEdentifica,
+            fontSize = TextSizes.H1,
+            textAlign = TextAlign.Center,
+        )
 
         //field email
         Spacer(modifier = Modifier.height(50.dp))
@@ -158,7 +164,9 @@ fun FormularioForgotPassword(
             },
             value = email,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            onValueChange = { email = it })
+            onValueChange = { email = it },
+            placeholder = {Text("ejemplo@gmail.com")}
+        )
 
         //button send email
         Spacer(modifier = Modifier.height(30.dp))

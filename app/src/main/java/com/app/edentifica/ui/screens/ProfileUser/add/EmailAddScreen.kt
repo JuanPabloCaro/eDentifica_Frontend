@@ -241,7 +241,7 @@ fun BodyContentEmailsAddScreen(
             modifier = Modifier
                 .wrapContentSize(Alignment.Center)
                 .padding(horizontal = 32.dp),
-            text = "Inserta un email",
+            text = "¡Conéctate con el mundo! Inserta un email.",
             color = AppColors.mainEdentifica,
             fontSize = TextSizes.H2
         )
@@ -253,7 +253,7 @@ fun BodyContentEmailsAddScreen(
             value = email,
             onValueChange = { email = it },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            placeholder = { Text(text = "ejemplo@ejemplo.com") }
+            placeholder = { Text(text = "ejemplo@gmail.com") }
         )
         Spacer(modifier = Modifier.height(34.dp))
 

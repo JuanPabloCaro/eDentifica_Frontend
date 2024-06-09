@@ -97,28 +97,6 @@ fun RegisterPhoneScreen(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if(user?.photoUrl != null) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(user?.photoUrl)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = "Imagen",
-                                placeholder = painterResource(id = R.drawable.profile),
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .size(40.dp))
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.profile),
-                                contentDescription = "image profile default",
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                            )
-                        }
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
@@ -130,7 +108,7 @@ fun RegisterPhoneScreen(
                                 color = AppColors.whitePerlaEdentifica
                             )
                             Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
+                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Usuario Anonimo",
                                 fontSize = TextSizes.Footer,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -215,7 +193,7 @@ fun BodyContentRegisterPhone(
 
         Text(
             modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
-            text = "No tienes un numero de telefono registrado, por favor introduce tu numero de telefono:",
+            text = "¡Vamos a mantenernos conectados! No tienes un número de teléfono registrado. Por favor, introduce tu número de WhatsApp, incluyendo el prefijo del país.",
             color = AppColors.mainEdentifica,
             fontSize = TextSizes.H2
         )
@@ -227,6 +205,8 @@ fun BodyContentRegisterPhone(
             value = userPhone,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             onValueChange = { userPhone = it },
+            placeholder = {Text("34xxxxxxxxx")}
+
         )
         Spacer(modifier = Modifier.height(34.dp))
 

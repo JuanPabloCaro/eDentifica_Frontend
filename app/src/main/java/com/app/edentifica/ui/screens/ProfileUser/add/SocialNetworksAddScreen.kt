@@ -244,7 +244,7 @@ fun BodyContentSocialsAddScreen(
             modifier = Modifier
                 .wrapContentSize(Alignment.Center)
                 .padding(horizontal = 32.dp),
-            text = "Inserta una Red Social",
+            text = "¡Conéctate con el mundo! Inserta una red social.",
             color = AppColors.mainEdentifica,
             fontSize = TextSizes.H2
         )
@@ -267,6 +267,7 @@ fun BodyContentSocialsAddScreen(
             value = nameSocial,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             onValueChange = { nameSocial = it },
+            placeholder = {Text("ejemplo_de_prueba999")}
         )
         Spacer(modifier = Modifier.height(34.dp))
 

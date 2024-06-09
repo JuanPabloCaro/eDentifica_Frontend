@@ -51,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -179,7 +180,8 @@ fun BodyContentValidationOneSuccess(
             text = "Validación 1 Exitosa",
             fontSize = TextSizes.H2,
             modifier = Modifier.padding(top = 8.dp),
-            color = AppColors.greenEdentifica
+            color = AppColors.greenEdentifica,
+            textAlign = TextAlign.Center,
         )
 
         //Boton empezar

@@ -240,7 +240,8 @@ fun BodyContentValidationOne(
                     modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
                     text = "Validacion 1",
                     fontSize = TextSizes.H1,
-                    color = AppColors.mainEdentifica
+                    color = AppColors.mainEdentifica,
+                    textAlign = TextAlign.Center,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 //Image
@@ -256,7 +257,8 @@ fun BodyContentValidationOne(
                     modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
                     text = "Para este proceso, te vamos a llamar y escucharás una operación matemática, después de esto debes colgar la llamada y contestar el resultado en nuestra aplicación. Si estás listo, empecemos",
                     fontSize = TextSizes.H3,
-                    color = AppColors.mainEdentifica
+                    color = AppColors.mainEdentifica,
+                    textAlign = TextAlign.Center,
                 )
 
                 //Button

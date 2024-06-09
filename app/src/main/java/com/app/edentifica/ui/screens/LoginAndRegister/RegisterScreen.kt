@@ -169,7 +169,8 @@ fun RegisterScreen(
                         },
                     value = name,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    onValueChange = { name = it })
+                    onValueChange = { name = it }
+                )
 
                 //field last name
                 Spacer(modifier = Modifier.height(20.dp))
@@ -182,20 +183,23 @@ fun RegisterScreen(
                         },
                     value = lastName,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    onValueChange = { lastName = it })
+                    onValueChange = { lastName = it }
+                )
 
                 //field phone
                 Spacer(modifier = Modifier.height(20.dp))
                 TextField(
                     label = {
                         Text(
-                            text = "Phone",
+                            text = "Número de teléfono (WhatsApp)",
                             fontSize = TextSizes.Paragraph
                         )
                     },
                     value = phone,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    onValueChange = { phone = it })
+                    onValueChange = { phone = it },
+                    placeholder = {Text("34xxxxxxxxx")}
+                )
 
                 //field email
                 Spacer(modifier = Modifier.height(20.dp))
@@ -208,21 +212,24 @@ fun RegisterScreen(
                     },
                     value = email,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    onValueChange = { email = it })
+                    onValueChange = { email = it },
+                    placeholder = {Text("ejemplo@gmail.com")}
+                )
 
                 //field password
                 Spacer(modifier = Modifier.height(20.dp))
                 TextField(
                     label = {
                         Text(
-                            text = "Password",
+                            text = "Contraseña (mín. 6 caracteres)",
                             fontSize = TextSizes.Paragraph
                         )
                     },
                     value = password,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    onValueChange = { password = it })
+                    onValueChange = { password = it }
+                )
 
                 //button signUp
                 Spacer(modifier = Modifier.height(30.dp))

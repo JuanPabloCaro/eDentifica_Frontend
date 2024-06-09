@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -253,7 +254,8 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
             )
             Text(
                 text = "El Telefono +${findString} le pertenece al usuario ${searchResultPhone!!.name} con eDentificador ${searchResultPhone!!.edentificador} garantizando la seguridad del perfil",
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Center,
             )
 
         } else {
@@ -267,7 +269,8 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
             )
             Text(
                 text = "Lo sentimos, usuario no encontrado, puede tratarse de una posible suplantacion",
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Center,
             )
         }
 
