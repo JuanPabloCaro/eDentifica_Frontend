@@ -181,8 +181,7 @@ class UsersViewModel : ViewModel() {
                 val response = userService.getDtoBySocialNetwork(type,socialname)
                 if (response.isSuccessful) {
                     //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
-                    //Pendiente agregar la validacion 2
-                    if(response.body()?.validations?.get(0)?.isValidated == true){
+                    if(response.body()?.validations?.get(0)?.isValidated == true && response.body()?.validations?.get(1)?.isValidated == true){
                         _userSocialSearch.value = response.body()
                     }else{
                         _userPhoneSearch.value = null

@@ -105,7 +105,13 @@ fun HomeScreen(
     if(userState != null){
         Log.e("entra 1", "entra en user state")
         if(userState?.validations?.get(0)?.isValidated==false && userState?.validations?.get(1)?.isValidated==false){ // importante modificacion en home
-            navController.navigate(AppScreen.ValidationOneScreen.route){
+            navController.navigate(AppScreen.InfoValidationsScreen.route){
+                popUpTo(AppScreen.HomeScreen.route){
+                    inclusive= true
+                }
+            }
+        }else if(userState?.validations?.get(0)?.isValidated==true && userState?.validations?.get(1)?.isValidated==false){
+            navController.navigate(AppScreen.ValidationTwoScreen.route){
                 popUpTo(AppScreen.HomeScreen.route){
                     inclusive= true
                 }

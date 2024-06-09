@@ -250,7 +250,7 @@ fun BodyContentValidationTwo(
             color = AppColors.mainEdentifica
         )
 
-        Spacer(modifier = Modifier.height(64.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         ImagePickerValidation(onImageSelected = { uri ->
             selectedImageUri = uri
             uri?.let {
@@ -295,7 +295,7 @@ fun BodyContentValidationTwo(
             imageSelected= true
         }
 
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         if (imageSelected){
             Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {

@@ -199,7 +199,11 @@ fun BodyContentValidationTwoSuccess(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Comenzar")
+                androidx.compose.material3.Text(
+                    text = "Comenzar",
+                    fontSize = TextSizes.H3,
+                    color = AppColors.whitePerlaEdentifica
+                )
             }
         }
     }
