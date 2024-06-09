@@ -30,9 +30,12 @@ import com.app.edentifica.ui.screens.Results.ResultSearchEmailScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchPhoneScreen
 import com.app.edentifica.ui.screens.Results.ResultSearchSocialScreen
 import com.app.edentifica.ui.screens.Search.FindBySocialNetworkScreen
+import com.app.edentifica.ui.screens.Validations.InfoValidationsScreen
 import com.app.edentifica.ui.screens.Validations.ValidationOneCheckScreen
 import com.app.edentifica.ui.screens.Validations.ValidationOneScreen
 import com.app.edentifica.ui.screens.Validations.ValidationOneSuccessScreen
+import com.app.edentifica.ui.screens.Validations.ValidationTwoScreen
+import com.app.edentifica.ui.screens.Validations.ValidationTwoSuccessScreen
 import com.app.edentifica.viewModel.UsersViewModel
 import com.app.edentifica.utils.AuthManager
 import com.google.firebase.auth.FirebaseUser
@@ -104,6 +107,15 @@ fun AppNavigation(
             )
         }
 
+        composable(route=AppScreen.InfoValidationsScreen.route){
+            InfoValidationsScreen(
+                navController = navController,
+                auth= authManager,
+                onSignOutGoogle= onSignOutGoogle,
+                vmUsers=vmUsers
+            )
+        }
+
         composable(route=AppScreen.ValidationOneScreen.route){
             ValidationOneScreen(
                 navController = navController,
@@ -112,6 +124,17 @@ fun AppNavigation(
                 vmUsers=vmUsers
             )
         }
+
+
+        composable(route=AppScreen.ValidationTwoScreen.route){
+            ValidationTwoScreen(
+                navController = navController,
+                auth= authManager,
+                onSignOutGoogle= onSignOutGoogle,
+                vmUsers=vmUsers
+            )
+        }
+
 
         composable(route=AppScreen.ValidationOneCheckScreen.route){
             ValidationOneCheckScreen(
@@ -123,6 +146,14 @@ fun AppNavigation(
 
         composable(route=AppScreen.ValidationOneSuccessScreen.route){
             ValidationOneSuccessScreen(
+                navController = navController,
+                auth= authManager,
+                vmUsers=vmUsers
+            )
+        }
+
+        composable(route=AppScreen.ValidationTwoSuccessScreen.route){
+            ValidationTwoSuccessScreen(
                 navController = navController,
                 auth= authManager,
                 vmUsers=vmUsers

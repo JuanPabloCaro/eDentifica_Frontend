@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,18 +21,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,31 +53,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.edentifica.R
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
-import com.app.edentifica.ui.screens.ClickableProfileImage
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.UsersViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ValidationOneSuccessScreen(
+fun InfoValidationsScreen(
     navController: NavController,
     auth: AuthManager,
     vmUsers: UsersViewModel,
+    onSignOutGoogle: () -> Unit,
 ) {
     //VARIABLES Y CONSTANTES
-    val currentUser = auth.getCurrentUser()
+
+    //para mostrar el dialogo de cerrar Sesion
+    var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    val user = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia ValidationOneScreen
     LaunchedEffect(Unit) {
@@ -84,7 +93,20 @@ fun ValidationOneSuccessScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
+    Log.e("userBBDD", userState.toString())
 
+
+
+    val onLogoutConfirmedInfoValidations:()->Unit = {
+        auth.signOut()
+        onSignOutGoogle()
+
+        navController.navigate(AppScreen.LoginScreen.route){
+            popUpTo(AppScreen.HomeScreen.route){
+                inclusive= true
+            }
+        }
+    }
 
 
     Scaffold(
@@ -96,26 +118,38 @@ fun ValidationOneSuccessScreen(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
+                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenid@",//welcomeMessage,
                                 fontSize = TextSizes.H3,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 color = AppColors.whitePerlaEdentifica
                             )
-                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Usuario Anonimo")?.let {
-                                Text(
-                                    text = it,
-                                    fontSize = TextSizes.Footer,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    color = AppColors.whitePerlaEdentifica
-                                )
-                            }
+                            Text(
+                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Usuario Anonimo",
+                                fontSize = TextSizes.Footer,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = AppColors.whitePerlaEdentifica
+                            )
                         }
-
+                    }
+                },
+                actions = {
+                    //boton de accion para salir cerrar sesion
+                    IconButton(
+                        onClick = {
+                            showDialog = true
+                        }
+                    ) {
+                        Icon(
+                            Icons.Outlined.ExitToApp,
+                            contentDescription = "Cerrar sesión",
+                            tint = AppColors.whitePerlaEdentifica
+                        )
                     }
                 }
             )
@@ -137,6 +171,19 @@ fun ValidationOneSuccessScreen(
             }
         }
     ) {
+        //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
+        contentPadding ->
+        Box(modifier = Modifier.padding(contentPadding)) {
+            if (showDialog) {
+                LogoutDialogInfoValidations(
+                    onConfirmLogout = {
+                        onLogoutConfirmedInfoValidations()
+                        showDialog = false
+                    },
+                    onDismiss = { showDialog = false })
+            }
+
+        }
         //funcion composable que pinta el contenido
         Box(
             modifier = Modifier
@@ -144,54 +191,51 @@ fun ValidationOneSuccessScreen(
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
         ){
-            BodyContentValidationOneSuccess(navController)
+            BodyContentInfoValidations(navController)
         }
-    }
 
+    }
 
 }
 
 @Composable
-fun BodyContentValidationOneSuccess(
+fun BodyContentInfoValidations(
     navController: NavController
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Text(
+            modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
+            text = "¡Ups! Aún no has completado tu validación.",
+            fontSize = TextSizes.H1,
+            color = AppColors.mainEdentifica
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         //Image
         Image(
-            painter = painterResource(id = R.drawable.check_green),
-            contentDescription = "search",
+            painter = painterResource(id = R.drawable.validations),
+            contentDescription = "Mobile",
             modifier = Modifier
-                .fillMaxWidth()
-                .scale(0.7f)
-                .padding(0.dp), // ajusta la altura según sea necesario
+                .fillMaxWidth().scale(0.7f).padding(0.dp), // ajusta la altura según sea necesario
             contentScale = ContentScale.Crop // Escala de la imagen
         )
-        Spacer(modifier = Modifier.height(10.dp))
 
-        // Text debajo del icono
         Text(
-            text = "Validación 1 Exitosa",
-            fontSize = TextSizes.H2,
-            modifier = Modifier.padding(top = 8.dp),
-            color = AppColors.greenEdentifica
+            modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
+            text = "Para registrarte en eDentifica, necesitas completar un proceso de dos validaciones. Una vez finalizado, podrás utilizar nuestros servicios. Si estás listo, comencemos.",
+            fontSize = TextSizes.H3,
+            color = AppColors.mainEdentifica
         )
 
-        //Boton empezar
-        Spacer(modifier = Modifier.height(54.dp))
+        //Button
+        Spacer(modifier = Modifier.height(34.dp))
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-                    navController.navigate(AppScreen.ValidationTwoScreen.route){
-                        popUpTo(AppScreen.HomeScreen.route){
-                            inclusive= true
-                        }
-                    }
+                    navController.navigate(AppScreen.ValidationOneScreen.route)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
@@ -199,8 +243,46 @@ fun BodyContentValidationOneSuccess(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                androidx.compose.material3.Text(text = "Continuar con la validacion 2")
+                Text(text = "Empezar Validaciones")
             }
         }
     }
+
 }
+
+
+/**
+ * Funcion composable que se encarga de mostrar un alert para preguntar al
+ * usuario si quiere continuar o cerrar sesion
+ */
+@Composable
+fun LogoutDialogInfoValidations(
+    onConfirmLogout: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        containerColor = AppColors.whitePerlaEdentifica,
+        onDismissRequest = onDismiss,
+        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
+        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        confirmButton = {
+            Button(
+                onClick = onConfirmLogout,
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
+            ) {
+                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onDismiss,
+                border = BorderStroke(1.dp, AppColors.FocusEdentifica),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
+            ) {
+                Text("Cancelar")
+            }
+        }
+    )
+
+}
+

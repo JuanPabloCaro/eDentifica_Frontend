@@ -1,9 +1,14 @@
 package com.app.edentifica.ui.screens.Validations
 
+
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
-import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,10 +21,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
@@ -27,7 +30,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -42,12 +44,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -56,22 +57,27 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil.compose.rememberImagePainter
 import com.app.edentifica.R
 import com.app.edentifica.data.model.User
+import com.app.edentifica.data.model.Validation
 import com.app.edentifica.navigation.AppScreen
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.UsersViewModel
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.io.File
+import java.io.FileOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ValidationOneScreen(
+fun ValidationTwoScreen(
     navController: NavController,
     auth: AuthManager,
     vmUsers: UsersViewModel,
@@ -104,7 +110,7 @@ fun ValidationOneScreen(
 
 
 
-    val onLogoutConfirmed:()->Unit = {
+    val onLogoutConfirmedValidationTwo:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -179,12 +185,12 @@ fun ValidationOneScreen(
         }
     ) {
         //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
-        contentPadding ->
+            contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogValidation(
+                LogoutDialogValidationTwo(
                     onConfirmLogout = {
-                        onLogoutConfirmed()
+                        onLogoutConfirmedValidationTwo()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
@@ -198,94 +204,241 @@ fun ValidationOneScreen(
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
         ){
-            BodyContentValidationOne(navController, vmUsers, userState, context)
+            BodyContentValidationTwo(navController,userState, vmUsers)
         }
 
     }
 
 }
+
+
+
+
+
+
+
+
+
 
 @Composable
-fun BodyContentValidationOne(
+fun BodyContentValidationTwo(
     navController: NavController,
-    vmUsers: UsersViewModel,
-    userState: User?,
-    context: Context
+    userCurrent: User?,
+    vmUsers: UsersViewModel
 ) {
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var imageSelected = false
+    var validations= ArrayList<Validation>()
 
-    // Observa el estado de validationOne
-    val validationOneState = vmUsers.validationOne.collectAsState()
 
-    // Usa un when para manejar diferentes casos
-    when {
-        validationOneState.value == true -> {
-            // Si validationOne es true, redirigir a otra pantalla
-            LaunchedEffect(Unit) {
-                navController.navigate(AppScreen.ValidationOneCheckScreen.route){
-                    popUpTo(AppScreen.ValidationOneScreen.route){
-                        inclusive= true
+    Column {
+        Spacer(modifier = Modifier.height(80.dp))
+        //Title
+        Text(
+            text = "Validacion 2",
+            fontSize = TextSizes.H1,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
+            text = "Para continuar con el proceso de validacion, por favor, toma una foto de tu rostro.",
+            fontSize = TextSizes.H3,
+            color = AppColors.mainEdentifica
+        )
+
+        Spacer(modifier = Modifier.height(64.dp))
+        ImagePickerValidation(onImageSelected = { uri ->
+            selectedImageUri = uri
+            uri?.let {
+                scope.launch {
+                    try {
+                        val imageUrl =uploadImageToFirebaseValidation(it,context)
+                        //Almaceno las validaciones por separado y cambio la validacion 2 a true
+                        var validationsUser1= userCurrent?.validations?.get(0)
+                        var validationsUser2= userCurrent?.validations?.get(1)?.copy(isValidated = true);
+
+                        //Agrego las validaciones a la lista
+                        if (validationsUser1 != null) {
+                            validations.add(0,validationsUser1)
+                        };
+                        if (validationsUser2 != null) {
+                            validations.add(1,validationsUser2)
+                        }
+
+                        //Actualizar la validacion del usuario con la lista creada anteriormente
+                        val updateUser =userCurrent?.copy(validations = validations)
+                        if (updateUser != null) {
+                            vmUsers.updateUserVM(updateUser)
+                        }
+
+                    } catch (e: Exception) {
+                        Log.e("Error Validation 2", e.message.toString())
                     }
                 }
-                Toast.makeText(context, "Te llamaremos en breve...", Toast.LENGTH_LONG).show()
             }
+        })
+
+        selectedImageUri?.let { uri ->
+            Image(
+                painter = rememberImagePainter(data = uri),
+                contentDescription = "image selected",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .scale(1f)
+                    .padding(0.dp), // ajusta la altura según sea necesario
+                contentScale = ContentScale.Crop // Escala de la imagen
+            )
+            imageSelected= true
         }
-        validationOneState.value == false -> {
-            // Si validationOne es false, mostrar el botón para comenzar la validación
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
-                    text = "Validacion 1",
-                    fontSize = TextSizes.H1,
-                    color = AppColors.mainEdentifica
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                //Image
-                Image(
-                    painter = painterResource(id = R.drawable.call),
-                    contentDescription = "Mobile",
+
+        Spacer(modifier = Modifier.height(50.dp))
+
+        if (imageSelected){
+            Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
+                Button(
+                    onClick = {
+                        navController.navigate(AppScreen.ValidationTwoSuccessScreen.route)//cambiar a pantalla exitosa validacion 2
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
+                    shape = RoundedCornerShape(50.dp),
                     modifier = Modifier
-                        .fillMaxWidth().scale(0.7f).padding(0.dp), // ajusta la altura según sea necesario
-                    contentScale = ContentScale.Crop // Escala de la imagen
-                )
-
-                Text(
-                    modifier = Modifier.wrapContentSize(Alignment.Center).padding(horizontal = 32.dp),
-                    text = "Para este proceso, te vamos a llamar y escucharás una operación matemática, después de esto debes colgar la llamada y contestar el resultado en nuestra aplicación. Si estás listo, empecemos",
-                    fontSize = TextSizes.H3,
-                    color = AppColors.mainEdentifica
-                )
-
-                //Button
-                Spacer(modifier = Modifier.height(34.dp))
-                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                    Button(
-                        onClick = {
-                            // Llamar a la función del ViewModel
-                            userState?.let { user ->
-                                vmUsers.toDoCallByUser(user)
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
-                        shape = RoundedCornerShape(50.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = "Empezar Validacion")
-                    }
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Text(
+                        text = "Enviar",
+                        fontSize = TextSizes.H3,
+                        color = AppColors.whitePerlaEdentifica
+                    )
                 }
             }
         }
-        else -> {
-            // Manejar otros casos si es necesario
-        }
+//        else{
+//            // Muestra la imagen actual del perfil si existe
+//            userCurrent?.profile?.urlImageProfile?.let { imageUrl ->
+//                //Image
+//                Image(
+//                    painter = rememberImagePainter(data = imageUrl),
+//                    contentDescription = "image profile",
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .scale(1f)
+//                        .padding(0.dp), // ajusta la altura según sea necesario
+//                    contentScale = ContentScale.Crop // Escala de la imagen
+//                )
+//            }
+//        }
     }
-
 }
+
+suspend fun uploadImageToFirebaseValidation(uri: Uri, context: Context): String {
+    val storage = FirebaseStorage.getInstance()
+    val storageRef = storage.reference
+    val imagesRef: StorageReference = storageRef.child("images/${uri.lastPathSegment}")
+
+    val uploadTask = imagesRef.putFile(uri)
+    val taskSnapshot = uploadTask.await()
+
+    return taskSnapshot.storage.downloadUrl.await().toString()
+}
+
+
+@Composable
+fun ImagePickerValidation(
+    onImageSelected: (Uri?) -> Unit
+) {
+    val context = LocalContext.current
+//    val launcher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.GetContent(),
+//        onResult = { bitmap ->
+//            onImageSelected(bitmap)
+//        }
+//    )
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview(),
+        onResult = { bitmap ->
+            val uri = bitmap?.let {
+                saveBitmapToInternalStorageValidation(context, it)
+            }
+            onImageSelected(uri)
+        }
+    )
+
+    Column {
+//        Button(
+//            onClick = { launcher.launch("image/*") },
+//            colors = ButtonDefaults.buttonColors(containerColor = AppColors.secondaryEdentifica),
+//            shape = RoundedCornerShape(50.dp),
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(50.dp)
+//        ) {
+//            Text(
+//                text = "Select from Gallery",
+//                fontSize = TextSizes.H3,
+//                color = AppColors.whitePerlaEdentifica
+//            )
+//        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = { cameraLauncher.launch() },
+            colors = ButtonDefaults.buttonColors(containerColor = AppColors.secondaryEdentifica),
+            shape = RoundedCornerShape(50.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+            Text(
+                text = "Tomar Foto",
+                fontSize = TextSizes.H3,
+                color = AppColors.whitePerlaEdentifica
+            )
+        }
+        Spacer(modifier = Modifier.height(22.dp))
+    }
+}
+
+
+
+
+
+fun saveBitmapToInternalStorageValidation(context: Context, bitmap: Bitmap): Uri? {
+    val filename = "profile_image_${System.currentTimeMillis()}.jpg"
+    var fos: FileOutputStream? = null
+    var uri: Uri?
+    try {
+        fos = context.openFileOutput(filename, Context.MODE_PRIVATE)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+        fos.close()
+        val file = File(context.filesDir, filename)
+        uri = Uri.fromFile(file)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        uri = null
+    } finally {
+        fos?.close()
+    }
+    return uri
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /**
@@ -293,7 +446,7 @@ fun BodyContentValidationOne(
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogValidation(
+fun LogoutDialogValidationTwo(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -322,4 +475,3 @@ fun LogoutDialogValidation(
     )
 
 }
-

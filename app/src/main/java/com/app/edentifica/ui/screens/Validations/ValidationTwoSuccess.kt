@@ -68,7 +68,7 @@ import com.app.edentifica.viewModel.UsersViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ValidationOneSuccessScreen(
+fun ValidationTwoSuccessScreen(
     navController: NavController,
     auth: AuthManager,
     vmUsers: UsersViewModel,
@@ -144,7 +144,7 @@ fun ValidationOneSuccessScreen(
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
         ){
-            BodyContentValidationOneSuccess(navController)
+            BodyContentValidationTwoSuccess(navController)
         }
     }
 
@@ -152,7 +152,7 @@ fun ValidationOneSuccessScreen(
 }
 
 @Composable
-fun BodyContentValidationOneSuccess(
+fun BodyContentValidationTwoSuccess(
     navController: NavController
 ) {
     Column(
@@ -176,7 +176,7 @@ fun BodyContentValidationOneSuccess(
 
         // Text debajo del icono
         Text(
-            text = "Validación 1 Exitosa",
+            text = "Validación 2 Exitosa",
             fontSize = TextSizes.H2,
             modifier = Modifier.padding(top = 8.dp),
             color = AppColors.greenEdentifica
@@ -187,7 +187,7 @@ fun BodyContentValidationOneSuccess(
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-                    navController.navigate(AppScreen.ValidationTwoScreen.route){
+                    navController.navigate(AppScreen.HomeScreen.route){
                         popUpTo(AppScreen.HomeScreen.route){
                             inclusive= true
                         }
@@ -199,7 +199,7 @@ fun BodyContentValidationOneSuccess(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                androidx.compose.material3.Text(text = "Continuar con la validacion 2")
+                Text(text = "Comenzar")
             }
         }
     }
