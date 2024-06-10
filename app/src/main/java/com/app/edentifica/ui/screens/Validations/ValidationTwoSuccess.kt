@@ -199,7 +199,7 @@ fun BodyContentValidationTwoSuccess(
             Button(
                 onClick = {
                     navController.navigate(AppScreen.HomeScreen.route){
-                        popUpTo(AppScreen.HomeScreen.route){
+                        popUpTo(AppScreen.ValidationTwoSuccessScreen.route){
                             inclusive= true
                         }
                     }

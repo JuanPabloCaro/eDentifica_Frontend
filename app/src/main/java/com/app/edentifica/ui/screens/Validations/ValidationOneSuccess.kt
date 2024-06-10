@@ -210,7 +210,10 @@ fun BodyContentValidationOneSuccess(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = stringResource(R.string.continuar_con_la_validacion_2))
+                Text(
+                    text = stringResource(R.string.continuar_con_la_validacion_2),
+                    fontSize = TextSizes.H3,
+                    color = AppColors.whitePerlaEdentifica)
             }
         }
     }

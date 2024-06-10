@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -186,6 +187,7 @@ fun BodyContentValidationOneCheck(
         Text(
             text = stringResource(R.string.validacion_de_la_llamada),
             fontSize = TextSizes.H1,
+            fontWeight = FontWeight.Bold,
             color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,
         )
@@ -203,7 +205,8 @@ fun BodyContentValidationOneCheck(
 
         Text(
             text = stringResource(R.string.por_favor_introduce_la_respuesta_del_reto_matem_tico),
-            fontSize = TextSizes.H3
+            fontSize = TextSizes.H3,
+            textAlign = TextAlign.Center,
         )
 
         // Campo de entrada para la respuesta del usuario

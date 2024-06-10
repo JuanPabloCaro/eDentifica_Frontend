@@ -266,7 +266,7 @@ fun BodyContentEmailsScreen(
                                 Text(text = it.email, color = AppColors.mainEdentifica)
                             }else{
                                 Column {
-                                    Text(text = stringResource(R.string.mis_correos), color = AppColors.FocusEdentifica)
+                                    Text(text = stringResource(R.string.predeterminado), color = AppColors.FocusEdentifica)
                                     Text(text = it.email, color = AppColors.mainEdentifica)
                                 }
                             }

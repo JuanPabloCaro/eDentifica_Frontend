@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -267,6 +268,7 @@ fun BodyContentValidationTwo(
                 .padding(horizontal = 32.dp),
             text = stringResource(R.string.validacion_2),
             fontSize = TextSizes.H1,
+            fontWeight = FontWeight.Bold,
             color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,
         )
@@ -391,20 +393,33 @@ fun ImagePickerValidation(
 
     Column {
         Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = { cameraLauncher.launch() },
-            colors = ButtonDefaults.buttonColors(containerColor = AppColors.secondaryEdentifica),
+        OutlinedButton(
+            onClick = {
+                cameraLauncher.launch()
+            },
+            border = BorderStroke(2.dp, AppColors.FocusEdentifica),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica),
             shape = RoundedCornerShape(50.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-        ) {
+        ){
             Text(
                 text = stringResource(R.string.tomar_foto),
                 fontSize = TextSizes.H3,
-                color = AppColors.whitePerlaEdentifica
+                color = AppColors.FocusEdentifica
             )
         }
+//        Button(
+//            onClick = { cameraLauncher.launch() },
+//            colors = ButtonDefaults.buttonColors(containerColor = AppColors.secondaryEdentifica),
+//            shape = RoundedCornerShape(50.dp),
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(50.dp)
+//        ) {
+//
+//        }
         Spacer(modifier = Modifier.height(22.dp))
     }
 }
