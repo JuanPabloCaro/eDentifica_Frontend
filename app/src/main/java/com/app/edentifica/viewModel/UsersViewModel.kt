@@ -97,12 +97,7 @@ class UsersViewModel : ViewModel() {
             try {
                 val response = userService.getDtoByEmail(email)
                 if (response.isSuccessful) {
-//                    //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
-//                    if(response.body()?.validations?.get(0)?.isValidated == true && response.body()?.validations?.get(1)?.isValidated == true){
-                        _userEmailSearch.value = response.body()
-//                    }else{
-//                        _userEmailSearch.value = null
-//                    }
+                    _userEmailSearch.value = response.body()
                 } else {
                     Log.e("error en userViewModel", "getUserByEmailSearch")
                 }
@@ -138,12 +133,7 @@ class UsersViewModel : ViewModel() {
             try {
                 val response = userService.getDtoByPhone(phone)
                 if (response.isSuccessful) {
-//                    //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
-//                    if(response.body()?.validations?.get(0)?.isValidated == true && response.body()?.validations?.get(1)?.isValidated == true){
-                        _userPhoneSearch.value = response.body()
-//                    }else{
-//                        _userPhoneSearch.value = null
-//                    }
+                    _userPhoneSearch.value = response.body()
                 } else {
                     Log.e("error en userViewModel", "getUserByPhoneSearch")
                 }
@@ -178,12 +168,7 @@ class UsersViewModel : ViewModel() {
             try {
                 val response = userService.getDtoBySocialNetwork(type,socialname)
                 if (response.isSuccessful) {
-//                    //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
-//                    if(response.body()?.validations?.get(0)?.isValidated == true && response.body()?.validations?.get(1)?.isValidated == true){
-                        _userSocialSearch.value = response.body()
-//                    }else{
-//                        _userPhoneSearch.value = null
-//                    }
+                    _userSocialSearch.value = response.body()
                 } else {
                     Log.e("error en userViewModel", "getUserBySocialSearch")
                 }
