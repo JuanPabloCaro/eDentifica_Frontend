@@ -61,12 +61,15 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation("androidx.compose.material3:material3-android:1.2.1")
+    implementation("com.google.android.gms:play-services-cast-framework:21.5.0")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.0")
     val compose_version = "1.0.2"
 
     //FIREBASE
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.android.gms:play-services-auth:20.6.0")
 
 

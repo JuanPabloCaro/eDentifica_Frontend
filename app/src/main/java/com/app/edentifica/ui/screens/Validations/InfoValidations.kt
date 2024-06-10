@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,17 +21,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,7 +53,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -60,22 +63,25 @@ import coil.request.ImageRequest
 import com.app.edentifica.R
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
-import com.app.edentifica.ui.screens.ClickableProfileImage
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.UsersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ValidationOneCheckScreen(
+fun InfoValidationsScreen(
     navController: NavController,
     auth: AuthManager,
     vmUsers: UsersViewModel,
+    onSignOutGoogle: () -> Unit,
 ) {
     //VARIABLES Y CONSTANTES
-    val context = LocalContext.current
+
+    //para mostrar el dialogo de cerrar Sesion
+    var showDialog by remember { mutableStateOf(false) }
+
     val currentUser = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia ValidationOneScreen
@@ -87,6 +93,31 @@ fun ValidationOneCheckScreen(
     val userState by vmUsers.user.collectAsState()
 
 
+    //Si no tiene ninguna validacion lo envio a las validaciones
+    if(userState?.validations?.get(0)?.isValidated==true) { // importante modificacion en home
+
+        navController.navigate(AppScreen.ValidationTwoScreen.route) {
+            popUpTo(AppScreen.InfoValidationsScreen.route) {
+                inclusive = true
+            }
+        }
+
+    }
+
+
+
+
+    val onLogoutConfirmedInfoValidations:()->Unit = {
+        auth.signOut()
+        onSignOutGoogle()
+
+        navController.navigate(AppScreen.LoginScreen.route){
+            popUpTo(AppScreen.HomeScreen.route){
+                inclusive= true
+            }
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -97,6 +128,7 @@ fun ValidationOneCheckScreen(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Spacer(modifier = Modifier.width(8.dp))
@@ -125,7 +157,20 @@ fun ValidationOneCheckScreen(
                                 )
                             }
                         }
-
+                    }
+                },
+                actions = {
+                    //boton de accion para salir cerrar sesion
+                    IconButton(
+                        onClick = {
+                            showDialog = true
+                        }
+                    ) {
+                        Icon(
+                            Icons.Outlined.ExitToApp,
+                            contentDescription = "Cerrar sesión",
+                            tint = AppColors.whitePerlaEdentifica
+                        )
                     }
                 }
             )
@@ -147,6 +192,19 @@ fun ValidationOneCheckScreen(
             }
         }
     ) {
+        //funcion para mostrar un pop up preguntando si quiere cerrar la sesion
+        contentPadding ->
+        Box(modifier = Modifier.padding(contentPadding)) {
+            if (showDialog) {
+                LogoutDialogInfoValidations(
+                    onConfirmLogout = {
+                        onLogoutConfirmedInfoValidations()
+                        showDialog = false
+                    },
+                    onDismiss = { showDialog = false })
+            }
+
+        }
         //funcion composable que pinta el contenido
         Box(
             modifier = Modifier
@@ -154,46 +212,36 @@ fun ValidationOneCheckScreen(
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
         ){
-            BodyContentValidationOneCheck(navController, vmUsers, userState, context)
+            BodyContentInfoValidations(navController)
         }
-    }
 
+    }
 
 }
 
 @Composable
-fun BodyContentValidationOneCheck(
-    navController: NavController,
-    vmUsers: UsersViewModel,
-    userState: User?,
-    context: Context
+fun BodyContentInfoValidations(
+    navController: NavController
 ) {
-    // Observa el estado de validationOneCheck
-    val validationOneCheckState = vmUsers.answerValidation.collectAsState()
-
-    // Estado para almacenar la respuesta del usuario
-    var userResponse by remember { mutableStateOf("") }
-
-    // Estado para verificar si se ha presionado el botón
-    var buttonPressed by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        //Title
         Text(
-            text = stringResource(R.string.validacion_de_la_llamada),
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = stringResource(R.string.ups_a_n_no_has_completado_tu_validaci_n),
             fontSize = TextSizes.H1,
             color = AppColors.mainEdentifica,
             textAlign = TextAlign.Center,
         )
-
+        Spacer(modifier = Modifier.height(16.dp))
         //Image
         Image(
-            painter = painterResource(id = R.drawable.check_call),
-            contentDescription = "check Call",
+            painter = painterResource(id = R.drawable.validations),
+            contentDescription = "Mobile",
             modifier = Modifier
                 .fillMaxWidth()
                 .scale(0.7f)
@@ -202,34 +250,21 @@ fun BodyContentValidationOneCheck(
         )
 
         Text(
-            text = stringResource(R.string.por_favor_introduce_la_respuesta_del_reto_matem_tico),
-            fontSize = TextSizes.H3
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = stringResource(R.string.para_registrarte_en_edentifica_necesitas_completar_un_proceso_de_dos_validaciones_una_vez_finalizado_podr_s_utilizar_nuestros_servicios_si_est_s_listo_comencemos),
+            fontSize = TextSizes.H3,
+            color = AppColors.mainEdentifica,
+            textAlign = TextAlign.Center,
         )
 
-        // Campo de entrada para la respuesta del usuario
-        Spacer(modifier = Modifier.height(20.dp))
-        TextField(
-            label = {
-                Text(
-                    text = stringResource(R.string.respuesta),
-                    fontSize = TextSizes.Paragraph
-                )
-            },
-            value = userResponse,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            onValueChange = { userResponse = it })
-
-
         //Button
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(34.dp))
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-                    // Llamar a la función del ViewModel
-                    if (userState != null) {
-                        vmUsers.answerMathByUser(userResponse.toInt(), userState)
-                        buttonPressed = true // Marcar el botón como presionado
-                    }
+                    navController.navigate(AppScreen.ValidationOneScreen.route)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
@@ -237,42 +272,46 @@ fun BodyContentValidationOneCheck(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.validar_respuesta),
-                    fontSize = TextSizes.H3,
-                    color = AppColors.whitePerlaEdentifica)
-            }
-        }
-
-        // Observar cambios en validationOneCheckState
-        LaunchedEffect(validationOneCheckState.value) {
-            // Si validationOneCheckState es false y el botón ha sido presionado
-            if (validationOneCheckState.value == false && buttonPressed) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.respuesta_inv_lida),
-                    Toast.LENGTH_LONG
-                ).show()
-
-                // Reiniciar variables y navegar a la pantalla anterior
-                buttonPressed = false
-                vmUsers.validationOneNegative()
-                vmUsers.validationOneCheckNegative()
-                navController.navigate(AppScreen.ValidationOneScreen.route){
-                    popUpTo(AppScreen.ValidationOneCheckScreen.route){
-                        inclusive= true
-                    }
-                }
-            }
-        }
-
-        // Si validationOneCheckState es true, navegar a la pantalla HomeScreen
-        if (validationOneCheckState.value == true) {
-            navController.navigate(AppScreen.ValidationOneSuccessScreen.route){
-                popUpTo(AppScreen.ValidationOneSuccessScreen.route){
-                    inclusive= true
-                }
+                Text(text = stringResource(R.string.empezar_validaciones))
             }
         }
     }
+
 }
+
+
+/**
+ * Funcion composable que se encarga de mostrar un alert para preguntar al
+ * usuario si quiere continuar o cerrar sesion
+ */
+@Composable
+fun LogoutDialogInfoValidations(
+    onConfirmLogout: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        containerColor = AppColors.whitePerlaEdentifica,
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
+        confirmButton = {
+            Button(
+                onClick = onConfirmLogout,
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
+            ) {
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onDismiss,
+                border = BorderStroke(1.dp, AppColors.FocusEdentifica),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
+            ) {
+                Text(stringResource(R.string.cancelar))
+            }
+        }
+    )
+
+}
+

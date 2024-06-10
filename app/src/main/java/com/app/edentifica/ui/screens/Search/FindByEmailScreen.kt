@@ -56,6 +56,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,6 +73,7 @@ import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.UsersViewModel
+import com.google.android.gms.common.internal.StringResourceValueReader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -86,16 +88,13 @@ fun FindByEmailScreen(
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
     //recojo al user Actual
-    val user = auth.getCurrentUser()
+    val currentUser = auth.getCurrentUser()
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
-
-    Log.e("userValidation", userState?.validations?.get(0)?.isValidated.toString())
-    Log.e("userValidation", userState?.toString().toString())
 
 
     val onLogoutConfirmedFindByEmail:()->Unit = {
@@ -119,60 +118,37 @@ fun FindByEmailScreen(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
-                        if(user?.photoUrl != null) {
-                            if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
-                                userState?.profile?.urlImageProfile?.let {
-                                    ClickableProfileImage(
-                                        navController = navController,
-                                        imageUrl = it
-                                    ) {
-                                        navController.navigate(AppScreen.ProfileUserScreen.route)
-                                    }
-                                }
-                            }else{
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(userState?.profile?.urlImageProfile)
-                                        .crossfade(true)
-                                        .build(),
-                                    contentDescription = "Imagen",
-                                    placeholder = painterResource(id = R.drawable.profile),
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .size(40.dp))
-                            }
-
-                        } else {
-                            if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
+                        if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
+                            userState?.profile?.urlImageProfile?.let {
                                 ClickableProfileImage(
-                                    onClick = {
-                                        navController.navigate(AppScreen.ProfileUserScreen.route)
-                                    }
-                                )
-                            } else{
-                                Image(
-                                    painter = painterResource(id = R.drawable.profile),
-                                    contentDescription = "image profile default",
-                                    modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .size(40.dp)
-                                        .clip(CircleShape)
-                                )
+                                    navController = navController,
+                                    imageUrl = it
+                                ) {
+                                    navController.navigate(AppScreen.ProfileUserScreen.route)
+                                }
                             }
                         }
 
+
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if(!user?.displayName.isNullOrEmpty() || userState!=null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            (if(!user?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else "Anonimo")?.let {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -276,12 +252,23 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        //Title
+        Text(
+            text = stringResource(R.string.vamos_a_encontrar_a_esa_persona_introduce_su_correo_electr_nico_aqu),
+            fontSize = TextSizes.H2,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         //Image
         Image(
             painter = painterResource(id = R.drawable.email),
             contentDescription = "Email",
             modifier = Modifier
-                .fillMaxWidth().scale(0.7f).padding(0.dp), // ajusta la altura según sea necesario
+                .fillMaxWidth()
+                .scale(0.7f)
+                .padding(0.dp), // ajusta la altura según sea necesario
             contentScale = ContentScale.Crop // Escala de la imagen
         )
 
@@ -289,10 +276,11 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
         // Campo de entrada para el correo electrónico
         Spacer(modifier = Modifier.height(34.dp))
         TextField(
-            label = { Text(text = "Correo", fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.correo), fontSize = TextSizes.Paragraph) },
             value = email,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             onValueChange = { email = it },
+            placeholder = {Text(stringResource(R.string.ejemplo_gmail_com))}
         )
 
         // Botón para enviar la búsqueda
@@ -302,6 +290,7 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
                 onClick = {
                     // Llamar a la función del ViewModel para buscar por correo electrónico
                     vmUsers.getUserByEmailSearch(email)
+                    vmUsers.saveFindString(email)
                     searchPerformedEmail = true
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
@@ -310,7 +299,7 @@ fun BodyContentFindByEmail(navController: NavController, vmUsers: UsersViewModel
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Buscar Correo")
+                Text(text = stringResource(R.string.buscar_correo))
             }
         }
 
@@ -340,14 +329,14 @@ fun LogoutDialogFindByEmail(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -356,7 +345,7 @@ fun LogoutDialogFindByEmail(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

@@ -42,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.edentifica.R
@@ -70,7 +71,7 @@ fun ForgotPasswordScreen(navController: NavController, auth: AuthManager /*altaU
                 },
                 title = {
                     Text(
-                        text = "Login",
+                        text = stringResource(R.string.inicio_de_sesion),
                         fontSize = TextSizes.H3,
                         color= AppColors.whitePerlaEdentifica
                     )
@@ -145,20 +146,27 @@ fun FormularioForgotPassword(
         Spacer(modifier = Modifier.height(60.dp))
 
         //Title
-        Text(text = "Forgot your password", color = AppColors.mainEdentifica, fontSize = TextSizes.H1)
+        Text(
+            text = stringResource(R.string.has_olvidado_tu_contrasena),
+            color = AppColors.mainEdentifica,
+            fontSize = TextSizes.H1,
+            textAlign = TextAlign.Center,
+        )
 
         //field email
         Spacer(modifier = Modifier.height(50.dp))
         TextField(
             label = {
                 Text(
-                    text = "Email",
+                    text = stringResource(R.string.correo),
                     fontSize = TextSizes.Paragraph
                 )
             },
             value = email,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            onValueChange = { email = it })
+            onValueChange = { email = it },
+            placeholder = {Text(stringResource(R.string.ejemplo_gmail_com))}
+        )
 
         //button send email
         Spacer(modifier = Modifier.height(30.dp))
@@ -168,11 +176,13 @@ fun FormularioForgotPassword(
                     scope.launch {
                         when(val res = auth.resetPassword(email)) {
                             is AuthRes.Succes -> {
-                                Toast.makeText(context, "Mail sent", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context,
+                                    context.getString(R.string.se_ha_enviado_un_correo_para_restablecer_la_contrasena), Toast.LENGTH_SHORT).show()
                                 navController.navigate(AppScreen.LoginScreen.route)
                             }
                             is AuthRes.Error -> {
-                                Toast.makeText(context, "Error sending mail", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context,
+                                    context.getString(R.string.error_al_enviar_el_correo), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -184,7 +194,7 @@ fun FormularioForgotPassword(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Password recovery",
+                    text = stringResource(R.string.recuperar_contrasena),
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica
                 )

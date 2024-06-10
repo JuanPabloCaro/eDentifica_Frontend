@@ -80,15 +80,13 @@ fun EmailsAddScreen(
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-//    //recojo al user Actual
-//    val user = auth.getCurrentUser()
+
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
-//    val emailCurrent by vmEmails.emailEdit.collectAsState()
 
 
     val onLogoutConfirmedEmailsAddScreen:()->Unit = {
@@ -125,7 +123,7 @@ fun EmailsAddScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Agregar Correo",
+                            text = stringResource(R.string.agregar_correo),
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -241,7 +239,7 @@ fun BodyContentEmailsAddScreen(
             modifier = Modifier
                 .wrapContentSize(Alignment.Center)
                 .padding(horizontal = 32.dp),
-            text = "Inserta un email",
+            text = stringResource(R.string.con_ctate_con_el_mundo_inserta_un_email),
             color = AppColors.mainEdentifica,
             fontSize = TextSizes.H2
         )
@@ -249,11 +247,11 @@ fun BodyContentEmailsAddScreen(
         // Campo de entrada para el correo electrónico
         Spacer(modifier = Modifier.height(34.dp))
         TextField(
-            label = { Text(text = "Correo", fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.correo), fontSize = TextSizes.Paragraph) },
             value = email,
             onValueChange = { email = it },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            placeholder = { Text(text = "ejemplo@ejemplo.com") }
+            placeholder = { Text(text = stringResource(R.string.ejemplo_gmail_com)) }
         )
         Spacer(modifier = Modifier.height(34.dp))
 
@@ -277,7 +275,7 @@ fun BodyContentEmailsAddScreen(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Insertar Correo",
+                    text = stringResource(R.string.insertar_correo),
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica
                 )
@@ -300,14 +298,14 @@ fun LogoutDialogEmailsAdd(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -316,7 +314,7 @@ fun LogoutDialogEmailsAdd(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

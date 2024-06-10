@@ -82,8 +82,7 @@ fun SocialNetworksScreen(
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-//    //recojo al user Actual
-//    val user = auth.getCurrentUser()
+
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
@@ -127,7 +126,7 @@ fun SocialNetworksScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Mis Redes Sociales",
+                            text = stringResource(R.string.mis_redes_sociales),
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -262,7 +261,7 @@ fun BodyContentSocialsScreen(
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
             Text(
-                text = "No hay nada para mostrar",
+                text = stringResource(R.string.no_hay_nada_para_mostrar),
                 color = AppColors.mainEdentifica,
                 fontSize =TextSizes.H2,
                 textAlign = TextAlign.Center
@@ -286,8 +285,8 @@ fun BodyContentSocialsScreen(
 
                         Column (
                             modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth()
+                                .padding(8.dp)
+                                .fillMaxWidth()
                         ){
                             Text(text = it.networkType.toString(), color = AppColors.FocusEdentifica)
                             Text(text = it.socialName, color = AppColors.mainEdentifica)
@@ -335,14 +334,14 @@ fun LogoutDialogSocials(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -351,7 +350,7 @@ fun LogoutDialogSocials(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

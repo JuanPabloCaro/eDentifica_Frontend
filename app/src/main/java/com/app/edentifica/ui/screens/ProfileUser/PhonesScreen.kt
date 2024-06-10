@@ -77,8 +77,7 @@ fun PhonesScreen(
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-    //recojo al user Actual
-    val user = auth.getCurrentUser()
+
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
@@ -122,7 +121,7 @@ fun PhonesScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Mis Telefonos",
+                            text = stringResource(R.string.mis_telefonos),
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -267,7 +266,7 @@ fun BodyContentPhonesScreen(
                                 Text(text = "+"+it.phoneNumber, color = AppColors.mainEdentifica)
                             }else{
                                 Column {
-                                    Text(text = "Predeterminado:", color = AppColors.FocusEdentifica)
+                                    Text(text = stringResource(R.string.predeterminado), color = AppColors.FocusEdentifica)
                                     Text(text = "+"+it.phoneNumber, color = AppColors.mainEdentifica)
                                 }
                             }
@@ -325,14 +324,14 @@ fun LogoutDialogPhones(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -341,7 +340,7 @@ fun LogoutDialogPhones(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

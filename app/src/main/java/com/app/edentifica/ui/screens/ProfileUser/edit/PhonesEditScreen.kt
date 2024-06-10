@@ -119,7 +119,7 @@ fun PhonesEditScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Editar Telefono",
+                            text = stringResource(R.string.editar_telefono),
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -234,13 +234,14 @@ fun BodyContentPhonesEditScreen(
 
 
         TextField(
-            label = { Text(text = "Telefono", fontSize = TextSizes.Paragraph) },
+            label = { Text(text = stringResource(R.string.telefono), fontSize = TextSizes.Paragraph) },
             value = currentPhone,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             onValueChange = { currentPhone = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            placeholder = {Text("34xxxxxxxxx")}
         )
 
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
@@ -259,7 +260,7 @@ fun BodyContentPhonesEditScreen(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Editar",
+                    text = stringResource(R.string.editar),
                     fontSize = TextSizes.H3,
                     color = AppColors.whitePerlaEdentifica
                 )
@@ -282,14 +283,14 @@ fun LogoutDialogPhonesEdit(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -298,7 +299,7 @@ fun LogoutDialogPhonesEdit(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

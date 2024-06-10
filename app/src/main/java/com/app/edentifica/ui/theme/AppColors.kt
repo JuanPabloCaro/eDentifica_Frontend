@@ -9,4 +9,5 @@ object AppColors {
     val whitePerlaEdentifica = Color(0xFFEFEDED)
     val darkEdentifica = Color(0xFF0D0D0D)
     val grayEdentifica = Color(0xFF363636)
+    val greenEdentifica = Color(0xFF006400)
 }

@@ -4,8 +4,10 @@ package com.app.edentifica.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.edentifica.data.model.Profile
 import com.app.edentifica.data.model.User
+import com.app.edentifica.data.model.dto.UserDto
 import com.app.edentifica.data.retrofit.RetrofitApi
 import com.app.edentifica.data.retrofit.RetrofitApi.userService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,14 +19,14 @@ class UsersViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
-    private val _userEmailSearch = MutableStateFlow<User?>(null)
-    val userEmailSearch: StateFlow<User?> = _userEmailSearch
+    private val _userEmailSearch = MutableStateFlow<UserDto?>(null)
+    val userEmailSearch: StateFlow<UserDto?> = _userEmailSearch
 
-    private val _userPhoneSearch = MutableStateFlow<User?>(null)
-    val userPhoneSearch: StateFlow<User?> = _userPhoneSearch
+    private val _userPhoneSearch = MutableStateFlow<UserDto?>(null)
+    val userPhoneSearch: StateFlow<UserDto?> = _userPhoneSearch
 
-    private val _userSocialSearch = MutableStateFlow<User?>(null)
-    val userSocialSearch: StateFlow<User?> = _userSocialSearch
+    private val _userSocialSearch = MutableStateFlow<UserDto?>(null)
+    val userSocialSearch: StateFlow<UserDto?> = _userSocialSearch
 
     private val _userInserted = MutableStateFlow<Boolean?>(false)
     val userInserted: StateFlow<Boolean?> = _userInserted
@@ -40,6 +42,9 @@ class UsersViewModel : ViewModel() {
 
     private val _userEdit = MutableStateFlow<User?>(null)
     val userEdit: StateFlow<User?> = _userEdit
+
+    private val _findString=MutableStateFlow<String?>(null)
+    val findString: StateFlow<String?> = _findString
 
 
     //CRUD USER
@@ -90,11 +95,10 @@ class UsersViewModel : ViewModel() {
     fun getUserByEmailSearch(email: String) {
         viewModelScope.launch {
             try {
-                val response = userService.getByEmail(email)
+                val response = userService.getDtoByEmail(email)
                 if (response.isSuccessful) {
                     //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
-                    //Pendiente agregar la validacion 2
-                    if(response.body()?.validations?.get(0)?.isValidated == true){
+                    if(response.body()?.validations?.get(0)?.isValidated == true && response.body()?.validations?.get(1)?.isValidated == true){
                         _userEmailSearch.value = response.body()
                     }else{
                         _userEmailSearch.value = null
@@ -132,11 +136,10 @@ class UsersViewModel : ViewModel() {
     fun getUserByPhoneSearch(phone: String) {
         viewModelScope.launch {
             try {
-                val response = userService.getByPhone(phone)
+                val response = userService.getDtoByPhone(phone)
                 if (response.isSuccessful) {
                     //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
-                    //Pendiente agregar la validacion 2
-                    if(response.body()?.validations?.get(0)?.isValidated == true){
+                    if(response.body()?.validations?.get(0)?.isValidated == true && response.body()?.validations?.get(1)?.isValidated == true){
                         _userPhoneSearch.value = response.body()
                     }else{
                         _userPhoneSearch.value = null
@@ -173,11 +176,10 @@ class UsersViewModel : ViewModel() {
     fun getUserBySocialSearch(type: String, socialname: String) {
         viewModelScope.launch {
             try {
-                val response = userService.getBySocialNetwork(type,socialname)
+                val response = userService.getDtoBySocialNetwork(type,socialname)
                 if (response.isSuccessful) {
                     //Aqui solo devuelvo los resultados de busqueda de los usuarios que esten validados.
-                    //Pendiente agregar la validacion 2
-                    if(response.body()?.validations?.get(0)?.isValidated == true){
+                    if(response.body()?.validations?.get(0)?.isValidated == true && response.body()?.validations?.get(1)?.isValidated == true){
                         _userSocialSearch.value = response.body()
                     }else{
                         _userPhoneSearch.value = null
@@ -347,6 +349,34 @@ class UsersViewModel : ViewModel() {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch userViewModel edit null", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion establece el parametro de busqueda
+     */
+    fun saveFindString(find: String) {
+        viewModelScope.launch {
+            try {
+                _findString.value = find
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch save find string", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone a nulo el userEdit
+     */
+    fun toNullfindString() {
+        viewModelScope.launch {
+            try {
+                _findString.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch to null find string", it) }
             }
         }
     }

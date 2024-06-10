@@ -1,11 +1,14 @@
 package com.app.edentifica
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -16,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,6 +34,11 @@ import com.app.edentifica.viewModel.ProfileViewModel
 import com.app.edentifica.viewModel.SocialViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Proyecto eDentifica:
@@ -102,6 +111,8 @@ class MainActivity : ComponentActivity() {
                             viewModel.resetState()
                         }
                     }
+
+
 
                     //Este es el componente que se encarga de la navegacion y sabe cual es la primera pantalla
                     //This is the component that is in charge of navigation and knows which is the first screen.

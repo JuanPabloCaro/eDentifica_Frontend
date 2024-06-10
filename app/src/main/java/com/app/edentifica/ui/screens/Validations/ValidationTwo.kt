@@ -1,7 +1,14 @@
-package com.app.edentifica.ui.screens.Search
+package com.app.edentifica.ui.screens.Validations
+
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,29 +21,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,56 +44,83 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil.compose.rememberImagePainter
 import com.app.edentifica.R
 import com.app.edentifica.data.model.User
+import com.app.edentifica.data.model.Validation
 import com.app.edentifica.navigation.AppScreen
-import com.app.edentifica.ui.screens.ClickableProfileImage
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.UsersViewModel
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.io.File
+import java.io.FileOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun FindByPhoneScreen(
+fun ValidationTwoScreen(
     navController: NavController,
     auth: AuthManager,
-    onSignOutGoogle: () -> Unit,
     vmUsers: UsersViewModel,
+    onSignOutGoogle: () -> Unit,
 ) {
     //VARIABLES Y CONSTANTES
+
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-    //recojo al user Actual
+
     val currentUser = auth.getCurrentUser()
-    // Llama a getUserByEmail cuando se inicia HomeScreen
+
+    // Llama a getUserByEmail cuando se inicia ValidationOneScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
     }
+
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
-    val onLogoutConfirmedFindByPhone:()->Unit = {
+    // Verifica si el teléfono del usuario es nulo y navega a la pantalla de registro de teléfono si es necesario
+    LaunchedEffect(userState) {
+        if (userState?.phone?.phoneNumber == null || userState?.phone?.phoneNumber.equals("") || userState?.phone?.phoneNumber.equals("null")) {
+            navController.navigate(AppScreen.RegisterPhoneScreen.route)
+        }
+    }
+
+
+
+    //Si no tiene ninguna validacion lo envio a las validaciones
+    if(userState?.validations?.get(1)?.isValidated==true) { // importante modificacion en home
+
+        navController.navigate(AppScreen.HomeScreen.route) {
+            popUpTo(AppScreen.ValidationTwoScreen.route) {
+                inclusive = true
+            }
+        }
+
+    }
+
+
+
+    val onLogoutConfirmedValidationTwo:()->Unit = {
         auth.signOut()
         onSignOutGoogle()
 
@@ -104,7 +131,7 @@ fun FindByPhoneScreen(
         }
     }
 
-    //Estructura de la pantalla
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -114,16 +141,6 @@ fun FindByPhoneScreen(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
-                            userState?.profile?.urlImageProfile?.let {
-                                ClickableProfileImage(
-                                    navController = navController,
-                                    imageUrl = it
-                                ) {
-                                    navController.navigate(AppScreen.ProfileUserScreen.route)
-                                }
-                            }
-                        }
 
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
@@ -153,29 +170,16 @@ fun FindByPhoneScreen(
                                 )
                             }
                         }
-
                     }
                 },
                 actions = {
-                    //Botton Home
-                    IconButton(
-                        onClick = {
-                            navController.navigate(AppScreen.HomeScreen.route)
-                        }
-                    ) {
-                        Icon(
-                            Icons.Outlined.Home,
-                            contentDescription = "Home",
-                            tint = AppColors.whitePerlaEdentifica
-                        )
-                    }
                     //boton de accion para salir cerrar sesion
                     IconButton(
                         onClick = {
                             showDialog = true
                         }
                     ) {
-                        androidx.compose.material3.Icon(
+                        Icon(
                             Icons.Outlined.ExitToApp,
                             contentDescription = "Cerrar sesión",
                             tint = AppColors.whitePerlaEdentifica
@@ -205,104 +209,229 @@ fun FindByPhoneScreen(
             contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
-                LogoutDialogFindByPhone(
+                LogoutDialogValidationTwo(
                     onConfirmLogout = {
-                        onLogoutConfirmedFindByPhone()
+                        onLogoutConfirmedValidationTwo()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false })
             }
 
         }
-
-        //funcion composable que pinta el contenido de home
+        //funcion composable que pinta el contenido
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
-        ) {
-            BodyContentFindByPhone(navController, vmUsers, userState)
+        ){
+            BodyContentValidationTwo(navController,userState, vmUsers)
         }
 
     }
+
 }
+
+
+
+
+
+
+
 
 
 
 @Composable
-fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel, userState: User?) {
+fun BodyContentValidationTwo(
+    navController: NavController,
+    userCurrent: User?,
+    vmUsers: UsersViewModel
+) {
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var imageSelected = false
+    var validations= ArrayList<Validation>()
 
-    // Estado para almacenar el telefono ingresado por el usuario
-    var phone by remember { mutableStateOf("") }
 
-    // Estado para controlar si se ha realizado una búsqueda
-    var searchPerformedPhone by remember { mutableStateOf(false) }
-
-
-    Column(
+    Column (
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
+        Spacer(modifier = Modifier.height(26.dp))
         //Title
         Text(
-            text = stringResource(R.string.vamos_a_encontrar_a_esa_persona_introduce_aqu_el_tel_fono_a_buscar_incluyendo_el_prefijo_del_pa_s),
-            fontSize = TextSizes.H2,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        //Image
-        Image(
-            painter = painterResource(id = R.drawable.searchphone),
-            contentDescription = "Phone",
             modifier = Modifier
-                .fillMaxWidth()
-                .scale(0.7f)
-                .padding(0.dp), // ajusta la altura según sea necesario
-            contentScale = ContentScale.Crop // Escala de la imagen
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = stringResource(R.string.validacion_2),
+            fontSize = TextSizes.H1,
+            color = AppColors.mainEdentifica,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 32.dp),
+            text = stringResource(R.string.estamos_casi_listos_para_continuar_con_el_proceso_de_validaci_n_por_favor_toma_una_foto_de_tu_rostro_selecciona_la_escala_1_1_de_la_foto),
+            fontSize = TextSizes.H3,
+            color = AppColors.mainEdentifica,
+            textAlign = TextAlign.Center,
         )
 
-        // Campo de entrada para el telefono
-        Spacer(modifier = Modifier.height(34.dp))
-        TextField(
-            label = { Text(text = stringResource(R.string.telefono), fontSize = TextSizes.Paragraph) },
-            value = phone,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            onValueChange = { phone = it },
-            placeholder = {Text("34xxxxxxxxxx")}
-        )
+        Spacer(modifier = Modifier.height(10.dp))
+        ImagePickerValidation(onImageSelected = { uri ->
+            selectedImageUri = uri
+            uri?.let {
+                scope.launch {
+                    try {
+                        val imageUrl =uploadImageToFirebaseValidation(it,context)
+                    } catch (e: Exception) {
+                        Log.e("Error Validation 2", e.message.toString())
+                    }
+                }
+            }
+        })
 
-        // Botón para enviar la búsqueda
-        Spacer(modifier = Modifier.height(34.dp))
-        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-            Button(
-                onClick = {
-                    // Llamar a la función del ViewModel para buscar por telefono
-                    vmUsers.getUserByPhoneSearch(phone)
-                    vmUsers.saveFindString(phone)
-                    searchPerformedPhone = true
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
-                shape = RoundedCornerShape(50.dp),
+        selectedImageUri?.let { uri ->
+            Image(
+                painter = rememberImagePainter(data = uri),
+                contentDescription = "image selected",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text(text = stringResource(R.string.buscar_telefono))
+                    .scale(1f)
+                    .padding(0.dp), // ajusta la altura según sea necesario
+                contentScale = ContentScale.Crop // Escala de la imagen
+            )
+            imageSelected= true
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        if (imageSelected){
+            Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
+                Button(
+                    onClick = {
+
+                        try {
+                            //Almaceno las validaciones por separado y cambio la validacion 2 a true
+                            var validationsUser1= userCurrent?.validations?.get(0)
+                            var validationsUser2= userCurrent?.validations?.get(1)?.copy(isValidated = true);
+
+                            //Agrego las validaciones a la lista
+                            if (validationsUser1 != null) {
+                                validations.add(0,validationsUser1)
+                            };
+                            if (validationsUser2 != null) {
+                                validations.add(1,validationsUser2)
+                            }
+
+                            //Actualizar la validacion del usuario con la lista creada anteriormente
+                            val updateUser =userCurrent?.copy(validations = validations)
+                            if (updateUser != null) {
+                                vmUsers.updateUserVM(updateUser)
+                            }
+
+                            if (userCurrent != null) {
+                                vmUsers.getUserByEmail(userCurrent.email.email)
+                            }
+
+                            navController.navigate(AppScreen.ValidationTwoSuccessScreen.route)//cambiar a pantalla exitosa validacion 2
+
+                        } catch (e: Exception) {
+                            Log.e("Error Validation 2", e.message.toString())
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
+                    shape = RoundedCornerShape(50.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.enviar),
+                        fontSize = TextSizes.H3,
+                        color = AppColors.whitePerlaEdentifica
+                    )
+                }
             }
         }
-
-        // Mostrar el resultado de la búsqueda o el mensaje de error
-        if (searchPerformedPhone) {
-            navController.navigate(AppScreen.ResultSearchPhoneScreen.route)
-        }
-
     }
-
 }
+
+suspend fun uploadImageToFirebaseValidation(uri: Uri, context: Context): String {
+    val storage = FirebaseStorage.getInstance()
+    val storageRef = storage.reference
+    val imagesRef: StorageReference = storageRef.child("images/${uri.lastPathSegment}")
+
+    val uploadTask = imagesRef.putFile(uri)
+    val taskSnapshot = uploadTask.await()
+
+    return taskSnapshot.storage.downloadUrl.await().toString()
+}
+
+
+@Composable
+fun ImagePickerValidation(
+    onImageSelected: (Uri?) -> Unit
+) {
+    val context = LocalContext.current
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview(),
+        onResult = { bitmap ->
+            val uri = bitmap?.let {
+                saveBitmapToInternalStorageValidation(context, it)
+            }
+            onImageSelected(uri)
+        }
+    )
+
+    Column {
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = { cameraLauncher.launch() },
+            colors = ButtonDefaults.buttonColors(containerColor = AppColors.secondaryEdentifica),
+            shape = RoundedCornerShape(50.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.tomar_foto),
+                fontSize = TextSizes.H3,
+                color = AppColors.whitePerlaEdentifica
+            )
+        }
+        Spacer(modifier = Modifier.height(22.dp))
+    }
+}
+
+
+
+
+
+fun saveBitmapToInternalStorageValidation(context: Context, bitmap: Bitmap): Uri? {
+    val filename = "profile_image_${System.currentTimeMillis()}.jpg"
+    var fos: FileOutputStream? = null
+    var uri: Uri?
+    try {
+        fos = context.openFileOutput(filename, Context.MODE_PRIVATE)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+        fos.close()
+        val file = File(context.filesDir, filename)
+        uri = Uri.fromFile(file)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        uri = null
+    } finally {
+        fos?.close()
+    }
+    return uri
+}
+
 
 
 
@@ -311,7 +440,7 @@ fun BodyContentFindByPhone(navController: NavController, vmUsers: UsersViewModel
  * usuario si quiere continuar o cerrar sesion
  */
 @Composable
-fun LogoutDialogFindByPhone(
+fun LogoutDialogValidationTwo(
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -338,5 +467,5 @@ fun LogoutDialogFindByPhone(
             }
         }
     )
-}
 
+}

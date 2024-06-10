@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,7 +83,7 @@ fun ResultSearchEmailScreen(
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
     //recojo al user Actual
-    val user = auth.getCurrentUser()
+    val currentUser = auth.getCurrentUser()
     // Llama a getUserByEmail cuando se inicia HomeScreen
     LaunchedEffect(Unit) {
         auth.getCurrentUser()?.email?.let { vmUsers.getUserByEmail(it) }
@@ -115,67 +116,37 @@ fun ResultSearchEmailScreen(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
-                        if (user?.photoUrl != null) {
-                            if (auth.getCurrentUser()?.email != null && userState?.validations?.get(
-                                    0
-                                )?.isValidated == true
-                            ) {
-                                userState?.profile?.urlImageProfile?.let {
-                                    ClickableProfileImage(
-                                        navController = navController,
-                                        imageUrl = it
-                                    ) {
-                                        navController.navigate(AppScreen.ProfileUserScreen.route)
-                                    }
-                                }
-                            } else {
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(userState?.profile?.urlImageProfile)
-                                        .crossfade(true)
-                                        .build(),
-                                    contentDescription = "Imagen",
-                                    placeholder = painterResource(id = R.drawable.profile),
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .size(40.dp)
-                                )
-                            }
-
-                        } else {
-                            if (auth.getCurrentUser()?.email != null && userState?.validations?.get(
-                                    0
-                                )?.isValidated == true
-                            ) {
+                        if(auth.getCurrentUser()?.email!=null && userState?.validations?.get(0)?.isValidated ==true ){
+                            userState?.profile?.urlImageProfile?.let {
                                 ClickableProfileImage(
-                                    onClick = {
-                                        navController.navigate(AppScreen.ProfileUserScreen.route)
-                                    }
-                                )
-                            } else {
-                                Image(
-                                    painter = painterResource(id = R.drawable.profile),
-                                    contentDescription = "image profile default",
-                                    modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .size(40.dp)
-                                        .clip(CircleShape)
-                                )
+                                    navController = navController,
+                                    imageUrl = it
+                                ) {
+                                    navController.navigate(AppScreen.ProfileUserScreen.route)
+                                }
                             }
                         }
 
+
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(
-                                text = if (!user?.displayName.isNullOrEmpty() || userState != null) "Hola ${userState?.name}" else "Bienvenid@",//welcomeMessage,
-                                fontSize = TextSizes.H3,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = AppColors.whitePerlaEdentifica
-                            )
-                            (if (!user?.email.isNullOrEmpty() || userState != null) userState?.email?.email else "Anonimo")?.let {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            (if(!currentUser?.displayName.isNullOrEmpty() || userState!=null) userState?.name?.let {
+                                stringResource(
+                                    R.string.hola, it
+                                )
+                            } else stringResource(R.string.bienvenid))?.let {
+                                Text(
+                                    text = it,//welcomeMessage,
+                                    fontSize = TextSizes.H3,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = AppColors.whitePerlaEdentifica
+                                )
+                            }
+                            (if(!currentUser?.email.isNullOrEmpty()|| userState!=null) userState?.email?.email else stringResource(
+                                R.string.usuario_anonimo
+                            ))?.let {
                                 Text(
                                     text = it,
                                     fontSize = TextSizes.Footer,
@@ -192,6 +163,8 @@ fun ResultSearchEmailScreen(
                     //Botton Home
                     IconButton(
                         onClick = {
+                            vmUsers.putEmailResultNull()
+                            vmUsers.toNullfindString()
                             navController.navigate(AppScreen.HomeScreen.route)
                         }
                     ) {
@@ -270,6 +243,8 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
 
     // Observamos el estado del resultado de la busqueda
     val searchResultEmail by vmUsers.userEmailSearch.collectAsState()
+    // Es el parametro que busco el usuario
+    val findString by vmUsers.findString.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -282,13 +257,28 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
                 painter = painterResource(id = R.drawable.checkresult),
                 contentDescription = "Check Result",
                 modifier = Modifier
-                    .fillMaxWidth().scale(0.9f).padding(0.dp), // ajusta la altura según sea necesario
+                    .fillMaxWidth()
+                    .scale(0.9f)
+                    .padding(0.dp), // ajusta la altura según sea necesario
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
-            Text(
-                text = "El Email ${searchResultEmail!!.email.email} le pertenece al usuario ${searchResultEmail!!.name} registrado en eDentifica garantizando la seguridad del perfil",
-                modifier = Modifier.padding(16.dp)
-            )
+
+            findString?.let {
+                searchResultEmail!!.edentificador?.let { it1 ->
+                    Text(
+                        text = stringResource(
+                            R.string.el_email_le_pertenece_al_usuario_con_edentificador_garantizando_la_seguridad_del_perfil,
+                            it,
+                            searchResultEmail!!.name,
+                            it1
+                        ),
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+
+
 
         } else {
             //Image
@@ -296,12 +286,15 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
                 painter = painterResource(id = R.drawable.warning),
                 contentDescription = "Warning",
                 modifier = Modifier
-                    .fillMaxWidth().scale(0.9f).padding(0.dp), // ajusta la altura según sea necesario
+                    .fillMaxWidth()
+                    .scale(0.9f)
+                    .padding(0.dp), // ajusta la altura según sea necesario
                 contentScale = ContentScale.Crop // Escala de la imagen
             )
             Text(
-                text = "Lo sentimos, usuario no encontrado, puede tratarse de una posible suplantacion",
-                modifier = Modifier.padding(16.dp)
+                text = stringResource(R.string.lo_sentimos_usuario_no_encontrado_puede_tratarse_de_una_posible_suplantacion),
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Center,
             )
         }
 
@@ -311,6 +304,7 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
             Button(
                 onClick = {
                     vmUsers.putEmailResultNull()
+                    vmUsers.toNullfindString()
                     navController.navigate(AppScreen.FindByEmailScreen.route)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
@@ -319,7 +313,7 @@ fun BodyContentResultEmail(navController: NavController, vmUsers: UsersViewModel
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Realizar otra Busqueda")
+                Text(text =stringResource(R.string.realizar_otra_busqueda))
             }
         }
     }
@@ -344,14 +338,14 @@ fun LogoutDialogResultEmail(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -360,7 +354,7 @@ fun LogoutDialogResultEmail(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

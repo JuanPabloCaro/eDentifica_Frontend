@@ -8,4 +8,5 @@ object TextSizes {
     val H3 = 16.sp
     val Paragraph = 14.sp
     val Footer = 12.sp
+    val title= 36.sp
 }

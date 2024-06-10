@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -101,7 +102,7 @@ fun RegisterScreen(
                 },
                 title = {
                     Text(
-                        text = "Login",
+                        text = stringResource(R.string.inicio_de_sesion),
                         fontSize = TextSizes.H3,
                         color= AppColors.whitePerlaEdentifica
                     )
@@ -152,7 +153,7 @@ fun RegisterScreen(
 
                 //title
                 Text(
-                    text = "Create an account",
+                    text = stringResource(R.string.crear_una_cuenta),
                     color = AppColors.mainEdentifica,
                     fontSize = TextSizes.H1
                 )
@@ -162,66 +163,73 @@ fun RegisterScreen(
                 TextField(
                     label = {
                         Text(
-                            text = "Name",
+                            text = stringResource(R.string.nombre),
                             fontSize = TextSizes.Paragraph
                             )
                         },
                     value = name,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    onValueChange = { name = it })
+                    onValueChange = { name = it }
+                )
 
                 //field last name
                 Spacer(modifier = Modifier.height(20.dp))
                 TextField(
                     label = {
                         Text(
-                            text = "Last Name",
+                            text = stringResource(R.string.apellido),
                             fontSize = TextSizes.Paragraph
                             )
                         },
                     value = lastName,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    onValueChange = { lastName = it })
+                    onValueChange = { lastName = it }
+                )
 
                 //field phone
                 Spacer(modifier = Modifier.height(20.dp))
                 TextField(
                     label = {
                         Text(
-                            text = "Phone",
+                            text = stringResource(R.string.n_mero_de_tel_fono_whatsapp),
                             fontSize = TextSizes.Paragraph
                         )
                     },
                     value = phone,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    onValueChange = { phone = it })
+                    onValueChange = { phone = it },
+                    placeholder = {Text("34xxxxxxxxx")}
+                )
 
                 //field email
                 Spacer(modifier = Modifier.height(20.dp))
                 TextField(
                     label = {
                         Text(
-                            text = "Email",
+                            text = stringResource(R.string.correo),
                             fontSize = TextSizes.Paragraph
                         )
                     },
                     value = email,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    onValueChange = { email = it })
+                    onValueChange = { email = it },
+                    placeholder = {Text(stringResource(R.string.ejemplo_gmail_com))}
+                )
 
                 //field password
                 Spacer(modifier = Modifier.height(20.dp))
                 TextField(
                     label = {
                         Text(
-                            text = "Password",
+                            text = stringResource(R.string.contrase_a_m_n_6_caracteres),
                             fontSize = TextSizes.Paragraph
                         )
                     },
                     value = password,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    onValueChange = { password = it })
+                    onValueChange = { password = it }
+                )
 
                 //button signUp
                 Spacer(modifier = Modifier.height(30.dp))
@@ -239,13 +247,13 @@ fun RegisterScreen(
                             .fillMaxWidth()
                             .height(50.dp)
                     ) {
-                        Text(text = "Sign Up")
+                        Text(text = stringResource(R.string.registrate))
                     }
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
                 ClickableText(
-                    text = AnnotatedString("Already have an account? Sign in"),
+                    text = AnnotatedString(stringResource(R.string.ya_tienes_una_cuenta_inicia_sesion)),
                     onClick = {
                         navController.popBackStack()
                     },
@@ -277,6 +285,7 @@ private suspend fun signUp(
     if(name.isNotEmpty() && lastName.isNotEmpty() && phone.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()){
         val userToInsert: User = User(
             null,
+            null,
             name,
             lastName,
             Phone(null,phone,null,null),
@@ -290,12 +299,15 @@ private suspend fun signUp(
             async { vmUsers.insertUserVm(userToInsert) }
         }.await()
 
+
+
         if(isUserInserted){
             when(val result = auth.createUserWithEmailandPassword(email, password)){
                 // agregar la linea de retrofit para insertar el user en la base de datos
                 is AuthRes.Succes ->{
 
-                    Toast.makeText(context, "Successful registration", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        context.getString(R.string.registro_con_exito), Toast.LENGTH_SHORT).show()
                     navController.popBackStack()
                 }
                 is AuthRes.Error ->{
@@ -303,10 +315,11 @@ private suspend fun signUp(
                 }
             }
         }else{
-            Toast.makeText(context, "Error SignUp: maybe already exists number phone or email", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,
+                context.getString(R.string.error_de_registro_tal_vez_ya_existe_el_correo_o_telefono), Toast.LENGTH_SHORT).show()
         }
 
     }else{
-        Toast.makeText(context, "There are empty fields", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.hay_campos_vacios), Toast.LENGTH_SHORT).show()
     }
 }

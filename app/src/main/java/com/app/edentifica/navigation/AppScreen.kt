@@ -51,4 +51,14 @@ sealed class AppScreen(val route: String){
 
     object ProfileUserEditScreen: AppScreen("profile_user_edit_user")
 
+    object ProfileUserPhotoEditScreen: AppScreen("photo_edit")
+
+    object ValidationOneSuccessScreen: AppScreen("validation_one_success")
+
+    object ValidationTwoScreen: AppScreen("validation_two")
+
+    object ValidationTwoSuccessScreen: AppScreen("validation_two_success")
+
+    object InfoValidationsScreen: AppScreen("info_validations")
+
 }

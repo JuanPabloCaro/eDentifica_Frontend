@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -85,8 +86,6 @@ fun ProfileScreen(
     //VARIABLES Y CONSTANTES
     //para mostrar el dialogo de cerrar Sesion
     var showDialog by remember { mutableStateOf(false) }
-//    //recojo al user Actual
-//    val user = auth.getCurrentUser()
 
     // Llama a getUserByEmail cuando se inicia Profile
     LaunchedEffect(Unit) {
@@ -139,7 +138,7 @@ fun ProfileScreen(
                     ) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Perfil",
+                            text = stringResource(R.string.perfil),
                             fontSize = TextSizes.H2,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -248,39 +247,47 @@ fun BodyContentProfile(
                     .clip(CircleShape)
                     .background(color = Color.Gray) // Color de fondo opcional
             ) {
-                if (userState != null && !userState.profile?.urlImageProfile.equals("")) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(userState.profile?.urlImageProfile)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "Imagen",
-                        placeholder = painterResource(id = R.drawable.profile),
-                        contentScale = ContentScale.Crop, // Ajusta la escala de contenido según tus necesidades
-                        modifier = Modifier
-                            .size(150.dp) // Ajusta el tamaño deseado
-                            .clip(CircleShape)
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile),
-                        contentDescription = "edit image",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .scale(1f)
-                            .padding(0.dp)
-                            .clip(CircleShape), // ajusta la altura según sea necesario
-                        contentScale = ContentScale.Crop // Escala de la imagen
-                    )
+                if (userState != null) {
+                    userState.profile?.urlImageProfile?.let {
+                        ClickableProfileImage(
+                            navController = navController,
+                            imageUrl = it
+                        ) {
+                            navController.navigate(AppScreen.ProfileUserPhotoEditScreen.route)
+                        }
+                    }
                 }
+
             }
             Spacer(modifier = Modifier.height(22.dp))
         }
 
-        item { UserInfoItem(label = "Nombre", value = userState?.name ?: "") }
-        item { UserInfoItem(label = "Apellido", value = userState?.lastName ?: "") }
-        item { UserInfoItem(label = "Fecha de Nacimiento", value = userState?.profile?.dateBirth.toString()) }
-        item { UserInfoItem(label = "Descripción del perfil", value = userState?.profile?.description ?: "") }
+
+        item{
+            Text(text = stringResource(R.string.edentificador), fontWeight = FontWeight.Bold, color = AppColors.mainEdentifica)
+            Box(
+                modifier = Modifier
+                    .padding(top = 4.dp, bottom = 16.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(
+                        width = 2.dp,
+                        color = AppColors.mainEdentifica,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .background(AppColors.mainEdentifica)
+            ){
+                Text(
+                    text = userState?.edentificador.toString(),
+                    modifier = Modifier.padding(top = 10.dp, bottom = 10.dp, start= 16.dp, end= 16.dp),
+                    color = AppColors.whitePerlaEdentifica
+                )
+            }
+        }
+
+        item { UserInfoItem(label = stringResource(R.string.nombre), value = userState?.name ?: "") }
+        item { UserInfoItem(label = stringResource(R.string.apellido), value = userState?.lastName ?: "") }
+        item { UserInfoItem(label = stringResource(R.string.fecha_de_nacimiento), value = userState?.profile?.dateBirth.toString()) }
+        item { UserInfoItem(label = stringResource(R.string.descripcion_del_perfil), value = userState?.profile?.description ?: "") }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
 
@@ -311,7 +318,7 @@ fun BodyContentProfile(
                         )
                         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                         Text(
-                            "Ver mis correos",
+                            text= stringResource(R.string.ver_mis_correos),
                             fontSize = TextSizes.H3,
                             color = AppColors.mainEdentifica
                         )
@@ -348,7 +355,7 @@ fun BodyContentProfile(
                         )
                         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                         Text(
-                            "Ver mis telefonos",
+                            text= stringResource(R.string.ver_mis_telefonos),
                             fontSize = TextSizes.H3,
                             color = AppColors.mainEdentifica
                         )
@@ -385,7 +392,7 @@ fun BodyContentProfile(
                         )
                         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                         Text(
-                            "Ver mis redes sociales",
+                            text = stringResource(R.string.ver_mis_redes_sociales),
                             fontSize = TextSizes.H3,
                             color = AppColors.mainEdentifica
                         )
@@ -429,7 +436,7 @@ fun BodyContentProfile(
                             )
                             Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                             Text(
-                                "Editar perfil",
+                                stringResource(R.string.editar_perfil),
                                 fontSize = TextSizes.H3,
                                 color = AppColors.whitePerlaEdentifica
                             )
@@ -452,15 +459,15 @@ fun UserInfoItem(label: String, value: String) {
         Text(text = "$label: ", fontWeight = FontWeight.Bold, color = AppColors.mainEdentifica)
         Box(
             modifier = Modifier
-            .padding(top=4.dp,bottom = 16.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(
-                width = 2.dp,
-                color = AppColors.mainEdentifica,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .background(Color.Transparent)
+                .padding(top = 4.dp, bottom = 16.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .border(
+                    width = 2.dp,
+                    color = AppColors.mainEdentifica,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .background(Color.Transparent)
          ){
             Text(
                 text = value,
@@ -471,6 +478,47 @@ fun UserInfoItem(label: String, value: String) {
 }
 
 
+/**
+ * Imagen de perfil clikeable
+ */
+@Composable
+fun ClickableProfileImage(
+    navController: NavController,  // Assuming you're using NavController for navigation
+    imageUrl: String,
+    onClick: () -> Unit  // Define your click action
+) {
+    Box(
+        modifier = Modifier
+            .clickable { onClick() }
+    ) {
+        if(!imageUrl.equals("")){
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Imagen",
+                placeholder = painterResource(id = R.drawable.profile),
+                contentScale = ContentScale.Crop, // Ajusta la escala de contenido según tus necesidades
+                modifier = Modifier
+                    .size(150.dp) // Ajusta el tamaño deseado
+                    .clip(CircleShape)
+            )
+        }else{
+            Image(
+                painter = painterResource(id = R.drawable.profile),
+                contentDescription = "edit image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .scale(1f)
+                    .padding(0.dp)
+                    .clip(CircleShape), // ajusta la altura según sea necesario
+                contentScale = ContentScale.Crop // Escala de la imagen
+            )
+        }
+
+    }
+}
 
 
 
@@ -487,14 +535,14 @@ fun LogoutDialogProfile(
     AlertDialog(
         containerColor = AppColors.whitePerlaEdentifica,
         onDismissRequest = onDismiss,
-        title = { Text("Cerrar sesión", color = AppColors.mainEdentifica) },
-        text = { Text("¿Estás seguro que deseas cerrar sesión?",color = AppColors.mainEdentifica) },
+        title = { Text(stringResource(R.string.cerrar_sesi_n), color = AppColors.mainEdentifica) },
+        text = { Text(stringResource(R.string.est_s_seguro_que_deseas_cerrar_sesi_n),color = AppColors.mainEdentifica) },
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica)
             ) {
-                Text("Aceptar", color = AppColors.whitePerlaEdentifica)
+                Text(stringResource(R.string.aceptar), color = AppColors.whitePerlaEdentifica)
             }
         },
         dismissButton = {
@@ -503,7 +551,7 @@ fun LogoutDialogProfile(
                 border = BorderStroke(1.dp, AppColors.FocusEdentifica),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.FocusEdentifica)
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )
