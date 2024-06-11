@@ -11,13 +11,13 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface UserService {
-    @GET("edentifica/users/get_by_email/{email}")
+    @GET("edentifica/users/get_by_email/{email}")// this is only for the email default of user
     suspend fun getByEmail(@Path("email") email: String): Response<User>
 
     @GET("edentifica/users/get_dto_by_email")
     suspend fun getDtoByEmail(@Query("email") email: String): Response<UserDto>
 
-    @GET("edentifica/users/get_by_phone/{phonenumber}")
+    @GET("edentifica/users/get_by_phone/{phonenumber}")// this is only for the phone default of user
     suspend fun getByPhone(@Path("phonenumber") phonenumber: String): Response<User>
 
     @GET("edentifica/users/get_dto_by_phone")
