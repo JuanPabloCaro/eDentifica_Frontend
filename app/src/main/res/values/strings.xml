@@ -108,4 +108,7 @@
     <string name="recuperar_contrasena">Recuperar contraseña</string>
     <string name="correo_electr_nico_no_v_lido">Correo electrónico no válido</string>
     <string name="el_n_mero_de_tel_fono_no_es_v_lido">El número de teléfono no es válido</string>
+    <string name="permisos_requeridos">Permisos Requeridos</string>
+    <string name="los_permisos_de_c_mara_y_notificaciones_son_necesarios_para_el_correcto_funcionamiento_de_la_aplicaci_n_por_favor_habilite_estos_permisos_en_la_configuraci_n_de_la_aplicaci_n">Los permisos de cámara y notificaciones son necesarios para el correcto funcionamiento de la aplicación. Por favor, habilite estos permisos en la configuración de la aplicación.</string>
+    <string name="ir_a_ajustes">Ir a ajustes</string>
 </resources>

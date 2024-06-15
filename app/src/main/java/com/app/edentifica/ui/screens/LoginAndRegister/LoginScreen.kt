@@ -2,6 +2,8 @@ package com.app.edentifica.ui.screens.LoginAndRegister
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -26,12 +28,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,6 +70,8 @@ import com.app.edentifica.utils.googleAuth.SignInState
 import com.app.edentifica.viewModel.UsersViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import android.provider.Settings
+
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -139,6 +145,21 @@ fun BodyContent(
     }
 }
 
+
+class FirstTimePreference(context: Context) {
+    private val preferences = context.getSharedPreferences("first_time_pref", Context.MODE_PRIVATE)
+
+    fun isFirstTime(): Boolean {
+        return preferences.getBoolean("isFirstTime", true)
+    }
+
+    fun setFirstTime(isFirstTime: Boolean) {
+        preferences.edit().putBoolean("isFirstTime", isFirstTime).apply()
+    }
+}
+
+
+
 @Composable
 fun FormularioLogin(
     align: Modifier,
@@ -152,6 +173,37 @@ fun FormularioLogin(
     //VARIABLES Y CONSTANTES
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val firstTimePreference = remember { FirstTimePreference(context) }
+    var showPermissionDialog by remember { mutableStateOf(firstTimePreference.isFirstTime())  }
+
+    if(showPermissionDialog){
+        AlertDialog(
+                onDismissRequest = { showPermissionDialog = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                            val uri = Uri.fromParts("package", context.packageName, null)
+                            intent.data = uri
+                            context.startActivity(intent)
+
+                            showPermissionDialog = false
+                            firstTimePreference.setFirstTime(false)
+                        }
+                    ) {
+                        Text(stringResource(R.string.ir_a_ajustes))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showPermissionDialog = false }) {
+                        Text(stringResource(R.string.cancelar))
+                    }
+                },
+                title = { Text(stringResource(R.string.permisos_requeridos)) },
+                text = { Text(stringResource(R.string.los_permisos_de_c_mara_y_notificaciones_son_necesarios_para_el_correcto_funcionamiento_de_la_aplicaci_n_por_favor_habilite_estos_permisos_en_la_configuraci_n_de_la_aplicaci_n)) }
+            )
+    }
 
     Column(
         modifier = align.fillMaxSize(),
