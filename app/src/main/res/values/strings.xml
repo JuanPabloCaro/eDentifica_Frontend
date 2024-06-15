@@ -106,4 +106,6 @@
     <string name="se_ha_enviado_un_correo_para_restablecer_la_contrasena">Se ha enviado un correo para restablecer la contraseña</string>
     <string name="error_al_enviar_el_correo">Error al enviar correo</string>
     <string name="recuperar_contrasena">Recuperar contraseña</string>
+    <string name="correo_electr_nico_no_v_lido">Correo electrónico no válido</string>
+    <string name="el_n_mero_de_tel_fono_no_es_v_lido">El número de teléfono no es válido</string>
 </resources>

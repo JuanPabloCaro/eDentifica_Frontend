@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -217,6 +218,7 @@ fun BodyContentEmailsAddScreen(
 ) {
     //VARIABLES
     var email by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -253,21 +255,47 @@ fun BodyContentEmailsAddScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             placeholder = { Text(text = stringResource(R.string.ejemplo_gmail_com)) }
         )
+
+
+        if (showError) {
+            Text(
+                text = stringResource(R.string.correo_electr_nico_no_v_lido),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
+
+
+
         Spacer(modifier = Modifier.height(34.dp))
 
         // Botón para insertar el correo electrónico
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
                 onClick = {
-                    // Insertar el correo electrónico llamando a la función del ViewModel
-                    userState?.let { user ->
-                        val emailToInsert = Email(id = null, email = email, isVerified = false, idProfileUser = null)
-                        user.profile?.id?.let { profileId ->
-                            vmProfiles.insertEmailVm(emailToInsert, profileId)
+                    if (isValidEmail(email)) {
+                        // Insertar el correo electrónico llamando a la función del ViewModel
+                        userState?.let { user ->
+                            val emailToInsert = Email(id = null, email = email, isVerified = false, idProfileUser = null)
+                            user.profile?.id?.let { profileId ->
+                                vmProfiles.insertEmailVm(emailToInsert, profileId)
+                            }
                         }
+                        navController.popBackStack()
+                    } else {
+                        showError = true
                     }
-                    navController.popBackStack()
                 },
+//                onClick = {
+//                    // Insertar el correo electrónico llamando a la función del ViewModel
+//                    userState?.let { user ->
+//                        val emailToInsert = Email(id = null, email = email, isVerified = false, idProfileUser = null)
+//                        user.profile?.id?.let { profileId ->
+//                            vmProfiles.insertEmailVm(emailToInsert, profileId)
+//                        }
+//                    }
+//                    navController.popBackStack()
+//                },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
@@ -283,6 +311,11 @@ fun BodyContentEmailsAddScreen(
         }
     }
 }
+
+fun isValidEmail(email: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+
 
 
 
