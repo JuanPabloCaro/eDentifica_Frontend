@@ -105,4 +105,9 @@
     <string name="se_ha_enviado_un_correo_para_restablecer_la_contrasena">An email has been sent to reset the password.</string>
     <string name="error_al_enviar_el_correo">Error sending mail</string>
     <string name="recuperar_contrasena">Password recovery</string>
+    <string name="correo_electr_nico_no_v_lido">Invalid e-mail address</string>
+    <string name="el_n_mero_de_tel_fono_no_es_v_lido">The phone number is invalid</string>
+    <string name="permisos_requeridos">Permissions Required</string>
+    <string name="los_permisos_de_c_mara_y_notificaciones_son_necesarios_para_el_correcto_funcionamiento_de_la_aplicaci_n_por_favor_habilite_estos_permisos_en_la_configuraci_n_de_la_aplicaci_n">Camera and notifications permissions are required for the correct functioning of the application. Please enable these permissions in the application settings.</string>
+    <string name="ir_a_ajustes">Go to settings</string>
 </resources>

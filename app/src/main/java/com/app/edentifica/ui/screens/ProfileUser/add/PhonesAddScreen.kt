@@ -57,6 +57,7 @@ import com.app.edentifica.data.model.Email
 import com.app.edentifica.data.model.Phone
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
+import com.app.edentifica.ui.screens.LoginAndRegister.isValidPhoneNumber
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
@@ -216,6 +217,7 @@ fun BodyContentPhonesAddScreen(
 ) {
     //VARIABLES
     var phone by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -252,20 +254,37 @@ fun BodyContentPhonesAddScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             placeholder = { Text(text = "34xxxxxxxxx") }
         )
+
+        if (showError) {
+            Text(
+                text = stringResource(R.string.el_n_mero_de_tel_fono_no_es_v_lido),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
+
         Spacer(modifier = Modifier.height(34.dp))
 
         // Botón para insertar el telefono
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
                 onClick = {
-                    // Insertar el telefono llamando a la función del ViewModel
-                    userState?.let { user ->
-                        val phoneToInsert = Phone(id = null, phoneNumber = phone, isVerified = false, idProfileUser = null)
-                        user.profile?.id?.let { profileId ->
-                            vmProfiles.insertPhoneVm(phoneToInsert, profileId)
+
+                    if(isValidPhoneNumberAdd(phone)){
+
+                        // Insertar el telefono llamando a la función del ViewModel
+                        userState?.let { user ->
+                            val phoneToInsert = Phone(id = null, phoneNumber = phone, isVerified = false, idProfileUser = null)
+                            user.profile?.id?.let { profileId ->
+                                vmProfiles.insertPhoneVm(phoneToInsert, profileId)
+                            }
                         }
+                        navController.popBackStack()
+                        showError=false
+
+                    }else{
+                        showError=true
                     }
-                    navController.popBackStack()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
@@ -317,4 +336,9 @@ fun LogoutDialogPhonesAdd(
             }
         }
     )
+}
+
+fun isValidPhoneNumberAdd(phone: String): Boolean {
+    val phoneRegex = "^[0-9]{10,15}$".toRegex()
+    return phone.matches(phoneRegex)
 }

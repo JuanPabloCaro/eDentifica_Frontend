@@ -53,6 +53,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -244,7 +245,7 @@ fun BodyContentValidationOne(
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-//                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     modifier = Modifier
@@ -252,6 +253,7 @@ fun BodyContentValidationOne(
                         .padding(horizontal = 32.dp),
                     text = stringResource(R.string.validacion_1),
                     fontSize = TextSizes.H1,
+                    fontWeight = FontWeight.Bold,
                     color = AppColors.mainEdentifica,
                     textAlign = TextAlign.Center,
                 )
@@ -293,7 +295,9 @@ fun BodyContentValidationOne(
                             .fillMaxWidth()
                             .height(50.dp)
                     ) {
-                        Text(text = stringResource(R.string.empezar_validacion))
+                        Text(text = stringResource(R.string.empezar_validacion),
+                            fontSize = TextSizes.H3,
+                            color = AppColors.whitePerlaEdentifica)
                     }
                 }
             }

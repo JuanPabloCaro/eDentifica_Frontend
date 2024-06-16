@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.edentifica.data.model.Email
 import com.app.edentifica.data.model.Phone
+import com.app.edentifica.data.model.User
 import com.app.edentifica.data.retrofit.RetrofitApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

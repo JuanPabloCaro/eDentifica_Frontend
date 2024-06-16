@@ -207,7 +207,7 @@ fun EmailsScreen(
                 .padding(24.dp)
         ){
             //funcion composable que pinta el contenido de home
-            BodyContentEmailsScreen(navController,vmEmails, userState,emails)
+            BodyContentEmailsScreen(navController,vmEmails,userState,emails)
         }
 
     }
@@ -266,7 +266,7 @@ fun BodyContentEmailsScreen(
                                 Text(text = it.email, color = AppColors.mainEdentifica)
                             }else{
                                 Column {
-                                    Text(text = stringResource(R.string.mis_correos), color = AppColors.FocusEdentifica)
+                                    Text(text = stringResource(R.string.predeterminado), color = AppColors.FocusEdentifica)
                                     Text(text = it.email, color = AppColors.mainEdentifica)
                                 }
                             }
@@ -292,7 +292,9 @@ fun BodyContentEmailsScreen(
                                     onClick = {
                                         if (userState != null) {
                                             if(!it.email.equals(userState.email.email)){
-                                                it.id?.let { it1 -> vmEmails.deleteEmailVM(it1) }
+                                                it.id?.let { it1 ->
+                                                    vmEmails.deleteEmailVM(it1)
+                                                }
                                                 navController.navigate(AppScreen.EmailsScreen.route)
                                             }
                                         }

@@ -172,6 +172,7 @@ fun BodyContentRegisterPhone(
 ) {
     //VARIABLES
     var userPhone by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
     // Observa el flujo de phone en el ViewModel
     val phoneUpsateState by vmPhones.phoneUpdated.collectAsState()
@@ -224,16 +225,33 @@ fun BodyContentRegisterPhone(
             placeholder = {Text("34xxxxxxxxx")}
 
         )
+
+        if (showError) {
+            Text(
+                text = stringResource(R.string.el_n_mero_de_tel_fono_no_es_v_lido),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
+
         Spacer(modifier = Modifier.height(34.dp))
 
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
                 onClick = {
-                    // Actualizar el teléfono en el objeto User y llamar a la función del ViewModel para actualizarlo en la base de datos
-                    userState?.let { user ->
-                        val updatedUser = user.copy(phone = Phone(id = user.phone.id, phoneNumber = userPhone, isVerified = user.phone.isVerified, idProfileUser = user.phone.idProfileUser))
-                        vmPhones.updatePhoneVM(updatedUser.phone)
+
+                    if(isValidPhoneNumber(userPhone)){
+                        // Actualizar el teléfono en el objeto User y llamar a la función del ViewModel para actualizarlo en la base de datos
+                        userState?.let { user ->
+                            val updatedUser = user.copy(phone = Phone(id = user.phone.id, phoneNumber = userPhone, isVerified = user.phone.isVerified, idProfileUser = user.phone.idProfileUser))
+                            vmPhones.updatePhoneVM(updatedUser.phone)
+                        }
+                        showError = false
+                    }else{
+                        showError=true
                     }
+
+
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
@@ -250,4 +268,9 @@ fun BodyContentRegisterPhone(
         }
     }
 
+}
+
+fun isValidPhoneNumber(phone: String): Boolean {
+    val phoneRegex = "^[0-9]{10,15}$".toRegex()
+    return phone.matches(phoneRegex)
 }

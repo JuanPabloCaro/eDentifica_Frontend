@@ -294,29 +294,25 @@ private suspend fun signUp(
             null,
             null
         )
-        // Llama a la función del ViewModel para insertar el usuario y espera a que se complete
-        val isUserInserted = coroutineScope {
-            async { vmUsers.insertUserVm(userToInsert) }
-        }.await()
 
 
 
-        if(isUserInserted){
-            when(val result = auth.createUserWithEmailandPassword(email, password)){
-                // agregar la linea de retrofit para insertar el user en la base de datos
-                is AuthRes.Succes ->{
 
-                    Toast.makeText(context,
-                        context.getString(R.string.registro_con_exito), Toast.LENGTH_SHORT).show()
-                    navController.popBackStack()
-                }
-                is AuthRes.Error ->{
-                    Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
-                }
+        when(val result = auth.createUserWithEmailandPassword(email, password)){
+            // agregar la linea de retrofit para insertar el user en la base de datos
+            is AuthRes.Succes ->{
+                // Llama a la función del ViewModel para insertar el usuario y espera a que se complete
+                val isUserInserted = coroutineScope {
+                    async { vmUsers.insertUserVm(userToInsert) }
+                }.await()
+
+                Toast.makeText(context,
+                    context.getString(R.string.registro_con_exito), Toast.LENGTH_SHORT).show()
+                navController.popBackStack()
             }
-        }else{
-            Toast.makeText(context,
-                context.getString(R.string.error_de_registro_tal_vez_ya_existe_el_correo_o_telefono), Toast.LENGTH_SHORT).show()
+            is AuthRes.Error ->{
+                Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
+            }
         }
 
     }else{
