@@ -1,6 +1,7 @@
 package com.app.edentifica.ui.screens.ProfileUser
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -232,6 +234,23 @@ fun BodyContentPhonesScreen(
     // Convertir el conjunto de correos electrónicos a una lista mutable
     val phoneList = phones?.toMutableList() ?: mutableListOf()
 
+    var context= LocalContext.current
+
+    // Observa el flujo de email en el ViewModel
+    val phoneDeletedState by vmPhones.phoneDeleted.collectAsState()
+
+    // Observa el flujo de actualización del email y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(phoneDeletedState) {
+        if (phoneDeletedState == true) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.el_n_mero_de_tel_fono_se_elimin_correctamente),
+                Toast.LENGTH_SHORT
+            ).show()
+            vmPhones.toNullPhoneDeleted()
+            navController.navigate(AppScreen.PhonesScreen.route)
+        }
+    }
 
 
     Column(
@@ -292,7 +311,6 @@ fun BodyContentPhonesScreen(
                                         if (userState != null) {
                                             if(!it.phoneNumber.equals(userState.phone.phoneNumber)){
                                                 it.id?.let { it1 -> vmPhones.deletePhoneVM(it1) }
-                                                navController.navigate(AppScreen.PhonesScreen.route)
                                             }
                                         }
                                     }

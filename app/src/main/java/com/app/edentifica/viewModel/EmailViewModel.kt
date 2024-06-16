@@ -81,6 +81,7 @@ class EmailViewModel: ViewModel()  {
                 if (response.isSuccessful) {
                     _emaildeleted.value = response.body()
                 } else {
+                    _emaildeleted.value = false
                     Log.e("error en emailViewModel", "delete Email")
                 }
             } catch (e: Exception) {
@@ -135,6 +136,20 @@ class EmailViewModel: ViewModel()  {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch emailViewModel emailupdate to null", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone a nulo el emailDeleted
+     */
+    fun toNullEmailDeleted() {
+        viewModelScope.launch {
+            try {
+                _emaildeleted.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch emailViewModel emailDeleted to null", it) }
             }
         }
     }

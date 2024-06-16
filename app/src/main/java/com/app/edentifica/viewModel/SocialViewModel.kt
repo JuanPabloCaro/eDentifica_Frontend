@@ -137,5 +137,19 @@ class SocialViewModel: ViewModel() {
         }
     }
 
+    /**
+     * Esta funcion pone a nulo la socialDeleted
+     */
+    fun toNullSocialNetworkDeleted() {
+        viewModelScope.launch {
+            try {
+                _socialdeleted.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch socialViewModel socialdeleted to null", it) }
+            }
+        }
+    }
+
 
 }

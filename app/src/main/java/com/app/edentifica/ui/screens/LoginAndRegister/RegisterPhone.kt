@@ -88,6 +88,13 @@ fun RegisterPhoneScreen(
 
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
+    val phoneRegisterInserted by vmPhones.phoneRegisterInserted.collectAsState()
+
+    LaunchedEffect(phoneRegisterInserted) {
+        if(phoneRegisterInserted==true){
+            navController.navigate(AppScreen.ValidationOneScreen.route)
+        }
+    }
 
 
     Scaffold(
@@ -175,19 +182,24 @@ fun BodyContentRegisterPhone(
     //VARIABLES
     var userPhone by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+    var showDuplicatePhoneError by remember { mutableStateOf(false) }
 
     // Observa el flujo de phone en el ViewModel
-    val phoneUpsateState by vmPhones.phoneUpdated.collectAsState()
+    val phoneUpdatedState by vmPhones.phoneUpdated.collectAsState()
 
-    // Observa el flujo de actualización del teléfono y muestra un Toast cuando se completa la actualización
-    LaunchedEffect(phoneUpsateState) {
-        if (phoneUpsateState==true) {
+    // Observa el flujo de actualización del email y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(phoneUpdatedState) {
+        if (phoneUpdatedState == true) {
             Toast.makeText(
                 context,
-                context.getString(R.string.el_tel_fono_se_inserto_correctamente),
+                context.getString(R.string.el_n_mero_de_tel_fono_se_actualiz_correctamente),
                 Toast.LENGTH_SHORT
             ).show()
+            vmPhones.toNullPhoneUpdated()
+            vmPhones.toTruePhoneRegisterInserted()
             navController.navigate(AppScreen.ValidationOneScreen.route)
+        } else if (phoneUpdatedState == false) {
+            showDuplicatePhoneError = true
         }
     }
 
@@ -242,6 +254,14 @@ fun BodyContentRegisterPhone(
         if (showError) {
             Text(
                 text = stringResource(R.string.el_n_mero_de_tel_fono_no_es_v_lido),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
+
+        if (showDuplicatePhoneError) {
+            Text(
+                text = stringResource(R.string.el_n_mero_de_tel_fono_ya_existe),
                 color = AppColors.FocusEdentifica,
                 fontSize = TextSizes.Paragraph
             )

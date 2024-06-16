@@ -120,4 +120,7 @@
     <string name="el_correo_se_actualiz_correctamente">El correo se actualizó correctamente</string>
     <string name="el_n_mero_de_tel_fono_se_actualiz_correctamente">El número de teléfono se actualizó correctamente</string>
     <string name="la_red_social_se_actualiz_correctamente">La red social se actualizó correctamente</string>
+    <string name="el_correo_electr_nico_se_elimin_correctamente">El correo electrónico se eliminó correctamente</string>
+    <string name="el_n_mero_de_tel_fono_se_elimin_correctamente">El número de teléfono se eliminó correctamente</string>
+    <string name="la_red_social_se_elimin_correctamente">La red social se eliminó correctamente</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.app.edentifica.ui.screens.ProfileUser
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -232,6 +234,24 @@ fun BodyContentEmailsScreen(
     // Convertir el conjunto de correos electrónicos a una lista mutable
     val emailList = emails?.toMutableList() ?: mutableListOf()
 
+    var context= LocalContext.current
+
+    // Observa el flujo de email en el ViewModel
+    val emailDeletedState by vmEmails.emailDeleted.collectAsState()
+
+    // Observa el flujo de actualización del email y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(emailDeletedState) {
+        if (emailDeletedState == true) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.el_correo_electr_nico_se_elimin_correctamente),
+                Toast.LENGTH_SHORT
+            ).show()
+            vmEmails.toNullEmailDeleted()
+            navController.navigate(AppScreen.EmailsScreen.route)
+        }
+    }
+
 
 
     Column(
@@ -295,7 +315,6 @@ fun BodyContentEmailsScreen(
                                                 it.id?.let { it1 ->
                                                     vmEmails.deleteEmailVM(it1)
                                                 }
-                                                navController.navigate(AppScreen.EmailsScreen.route)
                                             }
                                         }
                                     }

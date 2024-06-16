@@ -16,6 +16,9 @@ class PhonesViewModel: ViewModel() {
     private val _phoneUpdated = MutableStateFlow<Boolean?>(null)
     val phoneUpdated: StateFlow<Boolean?> = _phoneUpdated
 
+    private val _phoneRegisterInserted = MutableStateFlow<Boolean?>(false)
+    val phoneRegisterInserted: StateFlow<Boolean?> = _phoneRegisterInserted
+
     private val _listPhones = MutableStateFlow<Set<Phone>?>(null)
     val listPhones: StateFlow<Set<Phone>?> = _listPhones
 
@@ -134,6 +137,34 @@ class PhonesViewModel: ViewModel() {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch phoneViewModel phone updated null", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone a nulo el phoneDeleted
+     */
+    fun toNullPhoneDeleted() {
+        viewModelScope.launch {
+            try {
+                _phoneDeleted.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch phoneViewModel phone deleted null", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone a true el phoneRegisterInserted
+     */
+    fun toTruePhoneRegisterInserted(){
+        viewModelScope.launch {
+            try {
+                _phoneRegisterInserted.value = true
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch phoneViewModel phone register intserted true", it) }
             }
         }
     }
