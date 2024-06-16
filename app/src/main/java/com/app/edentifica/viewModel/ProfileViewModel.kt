@@ -80,6 +80,7 @@ class ProfileViewModel: ViewModel() {
                 if (response.isSuccessful) {
                     _socialInserted.value = true
                 } else {
+                    _socialInserted.value = false
                     Log.e("error en profileViewModel", response.isSuccessful.toString())
                 }
             } catch (e: Exception) {
@@ -158,7 +159,7 @@ class ProfileViewModel: ViewModel() {
     }
 
     /**
-     * Esta funcion pone a nulo el phoneInserted
+     * Esta funcion pone a nulo el emailInserted
      */
     fun toNullEmailInserted() {
         viewModelScope.launch {
@@ -167,6 +168,20 @@ class ProfileViewModel: ViewModel() {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch profileViewModel email inserted to null", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone a nulo el SocialNetworkInserted
+     */
+    fun toNullSocialInserted() {
+        viewModelScope.launch {
+            try {
+                _socialInserted.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch profileViewModel social inserted to null", it) }
             }
         }
     }

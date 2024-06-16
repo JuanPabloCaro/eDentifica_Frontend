@@ -114,4 +114,6 @@
     <string name="el_n_mero_de_tel_fono_ya_existe">The phone number already exists</string>
     <string name="el_correo_se_insert_correctamente">The email was inserted correctly</string>
     <string name="el_correo_electr_nico_ya_existe">E-mail already exists</string>
+    <string name="la_red_social_se_insert_correctamente">The social network was successfully inserted</string>
+    <string name="la_red_social_ya_existe">The social network already exists</string>
 </resources>
