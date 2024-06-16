@@ -48,7 +48,7 @@
     <string name="lo_sentimos_usuario_no_encontrado_puede_tratarse_de_una_posible_suplantacion">Sorry, user not found, it may be a possible phishing.</string>
     <string name="realizar_otra_busqueda">Make another search</string>
     <string name="el_telefono_le_pertenece_al_usuario_con_edentificador_garantizando_la_seguridad_del_perfil">The Phone +%1$s belongs to the user %2$s with eDentifier %3$s ensuring profile security.</string>
-    <string name="el_email_le_pertenece_al_usuario_con_edentificador_garantizando_la_seguridad_del_perfil">The Email %1$s belongs to the user %2$s with eDentifier %3$s ensuring profile security.</string>
+    <string name="el_email_le_pertenece_al_usuario_con_edentificador_garantizando_la_seguridad_del_perfil">The email %1$s belongs to the user %2$s with eDentifier %3$s ensuring profile security.</string>
     <string name="mis_redes_sociales">My Social Networks</string>
     <string name="no_hay_nada_para_mostrar">There is nothing to show</string>
     <string name="perfil">Profile</string>
@@ -95,7 +95,7 @@
     <string name="error_de_registro_tal_vez_ya_existe_el_correo_o_telefono">Error SignUp: maybe already exists number phone or email</string>
     <string name="hay_campos_vacios">There are empty fields</string>
     <string name="el_tel_fono_se_inserto_correctamente">The phone was inserted correctly</string>
-    <string name="vamos_a_mantenernos_conectados_no_tienes_un_n_mero_de_tel_fono_registrado_por_favor_introduce_tu_n_mero_de_whatsapp_incluyendo_el_prefijo_del_pa_s">Let\'s stay connected! You do not have a registered phone number. Please enter your WhatsApp number, including country prefix.</string>
+    <string name="vamos_a_mantenernos_conectados_no_tienes_un_n_mero_de_tel_fono_registrado_por_favor_introduce_tu_n_mero_de_whatsapp_incluyendo_el_prefijo_del_pa_s">You do not have a registered phone number. Please enter your WhatsApp number, including country prefix.</string>
     <string name="password">Password</string>
     <string name="iniciar_sesion">Login</string>
     <string name="has_olvidado_tu_contrasena">Forgot your password?</string>
@@ -110,4 +110,8 @@
     <string name="permisos_requeridos">Permissions Required</string>
     <string name="los_permisos_de_c_mara_y_notificaciones_son_necesarios_para_el_correcto_funcionamiento_de_la_aplicaci_n_por_favor_habilite_estos_permisos_en_la_configuraci_n_de_la_aplicaci_n">Camera and notifications permissions are required for the correct functioning of the application. Please enable these permissions in the application settings.</string>
     <string name="ir_a_ajustes">Go to settings</string>
+    <string name="registrar_tel_fono">Register Phone</string>
+    <string name="el_n_mero_de_tel_fono_ya_existe">The phone number already exists</string>
+    <string name="el_correo_se_insert_correctamente">The email was inserted correctly</string>
+    <string name="el_correo_electr_nico_ya_existe">E-mail already exists</string>
 </resources>
