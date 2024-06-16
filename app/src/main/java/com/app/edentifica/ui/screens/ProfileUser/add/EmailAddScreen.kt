@@ -219,6 +219,27 @@ fun BodyContentEmailsAddScreen(
     //VARIABLES
     var email by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+    var context= LocalContext.current
+
+    var showDuplicateEmailError by remember { mutableStateOf(false) }
+
+    // Observa el flujo de email en el ViewModel
+    val emailInsertState by vmProfiles.emailInserted.collectAsState()
+
+    // Observa el flujo de actualización del email y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(emailInsertState) {
+        if (emailInsertState == true) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.el_correo_se_insert_correctamente),
+                Toast.LENGTH_SHORT
+            ).show()
+            vmProfiles.toNullEmailInserted()
+            navController.navigate(AppScreen.EmailsScreen.route)
+        } else if (emailInsertState == false) {
+            showDuplicateEmailError = true
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -265,6 +286,13 @@ fun BodyContentEmailsAddScreen(
             )
         }
 
+        if (showDuplicateEmailError) {
+            Text(
+                text = stringResource(R.string.el_correo_electr_nico_ya_existe),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
 
 
         Spacer(modifier = Modifier.height(34.dp))
@@ -281,21 +309,12 @@ fun BodyContentEmailsAddScreen(
                                 vmProfiles.insertEmailVm(emailToInsert, profileId)
                             }
                         }
-                        navController.popBackStack()
+                        showError=false
+
                     } else {
                         showError = true
                     }
                 },
-//                onClick = {
-//                    // Insertar el correo electrónico llamando a la función del ViewModel
-//                    userState?.let { user ->
-//                        val emailToInsert = Email(id = null, email = email, isVerified = false, idProfileUser = null)
-//                        user.profile?.id?.let { profileId ->
-//                            vmProfiles.insertEmailVm(emailToInsert, profileId)
-//                        }
-//                    }
-//                    navController.popBackStack()
-//                },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier

@@ -1,6 +1,7 @@
 package com.app.edentifica.ui.screens.ProfileUser.edit
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -217,6 +219,28 @@ fun BodyContentSocialsEditScreen(
 ) {
     var currentType by remember { mutableStateOf(social.networkType) }
     var currentSocialname by remember { mutableStateOf(social.socialName) }
+    var context= LocalContext.current
+
+    var showUpdatedSocialError by remember { mutableStateOf(false) }
+
+    // Observa el flujo de email en el ViewModel
+    val socialUpdatedState by vmSocial.socialNetworkUpdated.collectAsState()
+
+    // Observa el flujo de actualización del email y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(socialUpdatedState) {
+        if (socialUpdatedState == true) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.la_red_social_se_actualiz_correctamente),
+                Toast.LENGTH_SHORT
+            ).show()
+            vmSocial.toNullSocialNetworkUpdated()
+            vmSocial.toNullSocialNetworkEdit()
+            navController.navigate(AppScreen.SocialNetworksScreen.route)
+        } else if (socialUpdatedState == false) {
+            showUpdatedSocialError = true
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -270,14 +294,22 @@ fun BodyContentSocialsEditScreen(
 
         )
 
+
+        if (showUpdatedSocialError) {
+            Text(
+                text = stringResource(R.string.la_red_social_ya_existe),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
+
+
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
                 onClick = {
                     //Actualizar la red Social
                     val updateSocial = social.copy(socialName = currentSocialname)
                     vmSocial.updateSocialVM(updateSocial)
-                    vmSocial.toNullSocialNetworkEdit()
-                    navController.popBackStack()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),

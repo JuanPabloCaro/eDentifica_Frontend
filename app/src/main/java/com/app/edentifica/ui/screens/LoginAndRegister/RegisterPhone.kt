@@ -48,7 +48,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -86,6 +88,13 @@ fun RegisterPhoneScreen(
 
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
+    val phoneRegisterInserted by vmPhones.phoneRegisterInserted.collectAsState()
+
+    LaunchedEffect(phoneRegisterInserted) {
+        if(phoneRegisterInserted==true){
+            navController.navigate(AppScreen.ValidationOneScreen.route)
+        }
+    }
 
 
     Scaffold(
@@ -173,19 +182,24 @@ fun BodyContentRegisterPhone(
     //VARIABLES
     var userPhone by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+    var showDuplicatePhoneError by remember { mutableStateOf(false) }
 
     // Observa el flujo de phone en el ViewModel
-    val phoneUpsateState by vmPhones.phoneUpdated.collectAsState()
+    val phoneUpdatedState by vmPhones.phoneUpdated.collectAsState()
 
-    // Observa el flujo de actualización del teléfono y muestra un Toast cuando se completa la actualización
-    LaunchedEffect(phoneUpsateState) {
-        if (phoneUpsateState==true) {
+    // Observa el flujo de actualización del email y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(phoneUpdatedState) {
+        if (phoneUpdatedState == true) {
             Toast.makeText(
                 context,
-                context.getString(R.string.el_tel_fono_se_inserto_correctamente),
+                context.getString(R.string.el_n_mero_de_tel_fono_se_actualiz_correctamente),
                 Toast.LENGTH_SHORT
             ).show()
+            vmPhones.toNullPhoneUpdated()
+            vmPhones.toTruePhoneRegisterInserted()
             navController.navigate(AppScreen.ValidationOneScreen.route)
+        } else if (phoneUpdatedState == false) {
+            showDuplicatePhoneError = true
         }
     }
 
@@ -194,7 +208,17 @@ fun BodyContentRegisterPhone(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Spacer(modifier = Modifier.height(68.dp))
+        Spacer(modifier = Modifier.height(85.dp))
+        Text(
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(horizontal = 16.dp),
+            text = stringResource(R.string.registrar_tel_fono),
+            color = AppColors.mainEdentifica,
+            fontSize = TextSizes.H1,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold
+        )
         //Image
         Image(
             painter = painterResource(id = R.drawable.movil),
@@ -212,7 +236,8 @@ fun BodyContentRegisterPhone(
                 .padding(horizontal = 32.dp),
             text = stringResource(R.string.vamos_a_mantenernos_conectados_no_tienes_un_n_mero_de_tel_fono_registrado_por_favor_introduce_tu_n_mero_de_whatsapp_incluyendo_el_prefijo_del_pa_s),
             color = AppColors.mainEdentifica,
-            fontSize = TextSizes.H2
+            fontSize = TextSizes.H2,
+            textAlign = TextAlign.Center
         )
 
         // Campo de entrada para la respuesta del usuario
@@ -229,6 +254,14 @@ fun BodyContentRegisterPhone(
         if (showError) {
             Text(
                 text = stringResource(R.string.el_n_mero_de_tel_fono_no_es_v_lido),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
+
+        if (showDuplicatePhoneError) {
+            Text(
+                text = stringResource(R.string.el_n_mero_de_tel_fono_ya_existe),
                 color = AppColors.FocusEdentifica,
                 fontSize = TextSizes.Paragraph
             )

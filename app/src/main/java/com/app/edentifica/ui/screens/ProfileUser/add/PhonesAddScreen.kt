@@ -1,6 +1,7 @@
 package com.app.edentifica.ui.screens.ProfileUser.add
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -218,6 +220,28 @@ fun BodyContentPhonesAddScreen(
     //VARIABLES
     var phone by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+    var context= LocalContext.current
+
+    var showDuplicatePhoneError by remember { mutableStateOf(false) }
+
+    // Observa el flujo de phone en el ViewModel
+    val phoneInsertState by vmProfiles.phoneInserted.collectAsState()
+
+    // Observa el flujo de actualización del teléfono y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(phoneInsertState) {
+        if (phoneInsertState == true) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.el_tel_fono_se_inserto_correctamente),
+                Toast.LENGTH_SHORT
+            ).show()
+            vmProfiles.toNullPhoneInserted()
+            navController.navigate(AppScreen.PhonesScreen.route)
+        } else if (phoneInsertState == false) {
+            showDuplicatePhoneError = true
+        }
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -263,6 +287,16 @@ fun BodyContentPhonesAddScreen(
             )
         }
 
+        if (showDuplicatePhoneError) {
+            Text(
+                text = stringResource(R.string.el_n_mero_de_tel_fono_ya_existe),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
+
+
+
         Spacer(modifier = Modifier.height(34.dp))
 
         // Botón para insertar el telefono
@@ -279,7 +313,7 @@ fun BodyContentPhonesAddScreen(
                                 vmProfiles.insertPhoneVm(phoneToInsert, profileId)
                             }
                         }
-                        navController.popBackStack()
+
                         showError=false
 
                     }else{

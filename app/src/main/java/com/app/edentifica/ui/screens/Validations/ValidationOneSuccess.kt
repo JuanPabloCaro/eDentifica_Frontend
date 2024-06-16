@@ -193,9 +193,9 @@ fun BodyContentValidationOneSuccess(
             textAlign = TextAlign.Center,
         )
 
-        //Boton empezar
+        //Boton continuar con la validacion 2
         Spacer(modifier = Modifier.height(54.dp))
-        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+        Box(modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 0.dp)) {
             Button(
                 onClick = {
                     navController.navigate(AppScreen.ValidationTwoScreen.route){

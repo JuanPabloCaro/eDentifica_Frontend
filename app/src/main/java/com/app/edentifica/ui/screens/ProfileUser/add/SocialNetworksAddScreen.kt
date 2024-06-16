@@ -1,6 +1,7 @@
 package com.app.edentifica.ui.screens.ProfileUser.add
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -222,6 +224,28 @@ fun BodyContentSocialsAddScreen(
     var selectedSocialType by remember { mutableStateOf<String?>(null) }
     var nameSocial by remember { mutableStateOf("") }
 
+    var context= LocalContext.current
+
+    var showDuplicateSocialError by remember { mutableStateOf(false) }
+
+    // Observa el flujo de email en el ViewModel
+    val socialInsertState by vmProfiles.socialInserted.collectAsState()
+
+    // Observa el flujo de actualización del email y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(socialInsertState) {
+        if (socialInsertState == true) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.la_red_social_se_insert_correctamente),
+                Toast.LENGTH_SHORT
+            ).show()
+            vmProfiles.toNullSocialInserted()
+            navController.navigate(AppScreen.SocialNetworksScreen.route)
+        } else if (socialInsertState == false) {
+            showDuplicateSocialError = true
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -268,6 +292,15 @@ fun BodyContentSocialsAddScreen(
             onValueChange = { nameSocial = it },
             placeholder = {Text(stringResource(R.string.ejemplo_de_prueba999 ))}
         )
+
+        if (showDuplicateSocialError) {
+            Text(
+                text = stringResource(R.string.la_red_social_ya_existe),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
+
         Spacer(modifier = Modifier.height(34.dp))
 
         // Botón para insertar la red social
@@ -281,7 +314,6 @@ fun BodyContentSocialsAddScreen(
                             val socialToInsert = SocialNetwork(id = null, networkType = NetworkType.fromString(selectedSocialType.toString())!!, socialName = nameSocial ,isVerified = false, idProfileUser = null)
                             user.profile?.id?.let { profileId ->
                                 vmProfiles.insertSocialNetworkVm(socialToInsert, profileId)
-                                navController.popBackStack()
                             }
                         }
                     }

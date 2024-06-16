@@ -1,6 +1,7 @@
 package com.app.edentifica.ui.screens.ProfileUser.edit
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -211,6 +213,28 @@ fun BodyContentEmailsEditScreen(
     email: Email
 ) {
     var currentEmail by remember { mutableStateOf(email.email) }
+    var context= LocalContext.current
+
+    var showUpdatedEmailError by remember { mutableStateOf(false) }
+
+    // Observa el flujo de email en el ViewModel
+    val emailUpdatedState by vmEmails.emailUpdated.collectAsState()
+
+    // Observa el flujo de actualización del email y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(emailUpdatedState) {
+        if (emailUpdatedState == true) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.el_correo_se_actualiz_correctamente),
+                Toast.LENGTH_SHORT
+            ).show()
+            vmEmails.toNullEmailUpdated()
+            vmEmails.toNullEmailEdit()
+            navController.navigate(AppScreen.EmailsScreen.route)
+        } else if (emailUpdatedState == false) {
+            showUpdatedEmailError = true
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -240,6 +264,13 @@ fun BodyContentEmailsEditScreen(
                 .padding(16.dp),
             placeholder = {Text(stringResource(R.string.ejemplo_gmail_com))}
         )
+        if (showUpdatedEmailError) {
+            Text(
+                text = stringResource(R.string.el_correo_electr_nico_ya_existe),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
 
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
@@ -247,8 +278,6 @@ fun BodyContentEmailsEditScreen(
                     //Actualizar el email
                     val updatedEmail = email.copy(email = currentEmail)
                     vmEmails.updateEmailVM(updatedEmail)
-                    vmEmails.toNullEmailEdit()
-                    navController.popBackStack()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
