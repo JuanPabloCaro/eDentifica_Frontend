@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SocialViewModel: ViewModel() {
-    private val _SocialNetworkUpdated = MutableStateFlow<Boolean?>(false)
+    private val _SocialNetworkUpdated = MutableStateFlow<Boolean?>(null)
     val socialNetworkUpdated: StateFlow<Boolean?> = _SocialNetworkUpdated
 
     private val _listSocialNetworks = MutableStateFlow<Set<SocialNetwork>?>(null)
@@ -35,6 +35,7 @@ class SocialViewModel: ViewModel() {
                 if (response.isSuccessful) {
                     _SocialNetworkUpdated.value = response.body()
                 } else {
+                    _SocialNetworkUpdated.value = false
                     Log.e("error en socialViewModel", "update Social")
                 }
             } catch (e: Exception) {
@@ -118,6 +119,20 @@ class SocialViewModel: ViewModel() {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch socialViewModel edit null", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone a nulo la socialUpdated
+     */
+    fun toNullSocialNetworkUpdated() {
+        viewModelScope.launch {
+            try {
+                _SocialNetworkUpdated.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch socialViewModel socialUpdated to null", it) }
             }
         }
     }

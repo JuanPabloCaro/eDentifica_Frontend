@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class EmailViewModel: ViewModel()  {
-    private val _emailUpdated = MutableStateFlow<Boolean?>(false)
+    private val _emailUpdated = MutableStateFlow<Boolean?>(null)
     val emailUpdated: StateFlow<Boolean?> = _emailUpdated
 
     private val _emaildeleted = MutableStateFlow<Boolean?>(null)
@@ -36,8 +36,10 @@ class EmailViewModel: ViewModel()  {
             try {
                 val response = RetrofitApi.emailService.updateEmail(email)
                 if (response.isSuccessful) {
-                    _emailUpdated.value = response.body()
+                    _emailUpdated.value = true
+                    Log.e("correo actualizado", response.body().toString())
                 } else {
+                    _emailUpdated.value = false
                     Log.e("error en emailViewModel", "update Email")
                 }
             } catch (e: Exception) {
@@ -119,6 +121,20 @@ class EmailViewModel: ViewModel()  {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch emailViewModel edit null", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone a nulo el emailUpdated
+     */
+    fun toNullEmailUpdated() {
+        viewModelScope.launch {
+            try {
+                _emailUpdated.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch emailViewModel emailupdate to null", it) }
             }
         }
     }

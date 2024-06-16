@@ -117,4 +117,7 @@
     <string name="el_correo_electr_nico_ya_existe">El correo electrónico ya existe</string>
     <string name="la_red_social_se_insert_correctamente">La red social se insertó correctamente</string>
     <string name="la_red_social_ya_existe">La red social ya existe</string>
+    <string name="el_correo_se_actualiz_correctamente">El correo se actualizó correctamente</string>
+    <string name="el_n_mero_de_tel_fono_se_actualiz_correctamente">El número de teléfono se actualizó correctamente</string>
+    <string name="la_red_social_se_actualiz_correctamente">La red social se actualizó correctamente</string>
 </resources>

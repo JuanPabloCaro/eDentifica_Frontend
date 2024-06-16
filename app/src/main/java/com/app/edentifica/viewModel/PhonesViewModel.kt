@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class PhonesViewModel: ViewModel() {
 
-    private val _phoneUpdated = MutableStateFlow<Boolean?>(false)
+    private val _phoneUpdated = MutableStateFlow<Boolean?>(null)
     val phoneUpdated: StateFlow<Boolean?> = _phoneUpdated
 
     private val _listPhones = MutableStateFlow<Set<Phone>?>(null)
@@ -35,6 +35,7 @@ class PhonesViewModel: ViewModel() {
                 if (response.isSuccessful) {
                     _phoneUpdated.value = response.body()
                 } else {
+                    _phoneUpdated.value = false
                     Log.e("error en phoneViewModel", "update Phone")
                 }
             } catch (e: Exception) {
@@ -119,6 +120,20 @@ class PhonesViewModel: ViewModel() {
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
                 e.message?.let { Log.e("error catch phoneViewModel edit null", it) }
+            }
+        }
+    }
+
+    /**
+     * Esta funcion pone a nulo el phoneUpdated
+     */
+    fun toNullPhoneUpdated() {
+        viewModelScope.launch {
+            try {
+                _phoneUpdated.value = null
+            } catch (e: Exception) {
+                // Manejar errores de red u otros errores
+                e.message?.let { Log.e("error catch phoneViewModel phone updated null", it) }
             }
         }
     }

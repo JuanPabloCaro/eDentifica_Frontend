@@ -1,6 +1,7 @@
 package com.app.edentifica.ui.screens.ProfileUser.edit
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -213,6 +215,28 @@ fun BodyContentPhonesEditScreen(
     phone: Phone
 ) {
     var currentPhone by remember { mutableStateOf(phone.phoneNumber) }
+    var context= LocalContext.current
+
+    var showUpdatedPhoneError by remember { mutableStateOf(false) }
+
+    // Observa el flujo de email en el ViewModel
+    val phoneUpdatedState by vmPhones.phoneUpdated.collectAsState()
+
+    // Observa el flujo de actualización del email y muestra un Toast cuando se completa la actualización
+    LaunchedEffect(phoneUpdatedState) {
+        if (phoneUpdatedState == true) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.el_n_mero_de_tel_fono_se_actualiz_correctamente),
+                Toast.LENGTH_SHORT
+            ).show()
+            vmPhones.toNullPhoneUpdated()
+            vmPhones.toNullPhoneEdit()
+            navController.navigate(AppScreen.PhonesScreen.route)
+        } else if (phoneUpdatedState == false) {
+            showUpdatedPhoneError = true
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -244,14 +268,21 @@ fun BodyContentPhonesEditScreen(
             placeholder = {Text("34xxxxxxxxx")}
         )
 
+        if (showUpdatedPhoneError) {
+            Text(
+                text = stringResource(R.string.el_n_mero_de_tel_fono_ya_existe),
+                color = AppColors.FocusEdentifica,
+                fontSize = TextSizes.Paragraph
+            )
+        }
+
+
         Box(modifier = Modifier.padding(60.dp, 0.dp, 60.dp, 0.dp)) {
             Button(
                 onClick = {
                     //Actualizar el phone
                     val updatePhone = phone.copy(phoneNumber = currentPhone)
                     vmPhones.updatePhoneVM(updatePhone)
-                    vmPhones.toNullPhoneEdit()
-                    navController.popBackStack()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.FocusEdentifica),
                 shape = RoundedCornerShape(50.dp),
