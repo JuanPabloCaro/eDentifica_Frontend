@@ -167,10 +167,11 @@ class UsersViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = userService.getDtoBySocialNetwork(type,socialname)
+                Log.e("error en userViewModel", ""+ response)
                 if (response.isSuccessful) {
                     _userSocialSearch.value = response.body()
                 } else {
-                    Log.e("error en userViewModel", "getUserBySocialSearch")
+                    Log.e("error en userViewModel", "getUserBySocialSearch" + response.body())
                 }
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
