@@ -97,7 +97,7 @@ class UsersViewModel : ViewModel() {
                     _isLoading.value = false
                 } else {
                     Log.e("error en userViewModel", "getUserByEmail")
-                    _isLoading.value = false
+                    //_isLoading.value = false
                 }
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
