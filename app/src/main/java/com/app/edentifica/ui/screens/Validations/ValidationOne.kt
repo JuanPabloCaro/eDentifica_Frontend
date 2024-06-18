@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -49,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,6 +67,7 @@ import coil.request.ImageRequest
 import com.app.edentifica.R
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
+import com.app.edentifica.ui.screens.BodyContentHome
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
@@ -225,6 +229,7 @@ fun BodyContentValidationOne(
 
     // Observa el estado de validationOne
     val validationOneState = vmUsers.validationOne.collectAsState()
+    val isLoading by vmUsers.isLoadingCall.collectAsState()
 
     // Usa un when para manejar diferentes casos
     when {
@@ -241,6 +246,29 @@ fun BodyContentValidationOne(
             }
         }
         validationOneState.value == false -> {
+            if (isLoading==true) {
+                // Mostrar CircularProgressIndicator mientras carga
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(AppColors.mainEdentifica.copy(alpha = 0.2f))
+                        .clickable { /* No hace nada al hacer clic para evitar que se propague */ },
+                    contentAlignment = Alignment.Center
+
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize(Alignment.Center)
+                            .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    ) {
+                        CircularProgressIndicator(
+                            color = AppColors.FocusEdentifica,
+                            strokeWidth = 4.dp,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+                }
+            }
             // Si validationOne es false, mostrar el botón para comenzar la validación
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -279,7 +307,7 @@ fun BodyContentValidationOne(
                     textAlign = TextAlign.Center,
                 )
 
-                //Button
+                //Button enviar llamada
                 Spacer(modifier = Modifier.height(34.dp))
                 Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                     Button(

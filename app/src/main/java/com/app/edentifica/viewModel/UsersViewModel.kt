@@ -50,6 +50,10 @@ class UsersViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    // Variable que representa el estado de carga
+    private val _isLoadingCall = MutableStateFlow(false)
+    val isLoadingCall: StateFlow<Boolean> = _isLoadingCall
+
 
     //CRUD USER
     /**
@@ -208,6 +212,7 @@ class UsersViewModel : ViewModel() {
      * Esta funcion recibe un usuario para realizar la llamada de la validacion one
      */
     fun toDoCallByUser(user: User) {
+        _isLoadingCall.value = true
         viewModelScope.launch {
             try {
                 val response = userService.toDoCall(user)
@@ -216,6 +221,7 @@ class UsersViewModel : ViewModel() {
                     if (responseBody != null) {
                         _validationOne.value = responseBody
                         Log.e("validacion", "bien")
+                        _isLoadingCall.value = false
                     } else {
                         Log.e("error en userViewModel", "toDoCallByUser if")
                     }
