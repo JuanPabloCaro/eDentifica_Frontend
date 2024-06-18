@@ -46,6 +46,10 @@ class UsersViewModel : ViewModel() {
     private val _findString=MutableStateFlow<String?>(null)
     val findString: StateFlow<String?> = _findString
 
+    // Variable que representa el estado de carga
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
 
     //CRUD USER
     /**
@@ -74,10 +78,12 @@ class UsersViewModel : ViewModel() {
      */
     fun getUserByEmail(email: String) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val response = userService.getByEmail(email)
                 if (response.isSuccessful) {
                     _user.value = response.body()
+                    _isLoading.value = false
                 } else {
                     Log.e("error en userViewModel", "getUserByEmail")
                 }

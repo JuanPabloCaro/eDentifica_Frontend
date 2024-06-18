@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.getValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
@@ -102,6 +103,7 @@ fun HomeScreen(
 
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
+    val isLoading by vmUsers.isLoading.collectAsState()
 
     //si el user es existe le pregunto si ya esta validado
     if(userState != null){
@@ -269,7 +271,17 @@ fun HomeScreen(
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
                 .padding(24.dp)
         ){
-            BodyContentHome(navController, vmUsers, userState)
+            if (isLoading) {
+                // Mostrar CircularProgressIndicator mientras carga
+                CircularProgressIndicator(
+                    color = AppColors.FocusEdentifica,
+                    strokeWidth = 4.dp,
+                    modifier = Modifier.align(Alignment.Center).size(48.dp)
+                )
+            } else {
+                // Mostrar el contenido de Home cuando la carga finaliza
+                BodyContentHome(navController, vmUsers, userState)
+            }
         }
 
     }
