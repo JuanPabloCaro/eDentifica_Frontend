@@ -98,12 +98,15 @@ fun ValidationOneScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
+
     // Verifica si el teléfono del usuario es nulo y navega a la pantalla de registro de teléfono si es necesario
     LaunchedEffect(userState) {
         if (userState?.phone?.phoneNumber == null || userState?.phone?.phoneNumber.equals("") || userState?.phone?.phoneNumber.equals("null")) {
             navController.navigate(AppScreen.RegisterPhoneScreen.route)
         }
     }
+
+
 
 
 
@@ -210,7 +213,7 @@ fun ValidationOneScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
-                .padding(24.dp)
+
         ){
             BodyContentValidationOne(navController, vmUsers, userState, context)
         }
@@ -230,6 +233,7 @@ fun BodyContentValidationOne(
     // Observa el estado de validationOne
     val validationOneState = vmUsers.validationOne.collectAsState()
     val isLoading by vmUsers.isLoadingCall.collectAsState()
+    var enable = true
 
     // Usa un when para manejar diferentes casos
     when {
@@ -246,7 +250,9 @@ fun BodyContentValidationOne(
             }
         }
         validationOneState.value == false -> {
+
             if (isLoading==true) {
+                enable = false
                 // Mostrar CircularProgressIndicator mientras carga
                 Box(
                     modifier = Modifier
@@ -269,9 +275,10 @@ fun BodyContentValidationOne(
                     }
                 }
             }
+
             // Si validationOne es false, mostrar el botón para comenzar la validación
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -321,7 +328,8 @@ fun BodyContentValidationOne(
                         shape = RoundedCornerShape(50.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(50.dp),
+                        enabled = enable
                     ) {
                         Text(text = stringResource(R.string.empezar_validacion),
                             fontSize = TextSizes.H3,
