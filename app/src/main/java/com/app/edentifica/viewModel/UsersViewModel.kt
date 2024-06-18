@@ -54,6 +54,10 @@ class UsersViewModel : ViewModel() {
     private val _isLoadingCall = MutableStateFlow(false)
     val isLoadingCall: StateFlow<Boolean> = _isLoadingCall
 
+    // Variable que representa el estado de carga
+    private val _isLoadingRegister = MutableStateFlow(false)
+    val isLoadingRegister: StateFlow<Boolean> = _isLoadingRegister
+
 
     //CRUD USER
     /**
@@ -61,13 +65,16 @@ class UsersViewModel : ViewModel() {
      */
 
     suspend fun insertUserVm(user:User): Boolean {
+        _isLoadingRegister.value= true
         return try {
             val response = userService.insertUser(user)
             if (response.isSuccessful) {
                 _userInserted.value = true
+                _isLoadingRegister.value = false
                 true
             } else {
                 Log.e("error en userViewModel", "insertUser")
+                _isLoadingRegister.value = false
                 false
             }
         } catch (e: Exception) {
@@ -90,6 +97,7 @@ class UsersViewModel : ViewModel() {
                     _isLoading.value = false
                 } else {
                     Log.e("error en userViewModel", "getUserByEmail")
+                    _isLoading.value = false
                 }
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
@@ -223,9 +231,11 @@ class UsersViewModel : ViewModel() {
                         Log.e("validacion", "bien")
                         _isLoadingCall.value = false
                     } else {
+                        _isLoadingCall.value = false
                         Log.e("error en userViewModel", "toDoCallByUser if")
                     }
                 } else {
+                    _isLoadingCall.value = false
                     Log.e("error en userViewModel", "toDoCallByUser else")
                 }
             } catch (e: Exception) {
