@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -49,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,6 +67,7 @@ import coil.request.ImageRequest
 import com.app.edentifica.R
 import com.app.edentifica.data.model.User
 import com.app.edentifica.navigation.AppScreen
+import com.app.edentifica.ui.screens.BodyContentHome
 import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
@@ -94,12 +98,15 @@ fun ValidationOneScreen(
     // Observa el flujo de usuario en el ViewModel
     val userState by vmUsers.user.collectAsState()
 
+
     // Verifica si el teléfono del usuario es nulo y navega a la pantalla de registro de teléfono si es necesario
     LaunchedEffect(userState) {
         if (userState?.phone?.phoneNumber == null || userState?.phone?.phoneNumber.equals("") || userState?.phone?.phoneNumber.equals("null")) {
             navController.navigate(AppScreen.RegisterPhoneScreen.route)
         }
     }
+
+
 
 
 
@@ -206,7 +213,7 @@ fun ValidationOneScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AppColors.whitePerlaEdentifica) //Color de fondo de la aplicacion
-                .padding(24.dp)
+
         ){
             BodyContentValidationOne(navController, vmUsers, userState, context)
         }
@@ -225,6 +232,8 @@ fun BodyContentValidationOne(
 
     // Observa el estado de validationOne
     val validationOneState = vmUsers.validationOne.collectAsState()
+    val isLoading by vmUsers.isLoadingCall.collectAsState()
+    var enable = true
 
     // Usa un when para manejar diferentes casos
     when {
@@ -241,9 +250,35 @@ fun BodyContentValidationOne(
             }
         }
         validationOneState.value == false -> {
+
+            if (isLoading==true) {
+                enable = false
+                // Mostrar CircularProgressIndicator mientras carga
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(AppColors.mainEdentifica.copy(alpha = 0.2f))
+                        .clickable { /* No hace nada al hacer clic para evitar que se propague */ },
+                    contentAlignment = Alignment.Center
+
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize(Alignment.Center)
+                            .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    ) {
+                        CircularProgressIndicator(
+                            color = AppColors.FocusEdentifica,
+                            strokeWidth = 4.dp,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+                }
+            }
+
             // Si validationOne es false, mostrar el botón para comenzar la validación
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -279,7 +314,7 @@ fun BodyContentValidationOne(
                     textAlign = TextAlign.Center,
                 )
 
-                //Button
+                //Button enviar llamada
                 Spacer(modifier = Modifier.height(34.dp))
                 Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                     Button(
@@ -293,7 +328,8 @@ fun BodyContentValidationOne(
                         shape = RoundedCornerShape(50.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(50.dp),
+                        enabled = enable
                     ) {
                         Text(text = stringResource(R.string.empezar_validacion),
                             fontSize = TextSizes.H3,

@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -67,6 +68,7 @@ import com.app.edentifica.ui.theme.AppColors
 import com.app.edentifica.ui.theme.TextSizes
 import com.app.edentifica.utils.AuthManager
 import com.app.edentifica.viewModel.UsersViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -243,6 +245,13 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
     val searchResultPhone by vmUsers.userPhoneSearch.collectAsState()
     // Es el parametro que busco el usuario
     val findString by vmUsers.findString.collectAsState()
+    var isLoading by remember { mutableStateOf(true) }
+
+    // Temporizador para ocultar el cargador después de 5 segundos
+    LaunchedEffect(Unit) {
+        delay(5000)
+        isLoading=false
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -277,6 +286,14 @@ fun BodyContentResultPhone(navController: NavController, vmUsers: UsersViewModel
 
 
         } else {
+            // Si isLoading es true, mostrar el cargador
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = AppColors.FocusEdentifica,
+                    strokeWidth = 4.dp,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
             //Image
             Image(
                 painter = painterResource(id = R.drawable.warning),

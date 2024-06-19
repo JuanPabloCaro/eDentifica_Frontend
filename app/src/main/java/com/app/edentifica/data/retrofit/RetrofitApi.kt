@@ -1,5 +1,7 @@
 package com.app.edentifica.data.retrofit
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.app.edentifica.data.retrofit.adapters.LocalDateAdapter
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -18,6 +20,7 @@ object RetrofitApi {
         .writeTimeout(30, TimeUnit.SECONDS)    // Tiempo de espera de escritura
         .build()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     val gson = GsonBuilder()
         .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
         .create()

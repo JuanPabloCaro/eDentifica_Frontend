@@ -46,6 +46,18 @@ class UsersViewModel : ViewModel() {
     private val _findString=MutableStateFlow<String?>(null)
     val findString: StateFlow<String?> = _findString
 
+    // Variable que representa el estado de carga
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    // Variable que representa el estado de carga
+    private val _isLoadingCall = MutableStateFlow(false)
+    val isLoadingCall: StateFlow<Boolean> = _isLoadingCall
+
+    // Variable que representa el estado de carga
+    private val _isLoadingRegister = MutableStateFlow(false)
+    val isLoadingRegister: StateFlow<Boolean> = _isLoadingRegister
+
 
     //CRUD USER
     /**
@@ -53,13 +65,16 @@ class UsersViewModel : ViewModel() {
      */
 
     suspend fun insertUserVm(user:User): Boolean {
+        _isLoadingRegister.value= true
         return try {
             val response = userService.insertUser(user)
             if (response.isSuccessful) {
                 _userInserted.value = true
+                _isLoadingRegister.value = false
                 true
             } else {
                 Log.e("error en userViewModel", "insertUser")
+                _isLoadingRegister.value = false
                 false
             }
         } catch (e: Exception) {
@@ -74,12 +89,15 @@ class UsersViewModel : ViewModel() {
      */
     fun getUserByEmail(email: String) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val response = userService.getByEmail(email)
                 if (response.isSuccessful) {
                     _user.value = response.body()
+                    _isLoading.value = false
                 } else {
                     Log.e("error en userViewModel", "getUserByEmail")
+                    //_isLoading.value = false
                 }
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
@@ -167,10 +185,11 @@ class UsersViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = userService.getDtoBySocialNetwork(type,socialname)
+                Log.e("error en userViewModel", ""+ response)
                 if (response.isSuccessful) {
                     _userSocialSearch.value = response.body()
                 } else {
-                    Log.e("error en userViewModel", "getUserBySocialSearch")
+                    Log.e("error en userViewModel", "getUserBySocialSearch" + response.body())
                 }
             } catch (e: Exception) {
                 // Manejar errores de red u otros errores
@@ -201,6 +220,7 @@ class UsersViewModel : ViewModel() {
      * Esta funcion recibe un usuario para realizar la llamada de la validacion one
      */
     fun toDoCallByUser(user: User) {
+        _isLoadingCall.value = true
         viewModelScope.launch {
             try {
                 val response = userService.toDoCall(user)
@@ -209,10 +229,13 @@ class UsersViewModel : ViewModel() {
                     if (responseBody != null) {
                         _validationOne.value = responseBody
                         Log.e("validacion", "bien")
+                        _isLoadingCall.value = false
                     } else {
+                        _isLoadingCall.value = false
                         Log.e("error en userViewModel", "toDoCallByUser if")
                     }
                 } else {
+                    _isLoadingCall.value = false
                     Log.e("error en userViewModel", "toDoCallByUser else")
                 }
             } catch (e: Exception) {
