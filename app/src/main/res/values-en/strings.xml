@@ -68,7 +68,7 @@
     <string name="nombre_del_perfil">Profile name</string>
     <string name="editar">Edit</string>
     <string name="seleccionar_fecha">Select Date</string>
-    <string name="fecha_seleccionada">Date selected:</string>
+    <string name="fecha_seleccionada">Date selected: %1$s</string>
     <string name="descripcion">Description</string>
     <string name="editar_telefono">Edit Phone</string>
     <string name="editar_correo">Edit Email</string>
